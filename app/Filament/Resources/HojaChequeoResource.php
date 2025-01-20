@@ -4,9 +4,14 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\HojaChequeoResource\Pages;
 use App\Filament\Resources\HojaChequeoResource\RelationManagers;
+use App\Infolists\Components\ViewItems;
 use App\Models\HojaChequeo;
-use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Grid;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,21 +23,6 @@ class HojaChequeoResource extends Resource
     protected static ?string $model = HojaChequeo::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-wrench';
-
-    public static function form(Form $form): Form {
-        return $form
-            ->schema([
-                Forms\Components\Select::make('equipo_id')
-                                       ->relationship('equipo', 'tag')
-                                       ->required(),
-                Forms\Components\TextInput::make('version')
-                                          ->readOnly()
-                                          ->default(1),
-                Forms\Components\RichEditor::make('observaciones')
-                                           ->disableToolbarButtons(['codeBlock', 'attachFiles'])
-                                           ->maxLength(255),
-            ]);
-    }
 
     public static function table(Table $table): Table {
         return $table
@@ -68,6 +58,53 @@ class HojaChequeoResource extends Resource
                 ]),
             ]);
     }
+
+
+    public static function infolist(Infolist $infolist): Infolist {
+        return $infolist
+            ->schema([
+                Grid::make()->schema([
+                    Section::make('Datos de la hoja de chequeo')
+                           ->icon('heroicon-o-document')
+                           ->schema([
+                               TextEntry::make('version'),
+                               TextEntry::make('observaciones')->html(),
+                               Grid::make(3)->schema([
+                                   TextEntry::make('created_at')->label('Creado')
+                                            ->since()
+                                            ->dateTimeTooltip()
+                                            ->columnSpan(1)->badge(),
+                                   TextEntry::make('updated_at')->label('Actualizado')
+                                            ->columnSpan(1)->since()
+                                            ->dateTimeTooltip()->badge()
+                               ])
+                           ])->columnSpan(1),
+                    Section::make('Datos del equipo')->columnSpan(1)
+                           ->icon('heroicon-o-wrench-screwdriver')
+                           ->schema([
+                               Grid::make()->schema([
+                                   TextEntry::make('equipo.nombre')
+                                            ->label('Equipo'),
+                                   ImageEntry::make('equipo.foto')->label('foto')
+                                             ->extraImgAttributes(['class' => 'rounded-lg'])
+                               ]),
+                               Grid::make()->schema([
+                                   TextEntry::make('equipo.tag')
+                                            ->label('Tag')
+                                            ->columnSpan(1),
+                                   TextEntry::make('equipo.area')
+                                            ->label('Area')
+                               ]),
+                           ]),
+                    Section::make('Items')->columnSpanFull()
+                           ->icon('heroicon-o-table-cells')
+                           ->schema([
+                               ViewItems::make('items')->hiddenLabel()
+                           ])
+                ])
+            ]);
+    }
+
 
     public static function getRelations(): array {
         return [

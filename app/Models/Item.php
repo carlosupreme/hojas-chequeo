@@ -26,4 +26,8 @@ class Item extends Model
     public function itemChequeoDiarios(): HasMany {
         return $this->hasMany(ItemChequeoDiario::class);
     }
+
+    public function alertas(): HasMany {
+        return $this->hasMany(Alerta::class);
+    }
 }
