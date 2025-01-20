@@ -47,19 +47,23 @@ class SimbologiaResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\IconColumn::make('icono')
-                          ->icon(fn($record) => $record->icono)
-                          ->color(fn(Simbologia $record) => Color::hex($record->color)),
+                                         ->icon(fn($record) => $record->icono)
+                                         ->color(fn(Simbologia $record) => Color::hex($record->color)),
                 Tables\Columns\TextColumn::make('nombre')
                                          ->searchable(),
                 Tables\Columns\TextColumn::make('descripcion')
                                          ->searchable(),
 
                 Tables\Columns\TextColumn::make('created_at')
-                                         ->dateTime()
+                                         ->badge()
+                                         ->dateTime('d M Y H:i')
+                                         ->label('Creado el')
                                          ->sortable()
                                          ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                                         ->dateTime()
+                                         ->badge()
+                                         ->dateTime('d M Y H:i')
+                                         ->label('Actualizado el')
                                          ->sortable()
                                          ->toggleable(isToggledHiddenByDefault: true),
             ])
