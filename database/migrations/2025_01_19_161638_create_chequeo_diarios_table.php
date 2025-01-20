@@ -16,9 +16,9 @@ return new class extends Migration
             $table->foreignIdFor(\App\Models\HojaChequeo::class);
             $table->string('nombre_operador');
             $table->foreignIdFor(\App\Models\User::class, 'operador_id')->nullable();
-            $table->longText('firma_operador');
-            $table->longText('firma_supervisor')->nullable();
-            $table->longText('observaciones')->nullable();
+            $table->text('firma_operador');
+            $table->text('firma_supervisor')->nullable();
+            $table->text('observaciones')->nullable();
             $table->timestamps();
         });
     }

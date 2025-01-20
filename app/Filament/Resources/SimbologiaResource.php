@@ -71,7 +71,7 @@ class SimbologiaResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->closeModalByClickingAway(false),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

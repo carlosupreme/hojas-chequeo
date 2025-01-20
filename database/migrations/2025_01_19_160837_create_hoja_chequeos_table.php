@@ -15,6 +15,8 @@ return new class extends Migration {
             $table->integer('version')->default(1);
             $table->string('observaciones')->nullable();
             $table->timestamps();
+
+            $table->unique(['equipo_id', 'version']);
         });
     }
 
