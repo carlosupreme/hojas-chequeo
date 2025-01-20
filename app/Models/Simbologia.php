@@ -9,7 +9,8 @@ class Simbologia extends Model
     protected $fillable = [
         'icono',
         'nombre',
-        'descripcion'
+        'descripcion',
+        'color'
     ];
 
 
