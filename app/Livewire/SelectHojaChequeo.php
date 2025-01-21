@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\HojaChequeo;
+use Carbon\Carbon;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -28,7 +29,12 @@ class SelectHojaChequeo extends Component implements HasForms
                 Select::make('hoja_chequeo_id')
                       ->label('Hoja de chequeo')
                       ->relationship(name            : 'hojaChequeo',
-                                     modifyQueryUsing: fn($query) => $query->where('hoja_chequeos.active', true))
+                                     modifyQueryUsing: fn($query) => $query
+                              ->whereActive(true)
+                              ->whereDoesntHave('chequeosDiarios', function ($query) {
+                                  $query->whereDate('created_at', Carbon::today());
+                              })
+                      )
                       ->getOptionLabelFromRecordUsing(fn(Model $record) => $record->equipo->tag)
                       ->required(),
             ))
