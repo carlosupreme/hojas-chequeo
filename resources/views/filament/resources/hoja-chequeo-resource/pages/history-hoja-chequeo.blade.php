@@ -1,5 +1,6 @@
 <x-filament-panels::page>
     <div class="flex items-center gap-4">
+        <x-filament::badge class="max-w-fit" color="warning"> Version: {{$record->version}}</x-filament::badge>
         <x-filament::badge class="max-w-fit"> Area: {{$record->equipo->area}}</x-filament::badge>
         <x-filament::badge class="max-w-fit"> Tag: {{$record->equipo->tag}}</x-filament::badge>
         <x-filament::badge class="max-w-fit"> Equipo: {{$record->equipo->nombre}}</x-filament::badge>
@@ -57,7 +58,8 @@
                                                     style="color: {{ $this->tableData['checks'][$day][$index]['color'] }}"
                                                 />
                                             @else
-                                                <span class="text-xs">{{$this->tableData['checks'][$day][$index]['text']}}</span>
+                                                <span
+                                                    class="text-xs">{{$this->tableData['checks'][$day][$index]['text']}}</span>
                                             @endif
                                         @else
                                             <span
@@ -117,10 +119,7 @@
                                     <img src="{{ $this->tableData['supervisorSignatures'][$day] }}"
                                          alt="Firma del Supervisor"
                                          class="mx-auto max-w-[100px] max-h-[50px]">
-                                @else
-                                    <div class="w-full grid place-items-center  "><span
-                                            class="w-6 h-6 rounded-full border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center text-xs">/</span>
-                                    </div>
+
                                 @endif
                             </td>
                         @endforeach

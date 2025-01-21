@@ -28,7 +28,7 @@ class HistoryHojaChequeo extends Page
     protected array $queryString = ['startDate', 'endDate'];
 
     public function getTitle(): string {
-        return 'Historial de ' . $this->record->name;
+        return 'Historial de ' . $this->record->equipo->tag;
     }
 
     public function mount(): void {

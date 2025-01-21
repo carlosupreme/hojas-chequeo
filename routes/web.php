@@ -7,12 +7,9 @@ Route::get('/', function () {
         return redirect('admin');
     }
 
-    return view('welcome');
+    return redirect('operador');
 });
 
-Route::get('/chequeo', function () {
-    return view('chequeo');
-})->name('chequeo');
 
 Route::get('/documentacion', function () {
     return view('docs');

@@ -1,4 +1,4 @@
-<div class="bg-white dark:bg-gray-900 sm:px-4 py-5 rounded-lg">
+<div class="bg-white dark:bg-gray-900 sm:px-4 py-5 rounded-lg px-2">
     @if($page === 1)
         <livewire:select-hoja-chequeo/>
     @else
@@ -14,6 +14,7 @@
             <livewire:chequeo-items :items=" $checkSheet->items"/>
 
             <div class="my-5">
+                <h2 class="font-bold">Observaciones</h2>
                 {!! $this->checkSheet->observaciones !!}
             </div>
 

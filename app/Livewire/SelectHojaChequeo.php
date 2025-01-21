@@ -2,7 +2,6 @@
 
 namespace App\Livewire;
 
-use App\Models\Equipo;
 use App\Models\HojaChequeo;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Concerns\InteractsWithForms;
