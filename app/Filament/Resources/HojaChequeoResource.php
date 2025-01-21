@@ -8,6 +8,7 @@ use App\Infolists\Components\ViewItems;
 use App\Models\HojaChequeo;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Grid;
+use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
@@ -34,6 +35,10 @@ class HojaChequeoResource extends Resource
                 Tables\Columns\TextColumn::make('version')
                                          ->numeric()
                                          ->sortable(),
+                Tables\Columns\ToggleColumn::make('active')
+                                           ->label('Publicada')
+                                           ->beforeStateUpdated(fn($record) => HojaChequeo::where('equipo_id', $record->equipo_id)
+                                                                                          ->update(['active' => false])),
                 Tables\Columns\TextColumn::make('observaciones')
                                          ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -51,6 +56,7 @@ class HojaChequeoResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -76,7 +82,11 @@ class HojaChequeoResource extends Resource
                                             ->columnSpan(1)->badge(),
                                    TextEntry::make('updated_at')->label('Actualizado')
                                             ->columnSpan(1)->since()
-                                            ->dateTimeTooltip()->badge()
+                                            ->dateTimeTooltip()->badge(),
+                                   IconEntry::make('active')
+                                            ->label('Activa')
+                                            ->boolean()
+                                            ->columnSpan(1),
                                ])
                            ])->columnSpan(1),
                     Section::make('Datos del equipo')->columnSpan(1)

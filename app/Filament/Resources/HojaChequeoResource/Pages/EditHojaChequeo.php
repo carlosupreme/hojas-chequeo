@@ -10,8 +10,10 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
 use Illuminate\Contracts\Support\Htmlable;
+use Livewire\Attributes\On;
 
 class EditHojaChequeo extends Page
 {
@@ -25,7 +27,7 @@ class EditHojaChequeo extends Page
 
     public function mount(HojaChequeo $record): void {
         $this->record = $record;
-        $this->form->fill($this->record->attributesToArray());
+        $this->form->fill([...$this->record->attributesToArray(), 'version'=> $record->version + 1]);
     }
 
     public function form(Form $form): Form {
@@ -38,22 +40,36 @@ class EditHojaChequeo extends Page
                           if (!$get('equipo_id')) {
                               return 1;
                           }
+
                           $ultimaVersion = HojaChequeo::where('equipo_id', $get('equipo_id'))
                                                       ->orderBy('version', 'desc')
                                                       ->value('version');
                           return $set('version', $ultimaVersion + 1);
                       })
                       ->required(),
-                TextInput::make('version')->readOnly()
+                TextInput::make('version')
+                         ->readOnly()
+
                          ->live()
-                    ->helperText('Esta version se actualizara para no modificar la actual'),
+                         ->helperText('Esta version se creará para no modificar la actual'),
                 RichEditor::make('observaciones')->disableToolbarButtons(['codeBlock', 'attachFiles'])->maxLength(255),
             ])
             ->statePath('data')
             ->model($this->record);
     }
 
-    public function update() {}
+    public function update(): void {
+        $data = $this->form->getState();
+        $record = HojaChequeo::create($data);
+        $this->form->model($record)->saveRelationships();
+        $this->dispatch('checkSheetUpdated', $record->id);
+    }
+
+    #[On('checkSheetItemsUpdated')]
+    public function redirectToTable(): void {
+        Notification::make()->success()->title('Nueva version creada')->send();
+        $this->redirect($this->getResource()::getUrl('index'));
+    }
 
     public function getTitle(): string|Htmlable {
         return __('actions.named.edit', ['name' => HojaChequeoResource::getModelLabel()]);

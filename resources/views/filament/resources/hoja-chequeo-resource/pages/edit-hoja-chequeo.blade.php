@@ -4,7 +4,7 @@
             {{ $this->form }}
         </form>
 
-        <x-filament-actions::modals />
+        <x-filament-actions::modals/>
     </div>
 
     <livewire:update-items :record="$record"></livewire:update-items>
