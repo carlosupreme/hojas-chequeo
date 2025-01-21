@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class ItemChequeoDiario extends Model
 {
     protected $fillable = [
+        'chequeo_diario_id',
         'item_id',
         'simbologia_id',
         'valor'
@@ -22,7 +22,7 @@ class ItemChequeoDiario extends Model
         return $this->belongsTo(Item::class);
     }
 
-    public function simbologia(): HasOne {
-        return $this->hasOne(Simbologia::class);
+    public function simbologia(): BelongsTo {
+        return $this->belongsTo(Simbologia::class);
     }
 }

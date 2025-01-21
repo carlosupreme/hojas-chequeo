@@ -55,6 +55,9 @@ class HojaChequeoResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+                Tables\Actions\Action::make('Historial')
+                                     ->url(fn(HojaChequeo $record): string => HojaChequeoResource::getUrl('history', ['record' => $record]))
+                                     ->icon('heroicon-o-calendar'),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -125,9 +128,10 @@ class HojaChequeoResource extends Resource
     public static function getPages(): array {
         return [
             'index'  => Pages\ListHojaChequeos::route('/'),
-            'create' => Pages\CreateHojaChequeo::route('/create'),
+            'create' => Pages\CreateHojaChequeo::route('/crear'),
             'view'   => Pages\ViewHojaChequeo::route('/{record}'),
-            'edit'   => Pages\EditHojaChequeo::route('/{record}/edit'),
+            'edit'   => Pages\EditHojaChequeo::route('/{record}/editar'),
+            'history' => Pages\HistoryHojaChequeo::route('/{record}/historial')
         ];
     }
 }

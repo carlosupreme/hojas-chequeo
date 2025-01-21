@@ -43,9 +43,6 @@ class UserResource extends Resource
                          ->required()
                          ->maxLength(255)
                          ->hiddenOn('edit'),
-                TextInput::make('profile_photo_path')
-                         ->label(ucfirst(__('validation.attributes.photo')))
-                         ->maxLength(2048),
                 Forms\Components\Select::make('roles')
                       ->relationship('roles', 'name')
                       ->multiple()
