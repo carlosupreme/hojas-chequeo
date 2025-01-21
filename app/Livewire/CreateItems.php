@@ -123,6 +123,10 @@ class CreateItems extends Component
                 'valores'         => $itemData['properties']
             ]);
 
+            if (is_null($itemData['alert']['selectedStatus']) && is_null($itemData['alert']['customText'])) {
+                return;
+            }
+
             Alerta::create([
                 'item_id'       => $checkSheetItem->id,
                 'simbologia_id' => $itemData['alert']['selectedStatus'] ?? null,

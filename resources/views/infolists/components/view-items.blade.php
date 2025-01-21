@@ -14,9 +14,21 @@
                     else
                         $row[] = $item->valores[$value];
                 }, $columns);
+
+
+                if($item->alerta) {
+                    $row[] = $item->alerta->simbologia ? $item->alerta->simbologia->icono : 'Cuando tenga el valor: ' . $item->alerta->valor;
+                } else {
+                  $row[] = 'No tiene';
+                }
                 $rows[] = $row;
             });
         }
+
+        $columns[] = 'Alerta';
+
+
+
     @endphp
 
     <div class="overflow-x-auto">
@@ -48,7 +60,15 @@
                             <td class="border border-gray-300 dark:border-gray-600 px-4 py-2"
                                 wire:key="cell-{{$rowIndex}}-{{$colIndex}}">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-gray-800 dark:text-gray-200">{{ $cell }}</span>
+                                    <span class="text-gray-800 dark:text-gray-200">
+                                        @if($loop->last && !str_contains($cell,'Cuando tenga el valor') && !str_contains($cell,'No tiene'))
+                                            @svg($cell, 'w-6 h-6')
+                                        @elseif($loop->last)
+                                            <x-filament::badge size="sm">{{ $cell }}</x-filament::badge>
+                                        @else
+                                            {{$cell}}
+                                        @endif
+                                    </span>
                                 </div>
                             </td>
                         @endforeach

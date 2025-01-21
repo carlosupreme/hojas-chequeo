@@ -16,7 +16,7 @@ class Alerta extends Model
         return $this->belongsTo(Item::class);
     }
 
-    public function simbologia(): HasOne {
-        return $this->hasOne(Simbologia::class);
+    public function simbologia(): BelongsTo {
+        return $this->belongsTo(Simbologia::class);
     }
 }

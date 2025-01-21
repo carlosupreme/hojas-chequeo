@@ -27,7 +27,12 @@ class EditHojaChequeo extends Page
 
     public function mount(HojaChequeo $record): void {
         $this->record = $record;
-        $this->form->fill([...$this->record->attributesToArray(), 'version'=> $record->version + 1]);
+        $this->form->fill([
+            ...$this->record->attributesToArray(),
+            'version' => HojaChequeo::where('equipo_id', $record->equipo_id)
+                                    ->orderBy('version', 'desc')
+                                    ->value('version') + 1
+        ]);
     }
 
     public function form(Form $form): Form {
@@ -49,7 +54,6 @@ class EditHojaChequeo extends Page
                       ->required(),
                 TextInput::make('version')
                          ->readOnly()
-
                          ->live()
                          ->helperText('Esta version se creará para no modificar la actual'),
                 RichEditor::make('observaciones')->disableToolbarButtons(['codeBlock', 'attachFiles'])->maxLength(255),
