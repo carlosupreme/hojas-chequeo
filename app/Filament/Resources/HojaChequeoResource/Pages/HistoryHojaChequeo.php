@@ -4,6 +4,7 @@ namespace App\Filament\Resources\HojaChequeoResource\Pages;
 
 use App\Filament\Resources\HojaChequeoResource;
 use App\Models\HojaChequeo;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Filament\Actions\Action;
@@ -12,6 +13,7 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\Page;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Computed;
 
 class HistoryHojaChequeo extends Page
@@ -127,7 +129,7 @@ class HistoryHojaChequeo extends Page
 
         $data['items'] = $this->normalizeArrayKeys(
             $data['items'],
-            collect($data['checks'])->first() ? count(collect($data['checks'])->first()): 0
+            collect($data['checks'])->first() ? count(collect($data['checks'])->first()) : 0
         );
 
         return $data;
@@ -145,7 +147,7 @@ class HistoryHojaChequeo extends Page
         );
     }
 
-    protected function getActions(): array {
+    protected function getHeaderActions(): array {
         return [
             Action::make('exportPdf')
                   ->label('Exportar a PDF')
@@ -154,5 +156,31 @@ class HistoryHojaChequeo extends Page
         ];
     }
 
-    public function exportPdf() {}
+    public function exportPdf() {
+        $headers = $this->headers;
+        $tableData = $this->tableData;
+        $availableDates = $this->availableDates;
+        $record = $this->record;
+
+        $dateChunks = array_chunk($availableDates, 15);
+        $chunks = array_map(function ($dates) {
+            return ['dates' => $dates];
+        }, $dateChunks);
+
+        $pdf = Pdf::loadView('pdf-view', compact('chunks', 'headers', 'tableData', 'record'))
+                  ->setPaper('a4', 'landscape')
+                  ->setOption('isHtml5ParserEnabled', true)
+                  ->setOption('isPhpEnabled', true)
+                  ->setOption('isRemoteEnabled', true);
+
+
+        // Create a unique file name
+        $fileName = 'checksheet-history-' . Str::random(10) . '.pdf';
+
+        // Download the pdf
+        return response()->streamDownload(
+            fn() => print($pdf->output()),
+            $fileName
+        );
+    }
 }
