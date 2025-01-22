@@ -20,7 +20,7 @@
                     ? $item->alerta->simbologia->icono
                     : 'Cuando tenga el valor: ' . $item->alerta->valor) . '`' . $item->alerta->contador;
                 } else {
-                  $row[] = 'No tiene';
+                  $row[] = 'No tiene`';
                 }
                 $rows[] = $row;
             });
@@ -80,12 +80,14 @@
                                                             {{ explode('`', $cell)[0] }}
                                                     </x-filament::badge>
 
-                                                    <x-filament::badge
-                                                        size="sm"
-                                                        color="warning"
-                                                        class="whitespace-normal max-w-full break-words">
+                                                    @if(!empty(explode('`', $cell)[1]))
+                                                        <x-filament::badge
+                                                                size="sm"
+                                                                color="warning"
+                                                                class="whitespace-normal max-w-full break-words">
                                                             {{ explode('`', $cell)[1] }}
-                                                    </x-filament::badge>
+                                                        </x-filament::badge>
+                                                    @endif
                                                   </span>
                                                 @endif
                                             @else

@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void {
         $adminRole = Role::create(['name' => 'Administrador']);
-        $operadorRole = Role::create(['name' => 'Operador']);
+        Role::create(['name' => 'Operador']);
 
         $user = User::factory()->create([
             'email'    => 'admin@admin.com',
@@ -23,5 +23,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $user->assignRole($adminRole);
+
+        $this->call(EquiposSeeder::class);
     }
 }
