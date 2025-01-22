@@ -118,11 +118,15 @@
                         <td class="date-column">
                             @if(isset($tableData['checks'][$day][$index]))
                                 @if($tableData['checks'][$day][$index]['icon'])
-                                    <x-dynamic-component
-                                            :component="$tableData['checks'][$day][$index]['icon']"
-                                            class="w-5 h-5"
-                                            style="color: {{ $tableData['checks'][$day][$index]['color'] }}"
-                                    />
+                                    @php
+                                        $icon = $tableData['checks'][$day][$index]['icon'];
+                                        $color = $tableData['checks'][$day][$index]['color'] ?? 'currentColor';
+                                    @endphp
+
+                                    {!! render_icon(
+                                        $icon,
+                                        $color
+                                    ) !!}
                                 @else
                                     <span class="text-sm"> {{$tableData['checks'][$day][$index]['text']}}</span>
                                 @endif
