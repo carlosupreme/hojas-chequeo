@@ -11,7 +11,7 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('alertas', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\Item::class)->constrained();
+            $table->foreignIdFor(\App\Models\Item::class)->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignIdFor(\App\Models\Simbologia::class)->nullable();
             $table->string('valor')->nullable();
             $table->integer('contador')->default(0);

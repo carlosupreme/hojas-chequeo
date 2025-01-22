@@ -110,7 +110,7 @@ class ChequeoDiario extends Component implements HasForms
                     ->actions([
                         Actions\Action::make('Ver')
                               ->button()
-                              ->url("/admin/check-sheets/{$this->checkSheet->id}/history?startDate=" . now()->format('Y-m-d') . '&endDate=' . now()->format('Y-m-d'))
+                              ->url(  "/admin/hoja-chequeos/{$this->checkSheet->id}/historial?startDate=" . now()->format('Y-m-d') . '&endDate=' . now()->format('Y-m-d'))
                     ])
                     ->sendToDatabase(User::role('Administrador')->get(), isEventDispatched: true);
 

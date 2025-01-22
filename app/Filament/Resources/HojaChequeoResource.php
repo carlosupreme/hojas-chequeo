@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\HojaChequeoResource\Pages;
 use App\Filament\Resources\HojaChequeoResource\RelationManagers;
+use App\Infolists\Components\AlertsView;
 use App\Infolists\Components\ViewItems;
 use App\Models\HojaChequeo;
 use Filament\Forms\Form;
@@ -127,10 +128,10 @@ class HojaChequeoResource extends Resource
 
     public static function getPages(): array {
         return [
-            'index'  => Pages\ListHojaChequeos::route('/'),
-            'create' => Pages\CreateHojaChequeo::route('/crear'),
-            'view'   => Pages\ViewHojaChequeo::route('/{record}'),
-            'edit'   => Pages\EditHojaChequeo::route('/{record}/editar'),
+            'index'   => Pages\ListHojaChequeos::route('/'),
+            'create'  => Pages\CreateHojaChequeo::route('/crear'),
+            'view'    => Pages\ViewHojaChequeo::route('/{record}'),
+            'edit'    => Pages\EditHojaChequeo::route('/{record}/editar'),
             'history' => Pages\HistoryHojaChequeo::route('/{record}/historial')
         ];
     }

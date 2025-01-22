@@ -16,9 +16,7 @@
                 }, $columns);
 
                 if($item->alerta) {
-                    $row[] = ($item->alerta->simbologia
-                    ? $item->alerta->simbologia->icono
-                    : 'Cuando tenga el valor: ' . $item->alerta->valor) . '`' . $item->alerta->contador;
+                    $row[] = $item->alerta->simbologia ? $item->alerta->simbologia->icono : 'Cuando tenga el valor: ' . $item->alerta->valor;
                 } else {
                   $row[] = 'No tiene';
                 }
@@ -60,40 +58,24 @@
                                     <div class="flex items-center min-w-max">
                                         <!-- Contenedor para contenido de celda -->
                                         <span class="text-gray-800 dark:text-gray-200 break-words max-w-full">
-                                            @if($loop->last)
+                                                @if($loop->last)
                                                 @if(!str_contains($cell,'Cuando tenga el valor') && !str_contains($cell,'No tiene'))
-                                                    <div class="flex items-center gap-2">
-                                                        @svg(explode('`', $cell)[0], 'w-6 h-6 shrink-0')
-
-                                                        <x-filament::badge
-                                                            size="sm"
-                                                            color="warning"
-                                                            class="whitespace-normal max-w-full break-words">
-                                                            {{ explode('`', $cell)[1] }}
-                                                    </x-filament::badge>
-                                                    </div>
+                                                    <div class="flex items-center gap-1">
+                                                            @svg($cell, 'w-6 h-6 shrink-0')
+                                                        </div>
                                                 @else
-                                                    <span class="flex items-center gap-2">
-                                                        <x-filament::badge
-                                                            size="sm"
-                                                            class="whitespace-normal max-w-full break-words">
-                                                            {{ explode('`', $cell)[0] }}
-                                                    </x-filament::badge>
-
                                                     <x-filament::badge
                                                         size="sm"
-                                                        color="warning"
                                                         class="whitespace-normal max-w-full break-words">
-                                                            {{ explode('`', $cell)[1] }}
-                                                    </x-filament::badge>
-                                                  </span>
+                                                            {{ $cell }}
+                                                        </x-filament::badge>
                                                 @endif
                                             @else
                                                 <span class="inline-block max-w-full break-all">
                                                         {{ $cell }}
-                                                </span>
+                                                    </span>
                                             @endif
-                                        </span>
+                                            </span>
                                     </div>
                                 </td>
                             @endforeach

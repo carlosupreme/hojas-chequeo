@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('item_chequeo_diarios', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\ChequeoDiario::class)->constrained();
-            $table->foreignIdFor(\App\Models\Item::class)->constrained();
-            $table->foreignIdFor(\App\Models\Simbologia::class)->constrained();
+            $table->foreignIdFor(\App\Models\ChequeoDiario::class)->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignIdFor(\App\Models\Item::class)->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignIdFor(\App\Models\Simbologia::class)->nullable();
             $table->string('valor')->nullable();
             $table->timestamps();
         });

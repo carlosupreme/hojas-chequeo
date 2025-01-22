@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Alerta;
 use App\Models\ItemChequeoDiario;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\On;
@@ -42,14 +43,33 @@ class ChequeoItems extends Component
                 $notes = is_null($this->customInputs[$item['id']]) ? null : $this->customInputs[$item['id']];
                 $checkStatus = is_null($this->checks[$item['id']]) ? null : $this->checks[$item['id']];
 
-
                 ItemChequeoDiario::create([
                     'chequeo_diario_id' => $id,
                     'item_id'           => $item['id'],
                     'valor'             => $notes,
                     'simbologia_id'     => $checkStatus
                 ]);
+
+                $alerta = Alerta::where('item_id', $item['id'])->first();
                 unset($item['id']);
+
+                if (empty($alerta)) {
+                    continue;
+                }
+
+                if (
+                    !is_null($alerta->simbologia_id)
+                    && !is_null($checkStatus)
+                    && $alerta->simbologia_id == $checkStatus
+                    || (
+                        !is_null($alerta->valor)
+                        && !is_null($notes)
+                        && $alerta->valor == $notes
+                    )
+                ) {
+                    $alerta->contador = $alerta->contador + 1;
+                    $alerta->save();
+                }
             }
 
             $this->dispatch('dailyCheckItemsSaved');

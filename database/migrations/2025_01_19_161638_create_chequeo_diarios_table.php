@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('chequeo_diarios', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\HojaChequeo::class);
+            $table->foreignIdFor(\App\Models\HojaChequeo::class)->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('nombre_operador');
             $table->foreignIdFor(\App\Models\User::class, 'operador_id')->nullable();
             $table->text('firma_operador');

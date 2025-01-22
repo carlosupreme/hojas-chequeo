@@ -123,7 +123,11 @@ class CreateItems extends Component
                 'valores'         => $itemData['properties']
             ]);
 
-            if (is_null($itemData['alert']['selectedStatus']) && is_null($itemData['alert']['customText'])) {
+            if (
+                ($itemData['alert']['selectedStatus'] ?? null) === null
+                &&
+                ($itemData['alert']['customText'] ?? null) === null
+            ) {
                 return;
             }
 

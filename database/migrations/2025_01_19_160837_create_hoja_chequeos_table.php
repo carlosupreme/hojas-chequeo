@@ -11,7 +11,7 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('hoja_chequeos', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\Equipo::class)->constrained();
+            $table->foreignIdFor(\App\Models\Equipo::class)->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->integer('version')->default(1);
             $table->string('observaciones')->nullable();
             $table->timestamps();
