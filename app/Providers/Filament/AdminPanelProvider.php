@@ -33,6 +33,8 @@ class AdminPanelProvider extends PanelProvider
             ->passwordReset()
             ->profile()
             ->favicon(asset(path: '/lg.png'))
+            ->brandLogo(asset("lg.png"))
+            ->darkModeBrandLogo(asset("dark.png"))
             ->brandName('Tacuba')
             ->brandLogoHeight('50px')
             ->sidebarCollapsibleOnDesktop()

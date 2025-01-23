@@ -39,22 +39,17 @@
         <div class="block lg:hidden">
             <div class="border-t dark:border-gray-700">
                 @foreach($items as $item)
-                    <div class="p-4 border-b dark:border-gray-700 last:border-b-0" x-data="{ open: false }" wire:key="item={{$item['id']}}}">
-                        <div class="flex items-center justify-between gap-5">
+                    <div class="p-2 border-b dark:border-gray-700  last:border-b-0" x-data="{ open: false }" wire:key="item={{$item['id']}}}">
+                        <div class="grid grid-cols-2 gap-2 items-center">
                             <button
                                 @click="open = !open"
                                 class="text-left focus:outline-none"
                             >
-                                <h3 class="font-medium text-gray-900 dark:text-gray-100">
+                                <h3 class="font-medium text-xs text-gray-900 dark:text-gray-100">
                                     {{ $item[$headers[0]] ?? 'N/A' }}
                                 </h3>
-                                @if(isset($headers[1]))
-                                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                        {{ $item[$headers[1]] ?? 'N/A' }}
-                                    </p>
-                                @endif
                             </button>
-                            <div class="flex-1">
+                            <div>
                                 <livewire:check-status-select
                                     wire:key="mobile-check-status-select-{{ $item['id'] }}"
                                     :item-id="$item['id']"
@@ -65,8 +60,8 @@
                         <div x-show="open" x-collapse>
                             <div class="mt-4 space-y-2">
                                 @foreach($headers as $index => $header)
-                                    @if($index > 1)
-                                        <div class="text-sm">
+                                    @if($index > 0)
+                                        <div class="text-xs">
                                             <span
                                                 class="font-medium text-gray-700 dark:text-gray-300">{{ $header }}:</span>
                                             <span

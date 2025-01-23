@@ -29,6 +29,8 @@ class OperadorPanelProvider extends PanelProvider
             ->path('operador')
             ->login()
             ->favicon(asset(path: '/lg.png'))
+            ->brandLogo(asset('lg.png'))
+            ->darkModeBrandLogo(asset('dark.png'))
             ->brandName('Tacuba')
             ->brandLogoHeight('50px')
             ->sidebarCollapsibleOnDesktop()
