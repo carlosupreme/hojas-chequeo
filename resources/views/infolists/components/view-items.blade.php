@@ -69,58 +69,60 @@
                             </span>
                         </h2>
                         <div class="min-w-full">
-                            <div class="overflow-x-auto pb-2">  <!-- Added pb-2 for scrollbar spacing -->
-                                <div class="min-w-[600px]">  <!-- Or your minimum required width -->
-                                    <table class="w-full border-collapse ">
+                            <div class="overflow-x-auto pb-2">
+                                <div class="min-w-[600px]">
+                                    <table
+                                        class="w-full border-collapse bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
                                         <thead>
                                         <tr>
-                                            <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-left left-0">
-                                                <span class="font-bold text-gray-800 dark:text-white">N°</span>
+                                            <th class="border-b border-gray-200 dark:border-gray-700 px-6 py-3 bg-gray-50 dark:bg-gray-900 text-left left-0 sticky">
+                                                <span
+                                                    class="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wider">N°</span>
                                             </th>
                                             @foreach ($columns as $column)
-                                                <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-left min-w-[150px]">
+                                                <th class="border-b border-gray-200 dark:border-gray-700 px-6 py-3 bg-gray-50 dark:bg-gray-900 text-left min-w-[150px]">
                                                     <div class="flex items-center justify-between">
                                                         <span
-                                                            class="font-bold text-gray-800 dark:text-white truncate">{{ $column }}</span>
+                                                            class="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wider truncate">{{ $column }}</span>
                                                     </div>
                                                 </th>
                                             @endforeach
                                         </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                                         @foreach ($category['rows'] as $rowIndex => $row)
-                                            <tr class="{{ $loop->even ? 'bg-gray-50 dark:bg-gray-800' : '' }}">
-                                                <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200 left-0 bg-inherit">
+                                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200">
+                                                <td class="border-r border-gray-200 dark:border-gray-700 px-6 py-4 text-gray-900 dark:text-gray-100 left-0 sticky bg-inherit font-medium">
                                                     {{ $rowIndex + 1 }}
                                                 </td>
                                                 @foreach ($row as $colIndex => $cell)
-                                                    <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 group relative">
+                                                    <td class="px-6 py-4 group relative">
                                                         <div class="flex items-center min-w-max">
                                                         <span
-                                                            class="text-gray-800 dark:text-gray-200 break-words max-w-full">
+                                                            class="text-gray-700 dark:text-gray-300 break-words max-w-full text-sm">
                                                             @if($loop->last)
                                                                 @if(!str_contains($cell, 'Cuando tenga el valor') && !str_contains($cell, 'No tiene'))
-                                                                    <div class="flex items-center gap-2">
-                                                                        @svg(explode('`', $cell)[0], 'w-6 h-6 shrink-0')
+                                                                    <div class="flex items-center gap-3">
+                                                                        @svg(explode('`', $cell)[0], 'w-5 h-5 shrink-0 text-gray-500 dark:text-gray-400')
                                                                         <x-filament::badge
                                                                             size="sm"
                                                                             color="warning"
-                                                                            class="whitespace-normal max-w-full break-words">
+                                                                            class="whitespace-normal max-w-full break-words font-medium">
                                                                             {{ explode('`', $cell)[1] }}
                                                                         </x-filament::badge>
                                                                     </div>
                                                                 @else
-                                                                    <span class="flex items-center gap-2">
+                                                                    <span class="flex items-center gap-3">
                                                                         <x-filament::badge
                                                                             size="sm"
-                                                                            class="whitespace-normal max-w-full break-words">
+                                                                            class="whitespace-normal max-w-full break-words font-medium">
                                                                             {{ explode('`', $cell)[0] }}
                                                                         </x-filament::badge>
                                                                         @if(!empty(explode('`', $cell)[1]))
                                                                             <x-filament::badge
                                                                                 size="sm"
                                                                                 color="warning"
-                                                                                class="whitespace-normal max-w-full break-words">
+                                                                                class="whitespace-normal max-w-full break-words font-medium">
                                                                                 {{ explode('`', $cell)[1] }}
                                                                             </x-filament::badge>
                                                                         @endif
