@@ -11,9 +11,8 @@ use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use TomatoPHP\FilamentIcons\Components\IconPicker;
+use TomatoPHP\FilamentIcons\Models\Icon;
 
 class SimbologiaResource extends Resource
 {
@@ -28,7 +27,22 @@ class SimbologiaResource extends Resource
         return $form
             ->schema([
                 IconPicker::make('icono')
-                          ->searchable()->preload()
+                          ->options(fn() => Icon::query()
+                                                ->where('name', 'like', 'heroicon-c-check')
+                                                ->orWhere('name', 'like', 'heroicon-o-x-mark')       // Checked but failed
+                                                ->orWhere('name', 'like', 'heroicon-o-exclamation-triangle')  // Needs attention
+                                                ->orWhere('name', 'like', 'heroicon-o-minus-circle') // Not applicable
+                                                ->orWhere('name', 'like', 'heroicon-o-eye')          // Visually inspected
+                                                ->orWhere('name', 'like', 'heroicon-o-clock')        // Pending/Deferred
+                                                ->orWhere('name', 'like', 'heroicon-o-shield-exclamation')  // Safety issue
+                                                ->orWhere('name', 'like', 'heroicon-o-wrench')       // Maintenance needed
+                                                ->orWhere('name', 'like', 'heroicon-o-no-symbol')    // Prohibited action
+                                                ->orWhere('name', 'like', 'heroicon-o-question-mark-circle')  // Unclear status
+                                                ->limit(10)
+                                                ->pluck('label', 'name')
+                                                ->toArray()
+                          )
+                          ->preload()
                           ->required(),
                 Forms\Components\ColorPicker::make('color')
                                             ->required()
