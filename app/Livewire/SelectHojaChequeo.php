@@ -3,51 +3,30 @@
 namespace App\Livewire;
 
 use App\Models\HojaChequeo;
-use Carbon\Carbon;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
-use Illuminate\Database\Eloquent\Model;
 use Livewire\Component;
 
-class SelectHojaChequeo extends Component implements HasForms
+class SelectHojaChequeo extends Component
 {
-    use InteractsWithForms;
+    public $selectedId;
+    public string $search = "";
 
-    public HojaChequeo $checkSheet;
+    protected $queryString = ['search' => ['except' => '']];
 
-    public ?array $data = [];
-
-    public function mount(): void {
-        $this->form->fill();
-    }
-
-    public function form(Form $form): Form {
-        return $form
-            ->schema(array(
-                Select::make('hoja_chequeo_id')
-                      ->label('Hoja de chequeo')
-                      ->relationship(name            : 'hojaChequeo',
-                                     modifyQueryUsing: fn($query) => $query
-                              ->whereActive(true)
-                              ->whereDoesntHave('chequeosDiarios', function ($query) {
-                                  $query->whereDate('created_at', Carbon::today());
-                              })
-                      )
-                      ->getOptionLabelFromRecordUsing(fn(Model $record) => $record->equipo->tag)
-                      ->required(),
-            ))
-            ->statePath('data')
-            ->model(\App\Models\ChequeoDiario::class);
-    }
-
-    public function nextPage(): void {
-        $data = $this->form->getState();
-        $this->dispatch('checkSheetSelected', $data['hoja_chequeo_id']);
+    public function selectEquipo($id) {
+        $this->dispatch('checkSheetSelected', $id);
     }
 
     public function render() {
-        return view('livewire.select-hoja-chequeo');
+        $hojas = HojaChequeo::with('equipo', 'chequeosDiarios')
+                            ->whereActive(true)
+                            ->whereHas('equipo', function ($query) {
+                                $query->where(function ($subQuery) {
+                                    $subQuery->whereRaw('LOWER(nombre) LIKE ?', ['%' . strtolower($this->search) . '%'])
+                                             ->orWhereRaw('LOWER(tag) LIKE ?', ['%' . strtolower($this->search) . '%'])
+                                             ->orWhereRaw('LOWER(area) LIKE ?', ['%' . strtolower($this->search) . '%']);
+                                });
+                            })->get();
+
+        return view('livewire.select-hoja-chequeo', compact('hojas'));
     }
 }

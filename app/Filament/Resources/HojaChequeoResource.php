@@ -4,10 +4,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\HojaChequeoResource\Pages;
 use App\Filament\Resources\HojaChequeoResource\RelationManagers;
-use App\Infolists\Components\AlertsView;
 use App\Infolists\Components\ViewItems;
 use App\Models\HojaChequeo;
-use Filament\Forms\Form;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\ImageEntry;
@@ -17,8 +15,6 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class HojaChequeoResource extends Resource
 {
@@ -99,7 +95,7 @@ class HojaChequeoResource extends Resource
                                Grid::make()->schema([
                                    TextEntry::make('equipo.nombre')
                                             ->label('Equipo'),
-                                   ImageEntry::make('equipo.foto')->label('foto')
+                                   ImageEntry::make('equipo.foto')->label('Foto')
                                              ->extraImgAttributes(['class' => 'rounded-lg'])
                                ]),
                                Grid::make()->schema([

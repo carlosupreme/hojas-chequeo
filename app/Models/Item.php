@@ -11,7 +11,8 @@ class Item extends Model
 {
     protected $fillable = [
         'hoja_chequeo_id',
-        'valores'
+        'valores',
+        'categoria'
     ];
 
     protected function casts(): array {
