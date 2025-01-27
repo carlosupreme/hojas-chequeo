@@ -98,7 +98,7 @@ class EquipmentCheckStats extends Component
                                         ->join('chequeo_diarios', 'hoja_chequeos.id', '=', 'chequeo_diarios.hoja_chequeo_id')
                                         ->join('item_chequeo_diarios', 'chequeo_diarios.id', '=', 'item_chequeo_diarios.chequeo_diario_id')
                                         ->whereIn('item_chequeo_diarios.item_id', $itemIds)
-                                        ->where('item_chequeo_diarios.simbologia_id', 1)
+                                        ->where('item_chequeo_diarios.simbologia_id', 1) // Solo funciona si la simbologia es id=1
                                         ->whereBetween('chequeo_diarios.created_at', [$start, $end])
                                         ->count();
 

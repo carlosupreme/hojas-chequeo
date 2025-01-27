@@ -4,7 +4,7 @@
         <!-- Selector de Año -->
         <div>
             <label for="year" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Año</label>
-            <select id="year" wire:model="selectedYear"
+            <select id="year" wire:model.live="selectedYear"
                     class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-indigo-500 dark:focus:ring-indigo-400">
                 @foreach($years as $year)
                     <option value="{{ $year }}">{{ $year }}</option>
@@ -26,7 +26,7 @@
             initAreaChart($wire.chartData);
         });
         $wire.on('areaChartDataUpdated', function (chartData) {
-            updateAreaChart(chartData);
+            updateAreaChart(chartData[0]);
         });
 
         function initAreaChart(chartData) {
