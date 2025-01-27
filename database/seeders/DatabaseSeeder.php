@@ -24,10 +24,10 @@ class DatabaseSeeder extends Seeder
 
 
         Simbologia::create([
-            "icono"       => "heroicon-c-check",
-            "nombre"      => "Exito",
-            "descripcion" => "Se realizó y está bien",
-            "color"       => "#27d623",
+            'icono'      => 'heroicon-c-check',
+            'nombre'      => 'Exito',
+            'descripcion' => 'Se realizó y está bien',
+            'color'       => '#27d623',
         ]);
 
         Simbologia::create([
@@ -36,8 +36,6 @@ class DatabaseSeeder extends Seeder
             'descripcion' => 'Se realizó y está mal',
             'color'       => '#cc3434',
         ]);
-
-        Simbologia::create([]);
 
         $user->assignRole($adminRole);
 
