@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\HojaChequeoArea;
 use App\Models\HojaChequeo;
 use App\Models\Reporte;
 use Carbon\Carbon;
@@ -10,11 +11,10 @@ use Livewire\Component;
 class AreaReportsChart extends Component
 {
     public $selectedYear = null;
-    public $years = [];
-    public $chartData = [];
+    public $years        = [];
+    public $chartData    = [];
 
-    public function mount()
-    {
+    public function mount() {
         // Obtener el año más antiguo desde HojaChequeo
         $oldestYear = HojaChequeo::min('created_at');
         $currentYear = now()->year;
@@ -31,14 +31,13 @@ class AreaReportsChart extends Component
         $this->loadChartData();
     }
 
-    public function loadChartData()
-    {
+    public function loadChartData() {
         if (!$this->selectedYear) {
             return;
         }
 
         // Definir las áreas y meses
-        $areas = ['Cuarto de maquinas', 'Tintoreria', 'Lavanderia Institucional'];
+        $areas = array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases());
         $months = range(1, 12);
 
         // Preparar datos para cada área
@@ -63,32 +62,30 @@ class AreaReportsChart extends Component
             }
 
             $datasets[] = [
-                'label' => $area,
-                'data' => $monthlyData,
-                'borderColor' => $colors[$index],
+                'label'           => $area,
+                'data'            => $monthlyData,
+                'borderColor'     => $colors[$index],
                 'backgroundColor' => $colors[$index],
-                'tension' => 0.4,
-                'fill' => false
+                'tension'         => 0.4,
+                'fill'            => false
             ];
         }
 
         $this->chartData = [
-            'labels' => ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+            'labels'   => ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
             'datasets' => $datasets
         ];
 
         $this->dispatch('areaChartDataUpdated', $this->chartData);
     }
 
-    public function updated($property)
-    {
+    public function updated($property) {
         if ($property === 'selectedYear') {
             $this->loadChartData();
         }
     }
 
-    public function render()
-    {
+    public function render() {
         return view('livewire.area-reports-chart');
     }
 }

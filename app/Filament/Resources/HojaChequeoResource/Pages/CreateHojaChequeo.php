@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\HojaChequeoResource\Pages;
 
 use App\Filament\Resources\HojaChequeoResource;
+use App\HojaChequeoArea;
 use App\Models\HojaChequeo;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -58,9 +59,11 @@ class CreateHojaChequeo extends Page
                           return $set('version', $ultimaVersion ? $ultimaVersion + 1 : 1);
                       })
                       ->required(),
-                TextInput::make('area')->live()->required(),
+                Select::make('area')
+                      ->options(fn() => array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases()))
+                      ->live()->required(),
                 TextInput::make('version')->readOnly()->live()->default(1)
-                    ->helperText('Esta version se calcula automaticamente'),
+                         ->helperText('Esta version se calcula automaticamente'),
                 RichEditor::make('observaciones')->disableToolbarButtons(['codeBlock', 'attachFiles'])->maxLength(255),
             ])
             ->statePath('data')

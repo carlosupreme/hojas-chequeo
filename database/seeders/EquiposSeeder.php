@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\HojaChequeoArea;
 use App\Models\Equipo;
 use App\Models\HojaChequeo;
 use App\Models\Item;
@@ -388,7 +389,7 @@ class EquiposSeeder extends Seeder
 
         $hoja = HojaChequeo::create([
             'equipo_id'     => $equipo->id, 'version' => 1,
-            'area'          => 'Lavanderia Institucional',
+            'area'          => HojaChequeoArea::TINTORERIA->value,
             'observaciones' => null
         ]);
 
