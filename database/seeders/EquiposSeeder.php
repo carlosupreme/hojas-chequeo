@@ -21,7 +21,181 @@ class EquiposSeeder extends Seeder
 
     public function cuartoDeMaquinas(): void {
         $this->laHid02();
-        $this->sth06();
+        $this->cmCal01(1);
+        $this->cmCal01(2);
+    }
+
+    public function cmCal01($tag) {
+        $equipo = Equipo::create([
+            'tag'           => 'CM-CAL-0'. $tag,
+            'nombre'        => 'CALDERA ' . $tag,
+            'area'          => 'CUARTO DE MAQUINAS',
+            'foto'          => null,
+            'numeroControl' => 'AC-ES-248-GV-391-2024',
+            'revision'      => 'NOM-020-STPS-2011'
+        ]);
+
+        $hoja = HojaChequeo::create([
+            'equipo_id'     => $equipo->id,
+            'area'          => HojaChequeoArea::CUARTO_DE_MAQUINAS->value,
+            'version'       => 1,
+            'observaciones' => null
+        ]);
+
+        $items = [
+            [
+                'items'     => [
+                    'ITEM'       => 'LIMPIEZA EXTERIOR DE EQUIPO',
+                    'CRITERIO'   => 'REALIZARLO LOS LUNES DESPUES DEL APAGADO DE LA CALDERA',
+                    'FRECUENCIA' => '1 VEZ POR QUINCENA'
+                ],
+                'categoria' => 'limpieza'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'LIMPIEZA DEL CRISTAL DEL NIVEL DEL AGUA',
+                    'CRITERIO'   => 'REALIZAR DURANTE LAS PURGAS',
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                ],
+                'categoria' => 'limpieza'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'COLOR DE HUMOS A LA SALIDA DE LA CHIMENEA',
+                    'CRITERIO'   => 'TRANSPARENTE',
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                ],
+                'categoria' => 'operacion'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'PURGAS DE COLUMNA DE CRISTAL DE NIVEL Y GRIFOS DE LA COLUMNA',
+                    'CRITERIO'   => 'SI o No',
+                    'FRECUENCIA' => '2 VECES POR TURNO'
+                ],
+                'categoria' => 'operacion'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'PURGA DE VALVULA DE PRUEBA',
+                    'CRITERIO'   => 'SI o No',
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                ],
+                'categoria' => 'operacion'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'PURGA DE FONDO',
+                    'CRITERIO'   => 'HORA',
+                    'FRECUENCIA' => '2 VECES POR TURNO'
+                ],
+                'categoria' => 'operacion'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'CONTROL DE PRESIÓN',
+                    'CRITERIO'   => '5,2 KG',
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                ],
+                'categoria' => 'operacion'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'DISPARO DE VALVULA DE SEGURIDAD',
+                    'CRITERIO'   => 'ACCIONAMIENTO DE VALVULA MODO MANUAL',
+                    'FRECUENCIA' => '1 VEZ AL MES'
+                ],
+                'categoria' => 'operacion'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'ALARMA DE NIVEL',
+                    'CRITERIO'   => 'ENCENDIDO Y APAGADO DEL QUEMADOR',
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                ],
+                'categoria' => 'operacion'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'DESINCRUSTANTE',
+                    'CRITERIO'   => 'DESPUES DE LA PURGA 5 LT HORA',
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                ],
+                'categoria' => 'operacion'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'TEMPERATURA TERMOMETRO CHIMENEA',
+                    'CRITERIO'   => '200°C A 270°C',
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'TEMPERATURAS DE LAS PARTES A PRESIÓN',
+                    'CRITERIO'   => '140°C A 160°C',
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'PRESIÓN DE VAPOR',
+                    'CRITERIO'   => '4.4 A 5.2 KG/CM2',
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'PRESION DEL COMBUSTIBLE',
+                    'CRITERIO'   => null,
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'TEMPERATURA ENTRADA DE AGUA',
+                    'CRITERIO'   => '80°C A 90°C',
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'FUNCIONAMIENTO DE LA BOMBA',
+                    'CRITERIO'   => 'QUE ENCIENDA Y APAGUE AUTOMATICAMENTE',
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'FUNCIONAMIENTO DEL QUEMADOR',
+                    'CRITERIO'   => 'ENCENDIDO Y APAGADO EN MIRILLA',
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'SUMINISTRO DE AGUA',
+                    'CRITERIO'   => 'REVISAR NIVEL EN MANGUERA',
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                ],
+                'categoria' => 'revision'
+            ]
+        ];
+
+        foreach ($items as $item) {
+            Item::create([
+                'hoja_chequeo_id' => $hoja->id,
+                'valores'         => $item['items'],
+                'categoria'       => $item['categoria']
+            ]);
+        }
     }
 
     public function lavanderia() {
@@ -1064,187 +1238,6 @@ class EquiposSeeder extends Seeder
                     'CRITERIO'   => 'LIMPIEZA PROFUNDA'
                 ],
                 'categoria' => 'limpieza'
-            ]
-        ];
-
-        foreach ($items as $item) {
-            Item::create([
-                'hoja_chequeo_id' => $hoja->id,
-                'valores'         => $item['items'],
-                'categoria'       => $item['categoria']
-            ]);
-        }
-    }
-
-    public function sth06() {
-        $equipo = Equipo::create([
-            'tag'           => 'STH-06',
-            'nombre'        => 'STAHL 06',
-            'area'          => 'Lavado',
-            'foto'          => null,
-            'numeroControl' => '006',
-            'revision'      => 'N'
-        ]);
-
-        $hoja = HojaChequeo::create(['equipo_id'     => $equipo->id,
-                                     'version'       => 1,
-                                     'area'          => 'Lavanderia Institucional',
-                                     'observaciones' => null]);
-
-        $items = [
-            [
-                'items'     => [
-                    'ITEM'          => 'TUBERIA',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'EXCESO DE POLVO Y RESPECTIVO AISLANTE',
-                    'RESPONSABLE'   => 'OPERARIO',
-                    'OBSERVACIONES' => 'LIMPIEZA DE TUBERIA PARA EVITAR POLVO Y/O PELUSA'
-                ],
-                'categoria' => 'limpieza'
-            ],
-            [
-                'items'     => [
-                    'ITEM'          => 'LIMPIEZA EXTERIOR DE EQUIPO',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'EXCESO DE POLVO Y RESPECTIVO AISLANTE',
-                    'RESPONSABLE'   => 'OPERARIO',
-                    'OBSERVACIONES' => 'QUE NO TENGA SUCIEDAD EL GABINETE, LA JUNTA DE LA PUERTA Y RETIRAR LOS RESIDUOS DE DETERGENTE DEL DEPOSITO DE JABON'
-                ],
-                'categoria' => 'limpieza'
-            ],
-            [
-                'items'     => [
-                    'ITEM'          => 'LIMPIEZA PARTE TRASERA DE EQUIPO',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'SIN POLVO Y SIN GRASA',
-                    'RESPONSABLE'   => 'OPERARIO',
-                    'OBSERVACIONES' => 'REVISAR QUE EL CABLE ELECTRICO QUE ESTE BIEN SUJETADO Y QUITAR POLVO O PELUSA DE LA TAPA.'
-                ],
-                'categoria' => 'limpieza'
-            ],
-            [
-                'items'     => [
-                    'ITEM'          => 'LIMPIEZA DE PISOS',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'QUE NO TENGA POLVO O GRASA Y OBJETOS AJENOS AL LUGAR.',
-                    'RESPONSABLE'   => 'OPERARIO',
-                    'OBSERVACIONES' => 'NO DEBE HABER GRASA EN PISO Y/O OBJETOS EXTRAÑOS AL LUGAR'
-                ],
-                'categoria' => 'limpieza'
-            ],
-            [
-                'items'     => [
-                    'ITEM'          => 'SUMINISTRO DE AGUA, VAPOR Y ELECTRICIDAD',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'VISUAL',
-                    'CRITERIO'      => 'VERIFICAR QUE SE CUENTE CON LOS SERVICIOS',
-                    'RESPONSABLE'   => 'OPERARIO',
-                    'OBSERVACIONES' => 'AL INICIO DE LA JORNADA ABRIR VALVULAS HACIA EL EQUIPO ASI COMO ENERGIZARLO. CERRAR VALVULAS Y DESENERGIZAR EL EQUIPO AL FINALIZAR LA JORNADA LABORAL'
-                ],
-                'categoria' => 'revision'
-            ],
-            [
-                'items'     => [
-                    'ITEM'          => 'CONTROL DE ENCENDIDO Y APAGADO',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'AL INICIAR LA JORNADA VERIFICAR QUE ESTE ENERGIZADO',
-                    'RESPONSABLE'   => 'OPERARIO',
-                    'OBSERVACIONES' => 'QUE ESTE EN MODO ENCENDIDO Y QUE EL DISPLAY ESTE ENCENDIDO'
-                ],
-                'categoria' => 'operacion'
-            ],
-            [
-                'items'     => [
-                    'ITEM'          => 'FUGAS DE AGUA',
-                    'FRECUENCIA'    => 'AL INICIO Y DURANTE EL TURNO',
-                    'METODO'        => 'REVISAR FISICAMENTE',
-                    'CRITERIO'      => 'QUE NO GOTEEN LAS TUBERIAS',
-                    'RESPONSABLE'   => 'OPERARIO',
-                    'OBSERVACIONES' => 'GENERA ENCHARCAMIENTO DE AGUA Y DAÑA TUBERIAS'
-                ],
-                'categoria' => 'revision'
-            ],
-            [
-                'items'     => [
-                    'ITEM'          => 'FUGAS DE VAPOR',
-                    'FRECUENCIA'    => 'AL INICIO Y DURANTE EL TURNO',
-                    'METODO'        => 'REVISAR FISICAMENTE',
-                    'CRITERIO'      => 'FUGAS DE VAPOR EN CONEXIONES',
-                    'RESPONSABLE'   => 'OPERARIO',
-                    'OBSERVACIONES' => 'NO DEBEN EXISTIR FUGAS EN LAS CONEXIONES'
-                ],
-                'categoria' => 'revision'
-            ],
-            [
-                'items'     => [
-                    'ITEM'          => 'PURGA',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'AL INICIAR LA JORNADA ABRIR LENTAMENTE LA VALVULA HASTA QUE SALGA VAPOR Y DESPUES CERRARLA.',
-                    'RESPONSABLE'   => 'OPERARIO',
-                    'OBSERVACIONES' => 'EVITAR CONDENSADOS DENTRO DEL EQUIPO Y TUBERIAS.'
-                ],
-                'categoria' => 'operacion'
-            ],
-            [
-                'items'     => [
-                    'ITEM'          => 'MOTOR',
-                    'FRECUENCIA'    => '1 VEZ POR TURNO',
-                    'METODO'        => 'REVISAR FISICAMENTE',
-                    'CRITERIO'      => 'FUNCIONAMIENTO OPTIMO',
-                    'RESPONSABLE'   => 'OPERARIO',
-                    'OBSERVACIONES' => 'QUE GIRE LA CANASTA ADECUADAMENTE Y QUE NO EXISTA RUIDOS EXTRAÑOS'
-                ],
-                'categoria' => 'operacion'
-            ],
-            [
-                'items'     => [
-                    'ITEM'          => 'BLOQUEO DE PUERTA',
-                    'FRECUENCIA'    => '1 VEZ POR TURNO',
-                    'METODO'        => 'REVISAR FISICAMENTE',
-                    'CRITERIO'      => 'CERRADURA Y ENCLAVAMIENTO DE LA PUERTA',
-                    'RESPONSABLE'   => 'OPERARIO',
-                    'OBSERVACIONES' => 'QUE CIERRE ADECUADAMENTE EN CUALQUIERA DE SUS ACTIVIDADES (VER NOTAS)'
-                ],
-                'categoria' => 'operacion'
-            ],
-            [
-                'items'     => [
-                    'ITEM'          => 'DOSIFICADORES',
-                    'FRECUENCIA'    => 'AL INICIO Y FINAL DE TURNO',
-                    'METODO'        => 'REVISAR FISICAMENTE',
-                    'CRITERIO'      => 'AL INICIO: ENCENDER DOSIFICADOR Y ABRIR LA VALVULA DE PASO DE AGUA AL FINAL: CERRAR VALVULA Y APAGAR DOSIFICADOR',
-                    'RESPONSABLE'   => 'OPERARIO',
-                    'OBSERVACIONES' => 'EVITAR FUGAS DE AGUA'
-                ],
-                'categoria' => 'revision'
-            ],
-            [
-                'items'     => [
-                    'ITEM'          => 'PRODUCTO',
-                    'FRECUENCIA'    => '1 VEZ POR TURNO',
-                    'METODO'        => 'REVISAR FISICAMENTE',
-                    'CRITERIO'      => 'REVISAR QUE LOS BIDONES TENGAN PRODUCTO',
-                    'RESPONSABLE'   => 'OPERARIO',
-                    'OBSERVACIONES' => 'EVITAR PAROS DE PRODUCCIÒN'
-                ],
-                'categoria' => 'revision'
-            ],
-            [
-                'items'     => [
-                    'ITEM'          => 'CICLOS',
-                    'FRECUENCIA'    => 'AL FINAL DEL TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'ANOTAR LOS CICLOS TRABAJADOS',
-                    'RESPONSABLE'   => 'OPERARIO',
-                    'OBSERVACIONES' => 'AL FINAL DE LA JORNADA ANOTAR SUS CICLOS'
-                ],
-                'categoria' => 'operacion'
             ]
         ];
 
