@@ -51,11 +51,24 @@
             // Initial chart setup
             updateChart($wire.chartData);
 
-            // Listen for chart data updates
-            $wire.on('chartDataUpdated', (chartData) => {
-                console.log(chartData[0])
-                updateChart(chartData[0]);
+        });
+
+        // Listen for chart data updates
+        $wire.on('chartDataUpdated', (chartData) => {
+            console.log(chartData[0])
+            updateChart(chartData[0]);
+        });
+
+        const darkModeObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'class') {
+                    updateChart($wire.chartData);
+                }
             });
+        });
+        darkModeObserver.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class']
         });
 
         // Handle chart updates
