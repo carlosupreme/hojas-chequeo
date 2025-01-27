@@ -37,6 +37,12 @@ class EquipoResource extends Resource
                 Forms\Components\TextInput::make('area')
                                           ->required()
                                           ->maxLength(255),
+                Forms\Components\TextInput::make('numeroControl')
+                                          ->label('Numero de control')
+                                          ->maxLength(255),
+                Forms\Components\TextInput::make('revision')
+                                          ->label('Revision')
+                                          ->maxLength(255),
                 Forms\Components\FileUpload::make('foto')->image(),
             ]);
     }
@@ -54,6 +60,10 @@ class EquipoResource extends Resource
                                          ->sortable()
                                          ->searchable(),
                 Tables\Columns\ImageColumn::make('foto'),
+                Tables\Columns\TextColumn::make('revision')
+                                         ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('numeroControl')
+                                         ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                                          ->dateTime()
                                          ->sortable()
