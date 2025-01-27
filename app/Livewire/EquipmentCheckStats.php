@@ -16,20 +16,37 @@ class EquipmentCheckStats extends Component
 
     public function mount() {
         $this->equipos = Equipo::pluck('tag', 'id')->toArray();
-        $this->initializeMonths();
-        $this->setInitialSelections();
+        $this->selectedEquipment = array_key_first($this->equipos);
+        $this->generateMonthsBasedOnEquipment(); // Cambiar a nuevo método
+        $this->selectedMonth = now()->format('Y-m');
         $this->loadChartData();
     }
 
-    private function initializeMonths(): void {
-        for ($i = 0; $i < 12; $i++) {
-            $date = now()->subMonths($i);
-            $this->months[$date->format('Y-m')] = $date->format('M Y');
+    private function generateMonthsBasedOnEquipment(): void
+    {
+        $this->months = [];
+
+        if (!$this->selectedEquipment) return;
+
+        $equipo = Equipo::find($this->selectedEquipment);
+
+        if (!$equipo || !$equipo->created_at) return;
+
+        $startDate = $equipo->created_at->copy()->startOfMonth();
+        $endDate = now()->startOfMonth();
+
+        while ($startDate <= $endDate) {
+            $key = $startDate->format('Y-m');
+            $this->months[$key] = ucfirst($startDate->translatedFormat('F Y'));
+            $startDate->addMonth();
         }
+
+        // Ordenar de más reciente a más antiguo
+        krsort($this->months);
     }
 
-    private function setInitialSelections(): void {
-        $this->selectedEquipment = array_key_first($this->equipos) ?: null;
+    public function updatedSelectedEquipment($value) {
+        $this->generateMonthsBasedOnEquipment();
         $this->selectedMonth = now()->format('Y-m');
     }
 

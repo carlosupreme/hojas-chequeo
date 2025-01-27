@@ -1,4 +1,6 @@
 <div class="p-6 bg-white rounded-lg shadow-lg">
+    <h1 class="mb-4 text-center">Porcentaje de cumplimiento</h1>
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <!-- Equipment Selector -->
         <div>
