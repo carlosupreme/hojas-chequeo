@@ -3,7 +3,9 @@
 namespace App\Livewire;
 
 use App\Models\HojaChequeo;
+use App\Models\Reporte;
 use App\Models\User;
+use Carbon\Carbon;
 use Coolsam\SignaturePad\Forms\Components\Fields\SignaturePad;
 use Filament\Notifications\Actions;
 use Filament\Forms\Components\Grid;
@@ -110,12 +112,16 @@ class ChequeoDiario extends Component implements HasForms
                     ->body(auth()->user()->name . ' ha completado un chequeo diario para la hoja ' . $this->checkSheet->name)
                     ->actions([
                         Actions\Action::make('Ver')
-                              ->button()
-                              ->url(  "/admin/hoja-chequeos/{$this->checkSheet->id}/historial?startDate=" . now()->format('Y-m-d') . '&endDate=' . now()->format('Y-m-d'))
+                                      ->button()
+                                      ->url("/admin/hoja-chequeos/{$this->checkSheet->id}/historial?startDate=" . now()->format('Y-m-d') . '&endDate=' . now()->format('Y-m-d'))
                     ])
                     ->sendToDatabase(User::role('Administrador')->get(), isEventDispatched: true);
 
         if ($this->reported) {
+            Reporte::create(
+                ['equipo_id' => $this->checkSheet->equipo->id],
+                ['fecha' => Carbon::now()]
+            );
             $this->redirect('https://mantenimientotintoreriatacuba.netlify.app/');
         } else {
             $this->resetState();
