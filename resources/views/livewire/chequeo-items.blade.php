@@ -39,7 +39,7 @@
         <div class="block lg:hidden">
             <div class="border-t dark:border-gray-700">
                 @foreach($items as $item)
-                    <div class="p-2 border-b dark:border-gray-700  last:border-b-0" x-data="{ open: false }" wire:key="item={{$item['id']}}}">
+                    <div class="p-2 border-b dark:border-gray-700 last:border-b-0" x-data="{ open: false }" wire:key="item={{$item['id']}}}">
                         <div class="grid grid-cols-2 gap-2 items-center">
                             <button
                                 @click="open = !open"
@@ -49,7 +49,7 @@
                                     {{ $item[$headers[0]] ?? 'N/A' }}
                                 </h3>
                             </button>
-                            <div class="overflow-auto">
+                            <div class="relative overflow-visible">
                                 <livewire:check-status-select
                                     wire:key="mobile-check-status-select-{{ $item['id'] }}"
                                     :item-id="$item['id']"
@@ -62,8 +62,8 @@
                                 @foreach($headers as $index => $header)
                                     @if($index > 0)
                                         <div class="text-xs">
-                                            <span
-                                                class="font-medium text-gray-700 dark:text-gray-300">{{ $header }}:</span>
+                                    <span
+                                        class="font-medium text-gray-700 dark:text-gray-300">{{ $header }}:</span>
                                             <span
                                                 class="text-gray-600 dark:text-gray-400 ml-2">{{ $item[$header] ?? 'N/A' }}</span>
                                         </div>
@@ -75,5 +75,6 @@
                 @endforeach
             </div>
         </div>
+
     </div>
 </div>
