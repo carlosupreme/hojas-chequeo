@@ -11,8 +11,9 @@ use Livewire\Component;
 
 class CreateItems extends Component
 {
-    public $columns = [];
-    public $rows    = [];
+    public $columns    = [];
+    public $rows       = [];
+    public $categories = [];
 
     public $alerts = [];
 
@@ -29,7 +30,6 @@ class CreateItems extends Component
         $this->addRow();
     }
 
-
     public function addColumn(): void {
         $this->newColumnName = 'Columna ' . (count($this->columns) + 1);
         $this->columns[] = $this->newColumnName;
@@ -39,6 +39,7 @@ class CreateItems extends Component
     public function addRow(): void {
         $this->rows[] = array_fill(0, count($this->columns), '');
         $this->alerts[] = [];
+        $this->categories[] = 'limpieza'; // Valor por defecto
     }
 
     public function removeColumn($index) {
@@ -55,10 +56,15 @@ class CreateItems extends Component
         $this->rows = array_values($this->rows);
         unset($this->alerts[$index]);
         $this->alerts = array_values($this->alerts);
+        unset($this->categories[$index]);
+        $this->categories = array_values($this->categories);
+    }
+
+    public function updateCategory($index, $category): void {
+        $this->categories[$index] = $category;
     }
 
     public function addAlert($index, $selectedStatus, $customText, $operador): void {
-        debug($operador);
         if (is_null($selectedStatus)) {
             $this->alerts[$index] = [
                 'customText' => $customText,
@@ -67,7 +73,7 @@ class CreateItems extends Component
         } else {
             $this->alerts[$index] = [
                 'selectedStatus' => $selectedStatus,
-                'operador'   => $operador ? "$operador" : null
+                'operador'       => $operador ? "$operador" : null
             ];
         }
 
@@ -90,12 +96,10 @@ class CreateItems extends Component
 
     public function updateCell($rowIndex, $colIndex, $value = null) {
         if ($value === null) {
-            // Toggle editing state
             $this->editingCell = $this->editingCell && $this->editingCell['rowIndex'] === $rowIndex && $this->editingCell['colIndex'] === $colIndex
                 ? null
                 : ['rowIndex' => $rowIndex, 'colIndex' => $colIndex];
         } else {
-            // Update cell value and exit editing state
             $this->rows[$rowIndex][$colIndex] = $value;
             $this->editingCell = null;
         }
@@ -118,14 +122,15 @@ class CreateItems extends Component
         collect($this->convertRowsToJsons())->map(function ($properties, $i) {
             return [
                 'alert'      => $this->alerts[$i],
-                'properties' => $properties
+                'properties' => $properties,
+                'categoria'  => $this->categories[$i]
             ];
         })->each(function ($itemData) use ($id) {
             $checkSheetItem = Item::create([
                 'hoja_chequeo_id' => $id,
-                'valores'         => $itemData['properties']
+                'valores'         => $itemData['properties'],
+                'categoria'       => $itemData['categoria']
             ]);
-            debug($itemData['alert']);
 
             if (
                 ($itemData['alert']['selectedStatus'] ?? null) === null
@@ -134,7 +139,6 @@ class CreateItems extends Component
             ) {
                 return;
             }
-
 
             Alerta::create([
                 'item_id'       => $checkSheetItem->id,
@@ -153,7 +157,6 @@ class CreateItems extends Component
             return array_combine($this->columns, $row);
         }, $this->rows);
     }
-
 
     public function render() {
         $statuses = Simbologia::select('id', 'nombre', 'icono', 'color')->get();
