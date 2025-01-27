@@ -52,6 +52,7 @@ class EditHojaChequeo extends Page
                           return $set('version', $ultimaVersion + 1);
                       })
                       ->required(),
+                TextInput::make('area')->live()->required(),
                 TextInput::make('version')
                          ->readOnly()
                          ->live()

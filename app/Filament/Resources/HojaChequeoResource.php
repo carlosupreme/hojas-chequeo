@@ -36,6 +36,8 @@ class HojaChequeoResource extends Resource
                                            ->label('Publicada')
                                            ->beforeStateUpdated(fn($record) => HojaChequeo::where('equipo_id', $record->equipo_id)
                                                                                           ->update(['active' => false])),
+                Tables\Columns\TextColumn::make('area')
+                                         ->searchable(),
                 Tables\Columns\TextColumn::make('observaciones')
                                          ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -73,7 +75,10 @@ class HojaChequeoResource extends Resource
                     Section::make('Datos de la hoja de chequeo')
                            ->icon('heroicon-o-document')
                            ->schema([
-                               TextEntry::make('version'),
+                               Grid::make()->schema([
+                                   TextEntry::make('version'),
+                                   TextEntry::make('area')
+                               ]),
                                TextEntry::make('observaciones')->html(),
                                Grid::make(3)->schema([
                                    TextEntry::make('created_at')->label('Creado')

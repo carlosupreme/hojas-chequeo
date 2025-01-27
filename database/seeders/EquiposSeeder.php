@@ -31,7 +31,10 @@ class EquiposSeeder extends Seeder
             'revision'      => 'N'
         ]);
 
-        $hoja = HojaChequeo::create(['equipo_id' => $equipo->id, 'version' => 1, 'observaciones' => null]);
+        $hoja = HojaChequeo::create(['equipo_id'     => $equipo->id,
+                                     'version'       => 1,
+                                     'area'          => 'Lavanderia Institucional',
+                                     'observaciones' => null]);
 
         $items = [
             [
@@ -198,6 +201,7 @@ class EquiposSeeder extends Seeder
             ]);
         }
     }
+
     public function laHid02(): void {
         $equipo = Equipo::create([
             'tag'           => 'LA-HID-02',
@@ -208,7 +212,11 @@ class EquiposSeeder extends Seeder
             'revision'      => 'NOM-020-STPS-2011'
         ]);
 
-        $hoja = HojaChequeo::create(['equipo_id' => $equipo->id, 'version' => 1, 'observaciones' => null]);
+        $hoja = HojaChequeo::create([
+            'equipo_id'     => $equipo->id, 'version' => 1,
+            'area'          => 'Lavanderia Institucional',
+            'observaciones' => null
+        ]);
 
         $items = [
             [

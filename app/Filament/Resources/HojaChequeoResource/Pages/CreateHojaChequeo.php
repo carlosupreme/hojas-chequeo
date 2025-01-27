@@ -58,6 +58,7 @@ class CreateHojaChequeo extends Page
                           return $set('version', $ultimaVersion ? $ultimaVersion + 1 : 1);
                       })
                       ->required(),
+                TextInput::make('area')->live()->required(),
                 TextInput::make('version')->readOnly()->live()->default(1)
                     ->helperText('Esta version se calcula automaticamente'),
                 RichEditor::make('observaciones')->disableToolbarButtons(['codeBlock', 'attachFiles'])->maxLength(255),
