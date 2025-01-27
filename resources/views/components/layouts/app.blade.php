@@ -23,8 +23,8 @@
 {{ $slot }}
 
 @livewire('notifications')
-
 @filamentScripts
 @vite('resources/js/app.js')
+@stack('scripts')
 </body>
 </html>
