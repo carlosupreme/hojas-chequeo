@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Simbologia;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
@@ -20,6 +21,23 @@ class DatabaseSeeder extends Seeder
             'email'    => 'admin@admin.com',
             'password' => \Hash::make('password')
         ]);
+
+
+        Simbologia::create([
+            "icono"       => "heroicon-c-check",
+            "nombre"      => "Exito",
+            "descripcion" => "Se realizó y está bien",
+            "color"       => "#27d623",
+        ]);
+
+        Simbologia::create([
+            'icono'       => 'heroicon-o-x-mark',
+            'nombre'      => 'Error',
+            'descripcion' => 'Se realizó y está mal',
+            'color'       => '#cc3434',
+        ]);
+
+        Simbologia::create([]);
 
         $user->assignRole($adminRole);
 
