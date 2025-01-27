@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Alerta extends Model
 {
     protected $fillable = [
-        'item_id', 'simbologia_id', 'valor', 'contador'
+        'item_id', 'simbologia_id', 'valor', 'contador', 'operador'
     ];
 
     public function item(): BelongsTo {

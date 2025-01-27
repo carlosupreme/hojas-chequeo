@@ -96,11 +96,71 @@
                                                 selectedName: '',
                                                 open: false,
                                                 customText: '',
+                                                operador: null,
                                                 selectedStatus: null,
                                                 setCustom() {this.selectedName = 'Personalizado'; this.selectedStatus = null; this.open = false; this.showCustomInput = true;},
-                                                choose(id, name) {this.selectedName = name; this.selectedStatus = id; this.open = false; this.customText = '', this.showCustomInput = false;}
+                                                choose(id, name) {this.selectedName = name; this.selectedStatus = id; this.open = false; this.customText = ''; this.showCustomInput = false;}
                                            }">
-                                <p>Este item sea marcado con:</p>
+                                <div class="space-y-2">
+                                    <legend class="text-sm font-medium text-gray-700 mb-2">Este item sea</legend>
+
+                                    <div class="flex flex-col sm:flex-row gap-4">
+                                        <div class="flex items-center">
+                                            <input
+                                                type="radio"
+                                                id="igual"
+                                                name="comparison"
+                                                value="="
+                                                class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500 peer"
+                                                x-model="operador"
+                                                required
+                                            >
+                                            <label
+                                                for="igual"
+                                                class="ml-2 block text-sm text-gray-700 peer-checked:text-blue-600 peer-hover:text-blue-500 transition-colors"
+                                            >
+                                                Igual (=)
+                                            </label>
+                                        </div>
+
+                                        <div class="flex items-center">
+                                            <input
+                                                type="radio"
+                                                id="menor"
+                                                x-model="operador"
+                                                name="comparison"
+                                                value="<"
+                                                class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500 peer"
+                                            >
+                                            <label
+                                                for="menor"
+                                                class="ml-2 block text-sm text-gray-700 peer-checked:text-blue-600 peer-hover:text-blue-500 transition-colors"
+                                            >
+                                                Menor (&lt;)
+                                            </label>
+                                        </div>
+
+                                        <div class="flex items-center">
+                                            <input
+                                                type="radio"
+                                                id="mayor"
+                                                x-model="operador"
+                                                name="comparison"
+                                                value=">"
+                                                class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500 peer"
+                                            >
+                                            <label
+                                                for="mayor"
+                                                class="ml-2 block text-sm text-gray-700 peer-checked:text-blue-600 peer-hover:text-blue-500 transition-colors"
+                                            >
+                                                Mayor (&gt;)
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <p>Que el valor:</p>
 
                                 <div class="relative">
                                     <button
@@ -165,7 +225,7 @@
 
                                 <x-filament::button
                                     x-show="customText.length || selectedStatus != null"
-                                    @click.prevent="$wire.addAlert({{ $rowIndex }}, selectedStatus, customText)">
+                                    @click.prevent="$wire.addAlert({{ $rowIndex }}, selectedStatus, customText, operador)">
                                     Establecer
                                 </x-filament::button>
                             </div>

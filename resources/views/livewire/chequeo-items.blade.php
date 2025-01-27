@@ -49,7 +49,7 @@
                                     {{ $item[$headers[0]] ?? 'N/A' }}
                                 </h3>
                             </button>
-                            <div>
+                            <div class="overflow-auto">
                                 <livewire:check-status-select
                                     wire:key="mobile-check-status-select-{{ $item['id'] }}"
                                     :item-id="$item['id']"

@@ -57,14 +57,17 @@ class CreateItems extends Component
         $this->alerts = array_values($this->alerts);
     }
 
-    public function addAlert($index, $selectedStatus, $customText): void {
+    public function addAlert($index, $selectedStatus, $customText, $operador): void {
+        debug($operador);
         if (is_null($selectedStatus)) {
             $this->alerts[$index] = [
-                'customText' => $customText
+                'customText' => $customText,
+                'operador'   => $operador ? "$operador" : null
             ];
         } else {
             $this->alerts[$index] = [
-                'selectedStatus' => $selectedStatus
+                'selectedStatus' => $selectedStatus,
+                'operador'   => $operador ? "$operador" : null
             ];
         }
 
@@ -122,6 +125,7 @@ class CreateItems extends Component
                 'hoja_chequeo_id' => $id,
                 'valores'         => $itemData['properties']
             ]);
+            debug($itemData['alert']);
 
             if (
                 ($itemData['alert']['selectedStatus'] ?? null) === null
@@ -131,10 +135,12 @@ class CreateItems extends Component
                 return;
             }
 
+
             Alerta::create([
                 'item_id'       => $checkSheetItem->id,
                 'simbologia_id' => $itemData['alert']['selectedStatus'] ?? null,
                 'valor'         => $itemData['alert']['customText'] ?? null,
+                'operador'      => $itemData['alert']['operador'] ?? null,
                 'contador'      => 0
             ]);
         });

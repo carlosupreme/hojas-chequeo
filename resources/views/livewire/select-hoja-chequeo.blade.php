@@ -18,13 +18,9 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         @foreach ($hojas as $hoja)
             <div
-                wire:click="selectEquipo({{ $hoja->equipo->id }})"
-                class="cursor-pointer rounded-xl shadow-md transition-all duration-300 ease-in-out transform hover:scale-105"
+                wire:click="selectEquipo({{ $hoja->id }})"
+                class="cursor-pointer rounded-xl shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
                 x-data="{}"
-                :class="{
-                    'bg-blue-50 dark:bg-blue-900 ring-2 ring-blue-500': {{ $hoja->equipo->id }} === $wire.selectedEquipo,
-                    'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700': {{ $hoja->equipo->id }} !== $wire.selectedEquipo
-                }"
             >
                 <div class="p-6 space-y-4">
                     <div class="flex items-start space-x-4">
@@ -41,6 +37,9 @@
                             </h3>
                             <p class="text-sm font-medium text-blue-600 dark:text-blue-400">
                                 {{ $hoja->equipo->tag }}
+                            </p>
+                            <p class="text-xs font-medium text-gray-600 dark:text-gray-400">
+                                version {{ $hoja->version }}
                             </p>
                         </div>
                     </div>

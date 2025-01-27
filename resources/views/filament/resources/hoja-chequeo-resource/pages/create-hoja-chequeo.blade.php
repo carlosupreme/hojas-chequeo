@@ -1,6 +1,6 @@
 <x-filament-panels::page>
-    <div class="flex items-center gap-4 mb-5">
-        <form>{{ $this->form }}</form>
+    <div class="flex items-center gap-4 mb-5 w-full">
+        <form class="w-full">{{ $this->form }}</form>
     </div>
 
     <livewire:create-items></livewire:create-items>

@@ -66,6 +66,8 @@ class ChequeoItems extends Component
                         && !is_null($notes)
                         && $alerta->valor == $notes
                     )
+                    || (!is_null($alerta->valor) && !is_null($notes) && $alerta->operador == "<" && intval($notes) < intval($alerta->valor))
+                    || (!is_null($alerta->valor) && !is_null($notes) && $alerta->operador == '>' && intval($notes) > intval($alerta->valor))
                 ) {
                     $alerta->contador = $alerta->contador + 1;
                     $alerta->save();
