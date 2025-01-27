@@ -173,11 +173,8 @@ class HistoryHojaChequeo extends Page
                   ->setOption('isPhpEnabled', true)
                   ->setOption('isRemoteEnabled', true);
 
-
-        // Create a unique file name
         $fileName = 'checksheet-history-' . Str::random(10) . '.pdf';
 
-        // Download the pdf
         return response()->streamDownload(
             fn() => print($pdf->output()),
             $fileName

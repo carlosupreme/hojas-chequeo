@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Equipo;
 use App\Models\HojaChequeo;
 use App\Models\Item;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class EquiposSeeder extends Seeder
@@ -18,17 +17,17 @@ class EquiposSeeder extends Seeder
     }
 
     public function cuartoDeMaquinas() {
-        $this->hid02();
-        $this->cal02();
         $this->cal01();
-        $this->hid04();
-        $this->sua05();
-        $this->fze03();
+//        $this->hid02();
+//        $this->cal02();
+//        $this->hid04();
+//        $this->sua05();
+//        $this->fze03();
     }
 
     public function fze03() {
         $equipo = Equipo::create([
-            'tag'    => 'CM-FZE-03',
+            'tag'    => 'FZE-03',
             'nombre' => 'FILTRO DE ZEOLITA',
             'area'   => 'CUARTO DE MAQUINAS',
             'foto'   => null
@@ -328,10 +327,12 @@ class EquiposSeeder extends Seeder
 
     public function cal01() {
         $equipo = Equipo::create([
-            'tag'    => 'CM-CAL-01',
-            'nombre' => 'CALDERA-01',
-            'area'   => 'CUARTO DE MAQUINAS',
-            'foto'   => null
+            'tag'           => 'CM-CAL-01',
+            'nombre'        => 'CALDERA-01',
+            'area'          => 'CUARTO DE MAQUINAS',
+            'foto'          => null,
+            'numeroControl' => 'AC-ES-248-GV-391-2024',
+            'revision'      => 'NOM-020-STPS-2011'
         ]);
 
         $hoja = HojaChequeo::create(['equipo_id' => $equipo->id, 'version' => 1, 'observaciones' => null]);

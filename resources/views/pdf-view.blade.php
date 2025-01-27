@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Check Sheet History</title>
+    <title>Hoja de chequeo </title>
     <style>
         @page {
             size: A4 landscape;
@@ -94,15 +94,25 @@
 <body>
 @foreach($chunks as $index => $chunk)
     <div @if(!$loop->last) class="page-break" @endif>
+        <div class="w-full " style="position: relative;">
+            <img src="{{asset('lg.png')}}" style="float: left" alt="Tacuba" height="20px">
+            <h4 style="text-align: center">TACUBA DRY CLEAN</h4>
+        </div>
         <table>
             <tr>
-                <td colspan="7" class="header">{{ $record->equipo->nombre }}</td>
-                <td colspan="8" class="text-right">Página {{ $index + 1 }}</td>
+                <td class="header">AREA</td>
+                <td class="header">TAG</td>
+                <td class="header text-center" rowspan="2">HOJA DE CHEQUEO EQUIPO {{$record->equipo->nombre}}</td>
+                <td class="header">No DE CONTROL DE EQUIPO</td>
+                <td class="header">REVISION</td>
+                <td class="header">RAZON</td>
             </tr>
             <tr>
-                <td colspan="5" class="subheader">Hoja de chequeo</td>
-                <td colspan="5" class="subheader">AREA: {{ $record->equipo->area  }}</td>
-                <td colspan="5" class="subheader">TAG: {{ $record->equipo->tag  }}</td>
+                <td class="subheader">{{ $record->equipo->area  }}</td>
+                <td class="subheader">{{ $record->equipo->tag  }}</td>
+                <td class="subheader">{{ $record->equipo->numeroControl  }}</td>
+                <td class="subheader">{{ $record->equipo->revision }}</td>
+                <td class="subheader">EMISION</td>
             </tr>
         </table>
 

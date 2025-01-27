@@ -12,7 +12,9 @@ class Equipo extends Model
         'nombre',
         'tag',
         'area',
-        'foto'
+        'foto',
+        'revision',
+        'numeroControl'
     ];
 
     public function hojasChequeo(): HasMany {
