@@ -25,4 +25,8 @@ class HojaChequeo extends Model
     public function chequeosDiarios(): HasMany {
         return $this->hasMany(ChequeoDiario::class);
     }
+
+    public function reportes(): HasMany {
+        return $this->hasMany(Reporte::class);
+    }
 }

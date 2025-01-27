@@ -19,6 +19,180 @@ class EquiposSeeder extends Seeder
     public function cuartoDeMaquinas(): void {
         $this->laHid02();
         $this->sth06();
+        $this->lsHdc02();
+    }
+
+    public function lsHdc02() {
+        $equipo = Equipo::create([
+            'tag'           => 'LS-HDC-02',
+            'nombre'        => 'LAV. HIDROCARBURO',
+            'area'          => 'Lavado en Seco',
+            'foto'          => null,
+            'numeroControl' => '002',
+            'revision'      => 'N'
+        ]);
+
+        $hoja = HojaChequeo::create([
+            'equipo_id'     => $equipo->id,
+            'version'       => 1,
+            'observaciones' => null,
+            'area'          => 'Tintoreria' // Inferido de Lavado en Seco
+        ]);
+
+        $items = [
+            [
+                'items'     => [
+                    'ITEM'       => 'LIMPIAR EL DESTILADOR',
+                    'FRECUENCIA' => '1 VEZ AL DÍA',
+                    'CRITERIO'   => 'CUANDO EL DESTILADOR ESTA FRIO'
+                ],
+                'categoria' => 'limpieza'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'LIMPIAR EL FILTRO DE TRAMPA BOTÓN',
+                    'FRECUENCIA' => '1 VEZ AL DÍA',
+                    'CRITERIO'   => 'CADA 3-4 CICLOS'
+                ],
+                'categoria' => 'limpieza'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'LIMPIAR EL FILTRO DE AIRE PRIMARIO Y SECUNDARIO',
+                    'FRECUENCIA' => '1 VEZ AL DÍA',
+                    'CRITERIO'   => 'MAQUINA EN PUNTO MUERTO'
+                ],
+                'categoria' => 'limpieza'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'LIMPIAR LOS FILTROS SPIN (1 y 2)',
+                    'FRECUENCIA' => '1 VEZ AL DÍA',
+                    'CRITERIO'   => 'CADA 8-10 CICLOS'
+                ],
+                'categoria' => 'limpieza'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'CORRER EL PROGRAMA DE “GOOD MORNING”',
+                    'FRECUENCIA' => '1 VEZ AL DÍA',
+                    'CRITERIO'   => 'DESPUES DE LA LIMPIEZA DEL DESTILADOR'
+                ],
+                'categoria' => 'operacion'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'LIMPIAR EL FILTRO DE LA BOMBA DE VACÍO',
+                    'FRECUENCIA' => '2 VECES POR SEMANA',
+                    'CRITERIO'   => 'MAQUINA EN PUNTO MUERTO'
+                ],
+                'categoria' => 'limpieza'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'LIMPIAR EL FILTRO DE AIRE PRIMARIO Y SECUNDARIO',
+                    'FRECUENCIA' => '1 VEZ POR SEMANA',
+                    'CRITERIO'   => 'LIMPIEZA PROFUNDA'
+                ],
+                'categoria' => 'limpieza'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'LIMPIAR EL FLOTADOR DE LA TRAMPA DE BOTONES',
+                    'FRECUENCIA' => 'CADA 2 MESES',
+                    'CRITERIO'   => 'LIMPIEZA PROFUNDA'
+                ],
+                'categoria' => 'limpieza'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'COMPRESOR',
+                    'FRECUENCIA' => '1 VEZ AL DÍA',
+                    'CRITERIO'   => 'PURGA'
+                ],
+                'categoria' => 'operacion' // Corregido operacon->operacion
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'CICLOS',
+                    'FRECUENCIA' => 'AL FINAL DEL DÍA',
+                    'CRITERIO'   => 'TOTALES'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'SOLVENTE',
+                    'FRECUENCIA' => 'SEMANAL',
+                    'CRITERIO'   => 'RELLENAR NIVELES'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'LIMPIEZA DE SEPARADOR DE AGUA',
+                    'FRECUENCIA' => '1 VEZ AL MES',
+                    'CRITERIO'   => 'LIMPIEZA PROFUNDA'
+                ],
+                'categoria' => 'limpieza'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'LECTURA DEL MANOMETRO ST1',
+                    'FRECUENCIA' => '1 VEZ AL DÍA',
+                    'CRITERIO'   => 'ESTADO OPTIMO DE CONDENSADOR Y DESTILADOR'
+                ],
+                'categoria' => 'operacion'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'LECTURA DEL MANOMETRO ST3',
+                    'FRECUENCIA' => '1 VEZ AL DÍA',
+                    'CRITERIO'   => 'ESTADO OPTIMO DE CONDENSADOR Y DESTILADOR'
+                ],
+                'categoria' => 'operacion'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'LECTURA DEL MANOMETRO ST6',
+                    'FRECUENCIA' => '1 VEZ AL DÍA',
+                    'CRITERIO'   => 'ESTADO OPTIMO DE CONDENSADOR Y DESTILADOR'
+                ],
+                'categoria' => 'operacion'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'CICLOS DEL FILTRO ROTATIVO F1',
+                    'FRECUENCIA' => '1 VEZ AL DÍA',
+                    'CRITERIO'   => 'ESTADO OPTIMO DEl FILTRO SPIN 1'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'CICLOS DEL FILTRO ROTATIVO F2',
+                    'FRECUENCIA' => '1 VEZ AL DÍA',
+                    'CRITERIO'   => 'ESTADO OPTIMO DEl FILTRO SPIN 2'
+                ],
+                'categoria' => 'revision' // Inferido de línea anterior
+            ],
+            [
+                'items'     => [
+                    'ITEM'       => 'limpieza general del equipo',
+                    'FRECUENCIA' => '1 VEZ AL DÍA',
+                    'CRITERIO'   => 'LIMPIEZA PROFUNDA'
+                ],
+                'categoria' => 'limpieza'
+            ]
+        ];
+
+        foreach ($items as $item) {
+            Item::create([
+                'hoja_chequeo_id' => $hoja->id,
+                'valores'         => $item['items'],
+                'categoria'       => $item['categoria']
+            ]);
+        }
     }
 
     public function sth06() {
