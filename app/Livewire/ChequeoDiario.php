@@ -118,10 +118,7 @@ class ChequeoDiario extends Component implements HasForms
                     ->sendToDatabase(User::role('Administrador')->get(), isEventDispatched: true);
 
         if ($this->reported) {
-            Reporte::create(
-                ['equipo_id' => $this->checkSheet->equipo->id],
-                ['fecha' => Carbon::now()]
-            );
+            Reporte::create(['equipo_id' => $this->checkSheet->equipo->id, 'fecha' => Carbon::now()]);
             $this->redirect('https://mantenimientotintoreriatacuba.netlify.app/');
         } else {
             $this->resetState();
