@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 class EquipmentAlertsChart extends ChartWidget
 {
-    protected int|string|array $columnSpan = "full";
     protected static ?string   $heading    = 'Top 5 Equipos con Más Alertas';
     protected static ?string   $maxHeight  = '400px';
 
