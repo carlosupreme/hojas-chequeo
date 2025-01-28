@@ -22,32 +22,38 @@ class HojaChequeoResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-wrench';
 
-    public static function table(Table $table): Table {
+    public static function table(Table $table): Table
+    {
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('equipo.tag')
-                                         ->sortable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('equipo.nombre')
-                                         ->sortable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('version')
-                                         ->numeric()
-                                         ->sortable(),
+                    ->searchable()
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\ToggleColumn::make('active')
-                                           ->label('Publicada')
-                                           ->beforeStateUpdated(fn($record) => HojaChequeo::where('equipo_id', $record->equipo_id)
-                                                                                          ->update(['active' => false])),
+                    ->label('Publicada')
+                    ->beforeStateUpdated(fn($record) => HojaChequeo::where('equipo_id', $record->equipo_id)
+                        ->update(['active' => false])),
                 Tables\Columns\TextColumn::make('area')
-                                         ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('observaciones')
-                                         ->searchable(),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
-                                         ->dateTime()
-                                         ->sortable()
-                                         ->toggleable(isToggledHiddenByDefault: true),
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                                         ->dateTime()
-                                         ->sortable()
-                                         ->toggleable(isToggledHiddenByDefault: true),
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
@@ -55,8 +61,8 @@ class HojaChequeoResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\Action::make('Historial')
-                                     ->url(fn(HojaChequeo $record): string => HojaChequeoResource::getUrl('history', ['record' => $record]))
-                                     ->icon('heroicon-o-calendar'),
+                    ->url(fn(HojaChequeo $record): string => HojaChequeoResource::getUrl('history', ['record' => $record]))
+                    ->icon('heroicon-o-calendar'),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -68,71 +74,74 @@ class HojaChequeoResource extends Resource
     }
 
 
-    public static function infolist(Infolist $infolist): Infolist {
+    public static function infolist(Infolist $infolist): Infolist
+    {
         return $infolist
             ->schema([
                 Grid::make()->schema([
                     Section::make('Datos de la hoja de chequeo')
-                           ->icon('heroicon-o-document')
-                           ->schema([
-                               Grid::make()->schema([
-                                   TextEntry::make('version'),
-                                   TextEntry::make('area')
-                               ]),
-                               TextEntry::make('observaciones')->html(),
-                               Grid::make(3)->schema([
-                                   TextEntry::make('created_at')->label('Creado')
-                                            ->since()
-                                            ->dateTimeTooltip()
-                                            ->columnSpan(1)->badge(),
-                                   TextEntry::make('updated_at')->label('Actualizado')
-                                            ->columnSpan(1)->since()
-                                            ->dateTimeTooltip()->badge(),
-                                   IconEntry::make('active')
-                                            ->label('Activa')
-                                            ->boolean()
-                                            ->columnSpan(1),
-                               ])
-                           ])->columnSpan(1),
+                        ->icon('heroicon-o-document')
+                        ->schema([
+                            Grid::make()->schema([
+                                TextEntry::make('version'),
+                                TextEntry::make('area')
+                            ]),
+                            TextEntry::make('observaciones')->html(),
+                            Grid::make(3)->schema([
+                                TextEntry::make('created_at')->label('Creado')
+                                    ->since()
+                                    ->dateTimeTooltip()
+                                    ->columnSpan(1)->badge(),
+                                TextEntry::make('updated_at')->label('Actualizado')
+                                    ->columnSpan(1)->since()
+                                    ->dateTimeTooltip()->badge(),
+                                IconEntry::make('active')
+                                    ->label('Activa')
+                                    ->boolean()
+                                    ->columnSpan(1),
+                            ])
+                        ])->columnSpan(1),
                     Section::make('Datos del equipo')->columnSpan(1)
-                           ->icon('heroicon-o-wrench-screwdriver')
-                           ->schema([
-                               Grid::make()->schema([
-                                   TextEntry::make('equipo.nombre')
-                                            ->label('Equipo'),
-                                   ImageEntry::make('equipo.foto')->label('Foto')
-                                             ->extraImgAttributes(['class' => 'rounded-lg'])
-                               ]),
-                               Grid::make()->schema([
-                                   TextEntry::make('equipo.tag')
-                                            ->label('Tag')
-                                            ->columnSpan(1),
-                                   TextEntry::make('equipo.area')
-                                            ->label('Area')
-                               ]),
-                           ]),
+                        ->icon('heroicon-o-wrench-screwdriver')
+                        ->schema([
+                            Grid::make()->schema([
+                                TextEntry::make('equipo.nombre')
+                                    ->label('Equipo'),
+                                ImageEntry::make('equipo.foto')->label('Foto')
+                                    ->extraImgAttributes(['class' => 'rounded-lg'])
+                            ]),
+                            Grid::make()->schema([
+                                TextEntry::make('equipo.tag')
+                                    ->label('Tag')
+                                    ->columnSpan(1),
+                                TextEntry::make('equipo.area')
+                                    ->label('Area')
+                            ]),
+                        ]),
                     Section::make('Items')->columnSpanFull()
-                           ->icon('heroicon-o-table-cells')
-                           ->schema([
-                               ViewItems::make('items')->hiddenLabel()
-                           ])
+                        ->icon('heroicon-o-table-cells')
+                        ->schema([
+                            ViewItems::make('items')->hiddenLabel()
+                        ])
                 ])
             ]);
     }
 
 
-    public static function getRelations(): array {
+    public static function getRelations(): array
+    {
         return [
             //
         ];
     }
 
-    public static function getPages(): array {
+    public static function getPages(): array
+    {
         return [
-            'index'   => Pages\ListHojaChequeos::route('/'),
-            'create'  => Pages\CreateHojaChequeo::route('/crear'),
-            'view'    => Pages\ViewHojaChequeo::route('/{record}'),
-            'edit'    => Pages\EditHojaChequeo::route('/{record}/editar'),
+            'index' => Pages\ListHojaChequeos::route('/'),
+            'create' => Pages\CreateHojaChequeo::route('/crear'),
+            'view' => Pages\ViewHojaChequeo::route('/{record}'),
+            'edit' => Pages\EditHojaChequeo::route('/{record}/editar'),
             'history' => Pages\HistoryHojaChequeo::route('/{record}/historial')
         ];
     }

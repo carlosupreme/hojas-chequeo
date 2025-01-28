@@ -13,7 +13,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignIdFor(\App\Models\Equipo::class)->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->integer('version')->default(1);
-            $table->string('observaciones')->nullable();
+            $table->text('observaciones')->nullable();
             $table->timestamps();
 
             $table->unique(['equipo_id', 'version']);

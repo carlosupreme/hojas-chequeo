@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\HojaChequeoArea;
 use App\Models\HojaChequeo;
 use Livewire\Component;
 
@@ -12,21 +13,38 @@ class SelectHojaChequeo extends Component
 
     protected $queryString = ['search' => ['except' => '']];
 
-    public function selectEquipo($id) {
+    public ?HojaChequeoArea $activeFilter = null;
+
+    public function toggleFilter(HojaChequeoArea $filter): void
+    {
+       $this->activeFilter = ($this->activeFilter === $filter) ? null : $filter;
+    }
+
+    public function selectEquipo($id)
+    {
         $this->dispatch('checkSheetSelected', $id);
     }
 
-    public function render() {
-        $hojas = HojaChequeo::with('equipo', 'chequeosDiarios')
-                            ->whereActive(true)
-                            ->whereHas('equipo', function ($query) {
-                                $query->where(function ($subQuery) {
-                                    $subQuery->whereRaw('LOWER(nombre) LIKE ?', ['%' . strtolower($this->search) . '%'])
-                                             ->orWhereRaw('LOWER(tag) LIKE ?', ['%' . strtolower($this->search) . '%'])
-                                             ->orWhereRaw('LOWER(area) LIKE ?', ['%' . strtolower($this->search) . '%']);
-                                });
-                            })->get();
+    public function render()
+    {
+        $query = HojaChequeo::with('equipo', 'chequeosDiarios')
+            ->whereActive(true);
 
-        return view('livewire.select-hoja-chequeo', compact('hojas'));
+        if ($this->activeFilter) {
+            $query = $query->where('area', $this->activeFilter->value);
+        }
+
+        $query = $query
+            ->whereHas('equipo', function ($query) {
+                $query->where(function ($subQuery) {
+                    $subQuery->whereRaw('LOWER(nombre) LIKE ?', ['%' . strtolower($this->search) . '%'])
+                        ->orWhereRaw('LOWER(tag) LIKE ?', ['%' . strtolower($this->search) . '%'])
+                        ->orWhereRaw('LOWER(area) LIKE ?', ['%' . strtolower($this->search) . '%']);
+                });
+            })->get();
+
+        return view('livewire.select-hoja-chequeo', [
+            'hojas' => $query
+        ]);
     }
 }
