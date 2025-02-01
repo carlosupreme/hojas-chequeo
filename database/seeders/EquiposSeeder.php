@@ -21,11 +21,475 @@ class EquiposSeeder extends Seeder
 
     public function cuartoDeMaquinas(): void {
         $this->laHid02();
-        $this->cmCal01(1);
-        $this->cmCal01(2);
+        $this->cmCal(1);
+        $this->cmCal(2);
+        $this->cmCom01();
+        $this->cmTco01();
+        $this->sua05();
+        $this->fze03();
+        $this->fca02();
+        $this->cm02Hid01();``
+    }
+    public function cm02Hid01(): void {
+        $equipo = Equipo::create([
+            'tag' => 'CM02-HID-01',
+            'nombre' => 'HIDRONEUMATICO 1',
+            'numeroControl' => '01',
+            'revision' => 'NOM-020-STPS-2012',
+            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+        ]);
+
+        $hoja = HojaChequeo::create([
+            'equipo_id' => $equipo->id,
+            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+        ]);
+
+        $items = [
+            [
+                'items' => [
+                    'ITEM' => 'ENCENDIDO DE INTERRUPTOR PRINCIPAL',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => 'VISUAL',
+                    'CRITERIO' => 'REVISAR QUE ESTE ENCENDIDO EL INTERRUPTOR DEL COMPRESOR DEL HIDRONEUMATICO',
+                    'QUIEN REALIZA' => 'OPERARIO'
+                ],
+                'categoria' => 'operacion'
+            ],
+            [
+                'items' => [
+                    'ITEM' => 'ENCENDIDO DE INTERRUPTOR SECUNDARIO',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => 'VISUAL Y AUDITIVO',
+                    'CRITERIO' => 'REVISAR QUE ESTE ENCENDIDO EL INTERRUPTOR DEL COMPRESOR DEL HIDRONEUMATICO',
+                    'QUIEN REALIZA' => 'OPERARIO'
+                ],
+                'categoria' => 'operacion'
+            ],
+            [
+                'items' => [
+                    'ITEM' => 'LIMPIEZA EXTERIOR DE EQUIPO',
+                    'FRECUENCIA' => '1 VEZ CADA TURNO',
+                    'METODO' => 'VISUAL',
+                    'CRITERIO' => 'REALIZAR AL INICIO DEL TURNO',
+                    'QUIEN REALIZA' => 'OPERARIO'
+                ],
+                'categoria' => 'limpieza'
+            ],
+            [
+                'items' => [
+                    'ITEM' => 'REVISION DE TUBERIA PRINCIPAL',
+                    'FRECUENCIA' => '1 VEZ CADA SEMANA',
+                    'METODO' => 'VISUAL',
+                    'CRITERIO' => 'CHECAR SI HAY FUGAS EN UNIONES',
+                    'QUIEN REALIZA' => 'OPERARIO'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items' => [
+                    'ITEM' => 'REVISION DE LLENADO DE CISTERNA',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => 'VISUAL',
+                    'CRITERIO' => 'VERIFICAR EL LLEANDO DE LA CISTERNA',
+                    'QUIEN REALIZA' => 'OPERARIO'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items' => [
+                    'ITEM' => 'PRESION DE TRABAJO MANOMETRO',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => '',
+                    'CRITERIO' => '60 PSI A 80 PSI',
+                    'QUIEN REALIZA' => 'OPERARIO'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items' => [
+                    'ITEM' => 'PRESION DEL AIRE',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => '',
+                    'CRITERIO' => '58 PSI',
+                    'QUIEN REALIZA' => 'OPERARIO'
+                ],
+                'categoria' => 'revision'
+            ]
+        ];
+
+        foreach ($items as $item) {
+            Item::create([
+                'hoja_chequeo_id' => $hoja->id,
+                'valores' => $item['items'],
+                'categoria' => $item['categoria']
+            ]);
+        }
+    }
+    public function fca02(): void {
+        $equipo = Equipo::create([
+            'tag' => 'FCA-02',
+            'nombre' => 'FILTRO CARBON ACTIVADO',
+            'numeroControl' => '002',
+            'revision' => 'N',
+            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+        ]);
+
+        $hoja = HojaChequeo::create([
+            'equipo_id' => $equipo->id,
+            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+        ]);
+
+        $items = [
+            [
+                'items' => [
+                    'ITEM' => 'ANALISIS DE CLORO RESIDUAL',
+                    'NORMA' => 'ENTRADA',
+                    'FRECUENCIA' => '1 VEZ POR DIA'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items' => [
+                    'ITEM' => 'ANALISIS DE CLORO RESIDUAL',
+                    'NORMA' => 'SALIDA',
+                    'FRECUENCIA' => '1 VEZ POR DIA'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items' => [
+                    'ITEM' => 'RETROLAVADO',
+                    'NORMA' => 'CON CLORO>1 PPM',
+                    'FRECUENCIA' => 'CADA SEMANA'
+                ],
+                'categoria' => 'operacion'
+            ],
+            [
+                'items' => [
+                    'ITEM' => 'LIMPIEZA GENERAL',
+                    'NORMA' => 'LIMPIEZA PROFUNDA',
+                    'FRECUENCIA' => 'CADA DIA'
+                ],
+                'categoria' => 'limpieza'
+            ]
+        ];
+
+        foreach ($items as $item) {
+            Item::create([
+                'hoja_chequeo_id' => $hoja->id,
+                'valores' => $item['items'],
+                'categoria' => $item['categoria']
+            ]);
+        }
+    }
+    public function fze03(): void {
+        $equipo = Equipo::create([
+            'tag' => 'FZE-03',
+            'nombre' => 'FILTRO DE ZEOLITA',
+            'numeroControl' => '001',
+            'revision' => 'N',
+            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+        ]);
+
+        $hoja = HojaChequeo::create([
+            'equipo_id' => $equipo->id,
+            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+        ]);
+
+        $items = [
+            [
+                'items' => [
+                    'ITEM' => 'TURBIDEZ',
+                    'NORMA' => '<5 NTU',
+                    'FRECUENCIA' => '1 VEZ POR DIA'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items' => [
+                    'ITEM' => 'COLOR DE AGUA EN EL ROTAMETRO',
+                    'NORMA' => 'CLARA',
+                    'FRECUENCIA' => '1 VEZ POR DIA'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items' => [
+                    'ITEM' => 'RETROLAVADO',
+                    'NORMA' => 'CON TURBIDEZ > 5 NTU',
+                    'FRECUENCIA' => 'CADA SEMANA'
+                ],
+                'categoria' => 'operacion'
+            ],
+            [
+                'items' => [
+                    'ITEM' => 'LIMPIEZA GENERAL',
+                    'NORMA' => 'LIMPIEZA PROFUNDA',
+                    'FRECUENCIA' => 'CADA DIA'
+                ],
+                'categoria' => 'limpieza'
+            ]
+        ];
+
+        foreach ($items as $item) {
+            Item::create([
+                'hoja_chequeo_id' => $hoja->id,
+                'valores' => $item['items'],
+                'categoria' => $item['categoria']
+            ]);
+        }
     }
 
-    public function cmCal01($tag) {
+    public function cmTco01(): void {
+        $equipo = Equipo::create([
+            'tag' => 'CM-TCO-01',
+            'nombre' => 'TANQUE DE CONDENSADOS',
+            'numeroControl' => '001',
+            'revision' => 'N',
+            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+        ]);
+
+        $hoja = HojaChequeo::create([
+            'equipo_id' => $equipo->id,
+            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+        ]);
+
+        $items = [
+            [
+                'items' => [
+                    'ITEM DE CHEQUEO' => 'REVISION DE LLENADO',
+                    'FRECUENCIA' => '1 VECES POR TURNO',
+                    'METODO DE CHEQUEO' => 'VISUAL',
+                    'CRITERIO DE DETERMINACION' => 'REVISION DE NIVEL EN MANGUERA',
+                    'QUIEN REALIZA' => 'OPERARIO',
+                    'OBSERVACIONES' => 'PREVENIR EL VACIADO DEL TANQUE'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items' => [
+                    'ITEM DE CHEQUEO' => 'REVISION DE VALVULA DE LLENADO',
+                    'FRECUENCIA' => '1 VECES POR TURNO',
+                    'METODO DE CHEQUEO' => 'VISUAL',
+                    'CRITERIO DE DETERMINACION' => 'REVISAR EL CERRADO DE LA LLAVE AL LLENAR TANQUE DE CONDENSADOS',
+                    'QUIEN REALIZA' => 'OPERARIO',
+                    'OBSERVACIONES' => 'PREVENIR DERRAME POR SOBRELLENADO'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items' => [
+                    'ITEM DE CHEQUEO' => 'REVISION VALVULA DE SURTIDO',
+                    'FRECUENCIA' => '3 VECES POR TURNO',
+                    'METODO DE CHEQUEO' => 'VISUAL',
+                    'CRITERIO DE DETERMINACION' => 'REVISAR LA APERTURA DE LAS VALVULAS QUE SUMINISTRAN AGUA A LA CALDERA',
+                    'QUIEN REALIZA' => 'OPERARIO',
+                    'OBSERVACIONES' => 'VERIFICAR QUE LA CALDERA NO SE QUEDE SIN SUMINISTRO DE AGUA'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items' => [
+                    'ITEM DE CHEQUEO' => 'TEMPERATURA INTERIOR',
+                    'FRECUENCIA' => '1 VECES DURANTE EL TURNO',
+                    'METODO DE CHEQUEO' => 'MANUAL',
+                    'CRITERIO DE DETERMINACION' => '70 °C a 95°C',
+                    'QUIEN REALIZA' => 'OPERARIO',
+                    'OBSERVACIONES' => ''
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items' => [
+                    'ITEM DE CHEQUEO' => 'COLOR DE AGUA EN LA PRUEBA',
+                    'FRECUENCIA' => '1 VECES DURANTE EL TURNO',
+                    'METODO DE CHEQUEO' => 'MANUAL',
+                    'CRITERIO DE DETERMINACION' => 'A/M',
+                    'QUIEN REALIZA' => 'OPERARIO',
+                    'OBSERVACIONES' => ''
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items' => [
+                    'ITEM DE CHEQUEO' => '% DUREZA (EDTA)',
+                    'FRECUENCIA' => '1 VECES DURANTE EL TURNO',
+                    'METODO DE CHEQUEO' => 'MANUAL',
+                    'CRITERIO DE DETERMINACION' => '0 PPM',
+                    'QUIEN REALIZA' => 'OPERARIO',
+                    'OBSERVACIONES' => ''
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items' => [
+                    'ITEM DE CHEQUEO' => 'FLOTADOR',
+                    'FRECUENCIA' => 'CADA 4 MESES',
+                    'METODO DE CHEQUEO' => 'VISUAL',
+                    'CRITERIO DE DETERMINACION' => '',
+                    'QUIEN REALIZA' => 'OPERARIO',
+                    'OBSERVACIONES' => ''
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items' => [
+                    'ITEM DE CHEQUEO' => 'LIMPIEZA DE MALLA',
+                    'FRECUENCIA' => 'CADA 10 DIAS',
+                    'METODO DE CHEQUEO' => '',
+                    'CRITERIO DE DETERMINACION' => '',
+                    'QUIEN REALIZA' => '',
+                    'OBSERVACIONES' => ''
+                ],
+                'categoria' => 'limpieza'
+            ],
+            [
+                'items' => [
+                    'ITEM DE CHEQUEO' => 'CUERPO DE TANQUE (LIMPIEZA)',
+                    'FRECUENCIA' => 'CADA 4 MESES',
+                    'METODO DE CHEQUEO' => '',
+                    'CRITERIO DE DETERMINACION' => '',
+                    'QUIEN REALIZA' => '',
+                    'OBSERVACIONES' => ''
+                ],
+                'categoria' => 'limpieza'
+            ]
+        ];
+
+        foreach ($items as $item) {
+            Item::create([
+                'hoja_chequeo_id' => $hoja->id,
+                'valores' => $item['items'],
+                'categoria' => $item['categoria']
+            ]);
+        }
+    }
+    public function cmCom01(): void {
+        $equipo = Equipo::create([
+            'tag' => 'CM-COM-01',
+            'nombre' => 'COMPRESOR -01',
+            'numeroControl' => 'AC-ES-248-RSP-012-2024',
+            'revision' => 'NOM-020-STPS-2011',
+            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+        ]);
+
+        $hoja = HojaChequeo::create([
+            'equipo_id' => $equipo->id,
+            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+        ]);
+
+        $items = [
+            [
+                'items' => [
+                    'ITEM DE CHEQUEO' => 'PURGA DE FONDO',
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
+                    'CRITERIO DE DETERMINACION' => 'APERTURA DE VALVULA',
+                    'OBSERVACIONES' => ''
+                ],
+                'categoria' => 'operacion'
+            ],
+            [
+                'items' => [
+                    'ITEM DE CHEQUEO' => 'DISPARO VALVULA DE SEGURIDAD',
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
+                    'CRITERIO DE DETERMINACION' => 'ACCIOANMIENTO DE VALVULA MODO MANUAL',
+                    'OBSERVACIONES' => ''
+                ],
+                'categoria' => 'operacion'
+            ],
+            [
+                'items' => [
+                    'ITEM DE CHEQUEO' => 'ENCENDIDO DE INTERRUPTOR PRINCIPAL',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'CRITERIO DE DETERMINACION' => 'REVISAR QUE ESTE ENCENDIDO EL INTERRUPTOR DEL COMPRESOR AL INICIAR TURNO',
+                    'OBSERVACIONES' => 'Pastilla termomagnetica en buen estado del tablero'
+                ],
+                'categoria' => 'operacion'
+            ],
+            [
+                'items' => [
+                    'ITEM DE CHEQUEO' => 'ENCENDIDO DE INTERRUPTOR SECUNDARIO',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'CRITERIO DE DETERMINACION' => 'REVISAR QUE ESTE ENCENDIDO EL INTERRUPTOR DEL COMPRESOR AL INICIAR TURNO',
+                    'OBSERVACIONES' => 'Cola de rata en buen estado'
+                ],
+                'categoria' => 'operacion'
+            ],
+            [
+                'items' => [
+                    'ITEM DE CHEQUEO' => 'TEMPERATURA DE PARTES A PRESIÓN',
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
+                    'CRITERIO DE DETERMINACION' => '70°C A 140°C',
+                    'OBSERVACIONES' => ''
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items' => [
+                    'ITEM DE CHEQUEO' => 'PRESIÓN MANOMETRICA',
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
+                    'CRITERIO DE DETERMINACION' => '7 kg a 9 kg',
+                    'OBSERVACIONES' => ''
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items' => [
+                    'ITEM DE CHEQUEO' => 'FUNCIONAMIENTO DE VALVULA DE ALIVIO',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'CRITERIO DE DETERMINACION' => 'LIBERACION DE PRESION AL LLEGAR A LA PRESION DE TRABAJO',
+                    'OBSERVACIONES' => 'Revisar calibracion adecuada'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items' => [
+                    'ITEM DE CHEQUEO' => 'REVISION DE BANDAS',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'CRITERIO DE DETERMINACION' => 'VERIFICAR EL DESGASTE Y POSICION',
+                    'OBSERVACIONES' => 'Tension de la banda'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items' => [
+                    'ITEM DE CHEQUEO' => 'REVISION FILTRO DE AIRE',
+                    'FRECUENCIA' => '1 VEZ POR SEMANA',
+                    'CRITERIO DE DETERMINACION' => 'VERIFICAR LA SUCIEDAD DEL FILTRO',
+                    'OBSERVACIONES' => 'Limpiar en contra del sentido'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items' => [
+                    'ITEM DE CHEQUEO' => 'REVISIÓN NIVEL DE ACEITE',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'CRITERIO DE DETERMINACION' => 'REVISAR QUE EL NIVEL DEL ACEITE ESTE A 3/4 DE SU CAPACIDAD',
+                    'OBSERVACIONES' => 'Lubricacion de los mecanismos'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items' => [
+                    'ITEM DE CHEQUEO' => 'LIMPIEZA EXTERIOR DE EQUIPO',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'CRITERIO DE DETERMINACION' => 'LIBERACION DE PRESION AL LLEGAR A LA PRESION DE TRABAJO',
+                    'OBSERVACIONES' => 'Exceso de pelusa y grasa'
+                ],
+                'categoria' => 'limpieza'
+            ]
+        ];
+
+        foreach ($items as $item) {
+            Item::create([
+                'hoja_chequeo_id' => $hoja->id,
+                'valores' => $item['items'],
+                'categoria' => $item['categoria']
+            ]);
+        }
+    }
+
+    public function cmCal($tag) {
         $equipo = Equipo::create([
             'tag'           => 'CM-CAL-0'. $tag,
             'nombre'        => 'CALDERA ' . $tag,
@@ -1079,6 +1543,86 @@ class EquiposSeeder extends Seeder
                 'hoja_chequeo_id' => $hoja->id,
                 'valores'         => $item['items'],
                 'categoria'       => $item['categoria']
+            ]);
+        }
+    }
+
+    public function sua05(): void {
+        $equipo = Equipo::create([
+            'tag' => 'SUA-05',
+            'nombre' => 'SUAVIZADOR 05',
+            'numeroControl' => '005',
+            'revision' => 'N',
+            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+        ]);
+
+        $hoja = HojaChequeo::create([
+            'equipo_id' => $equipo->id,
+            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+        ]);
+
+        $items = [
+            [
+                'items' => [
+                    'ITEM' => 'RETROLAVADO',
+                    'FRECUENCIA' => 'CADA 36 HRS',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'CUANDO SE PRESENTE DUREZA 0 A 80 PPM'
+                ],
+                'categoria' => 'operacion'
+            ],
+            [
+                'items' => [
+                    'ITEM' => 'LIMPIEZA DEL INYECTOR',
+                    'FRECUENCIA' => '1 VEZ POR 15 DIAS',
+                    'METODO' => '',
+                    'CRITERIO' => ''
+                ],
+                'categoria' => 'limpieza'
+            ],
+            [
+                'items' => [
+                    'ITEM' => 'NIVEL DE SALMUERA',
+                    'FRECUENCIA' => 'CADA 36 HRS',
+                    'METODO' => '',
+                    'CRITERIO' => '3/4 DE LLENADO'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items' => [
+                    'ITEM' => 'COLOR DE AGUA EN LA PRUEBA',
+                    'FRECUENCIA' => '1 VEZ POR DIA',
+                    'METODO' => '',
+                    'CRITERIO' => 'A/M'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items' => [
+                    'ITEM' => '% DUREZA DEL AGUA (EDTA)',
+                    'FRECUENCIA' => '1 VEZ POR DIA',
+                    'METODO' => '',
+                    'CRITERIO' => '0 PPM'
+                ],
+                'categoria' => 'revision'
+            ],
+            [
+                'items'     => [
+                    'ITEM'        => 'LIMPIEZA GENERAL',
+                    'FRECUENCIA'  => '1 VEZ POR TURNO',
+                    'METODO'      => '',
+                    'CRITERIO'    => 'LIMPIEZA PROFUNDA',
+                ],
+                'categoria' => 'limpieza'
+            ]
+        ];
+
+        foreach ($items as $item) {
+            Item::create([
+                'hoja_chequeo_id' => $hoja->id,
+                'valores' => $item['items'],
+                'categoria' => $item['categoria']
             ]);
         }
     }
