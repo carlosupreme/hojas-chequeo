@@ -11,7 +11,8 @@ class HojaChequeo extends Model
     protected $fillable = [
         'equipo_id',
         'version',
-        'observaciones'
+        'observaciones',
+        'area'
     ];
 
     public function equipo(): BelongsTo {

@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\HojaChequeoResource\Pages;
 use App\Filament\Resources\HojaChequeoResource\RelationManagers;
+use App\HojaChequeoArea;
 use App\Infolists\Components\ViewItems;
 use App\Models\HojaChequeo;
 use Filament\Infolists\Components\Grid;
@@ -15,6 +16,7 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class HojaChequeoResource extends Resource
 {
@@ -56,7 +58,12 @@ class HojaChequeoResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\Filter::make('Tintoreria')
+                                     ->query(fn(Builder $query): Builder => $query->where('area', HojaChequeoArea::TINTORERIA->value)),
+                Tables\Filters\Filter::make('Lavanderia')
+                                     ->query(fn(Builder $query): Builder => $query->where('area', HojaChequeoArea::LAVANDERIA_INSTITUCIONAL->value)),
+                Tables\Filters\Filter::make('Cuarto de maquinas')
+                                     ->query(fn(Builder $query): Builder => $query->where('area', HojaChequeoArea::CUARTO_DE_MAQUINAS->value))
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

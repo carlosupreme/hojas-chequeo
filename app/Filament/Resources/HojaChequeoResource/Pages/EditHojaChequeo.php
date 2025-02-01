@@ -28,6 +28,7 @@ class EditHojaChequeo extends Page
 
     public function mount(HojaChequeo $record): void {
         $this->record = $record;
+        debug($record);
         $this->form->fill([
             ...$this->record->attributesToArray(),
             'version' => HojaChequeo::where('equipo_id', $record->equipo_id)
@@ -53,9 +54,8 @@ class EditHojaChequeo extends Page
                           return $set('version', $ultimaVersion + 1);
                       })
                       ->required(),
-                Select::make('area')
-                      ->default(fn($record) => $record?->area)
-                      ->options(fn() => array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases()))
+                TextInput::make('area')
+                      ->datalist(fn() => array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases()))
                       ->required(),
                 TextInput::make('version')
                          ->readOnly()
