@@ -68,7 +68,7 @@ class HojaChequeoResource extends Resource
                                             ->queries(
                                                 true : fn(Builder $query) => $query->where('active', true),
                                                 false: fn(Builder $query) => $query->where('active', false),
-                                                blank: fn(Builder $query) => $query->whereNull('active')
+                                                blank: fn(Builder $query) => $query
                                             )
             ])
             ->actions([

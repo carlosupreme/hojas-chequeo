@@ -6,6 +6,9 @@
                 <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-left">
                     <span class="font-bold text-gray-800 dark:text-white">N°</span>
                 </th>
+                <th class="border border-gray-300 dark:border-gray-600 px-8 py-2 bg-gray-100 dark:bg-gray-700 text-left">
+                    <span class="font-bold text-gray-800 dark:text-white">Categoría</span>
+                </th>
                 @foreach ($columns as $index => $column)
                     <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-left">
                         <div class="flex items-center justify-between">
@@ -40,6 +43,16 @@
                 <tr class="{{ $loop->even ? 'bg-gray-50 dark:bg-gray-800' : '' }}">
                     <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-200">
                         {{ $rowIndex + 1 }}
+                    </td>
+                    <td class="border border-gray-300 dark:border-gray-600 px-4 py-2">
+                        <select
+                            wire:model.live="categories.{{ $rowIndex }}"
+                            class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                            <option value="limpieza">Limpieza</option>
+                            <option value="operacion">Operación</option>
+                            <option value="revision">Revisión</option>
+                        </select>
                     </td>
                     @foreach ($row as $colIndex => $cell)
                         <td class="border border-gray-300 dark:border-gray-600 px-4 py-2"
@@ -78,7 +91,6 @@
                                            width="xl"
                                            :close-by-clicking-away="false"
                                            :close-by-escaping="false"
-
                         >
                             <x-slot name="trigger">
                                 <x-filament::icon-button
@@ -96,11 +108,70 @@
                                                 selectedName: '',
                                                 open: false,
                                                 customText: '',
+                                                operador: null,
                                                 selectedStatus: null,
                                                 setCustom() {this.selectedName = 'Personalizado'; this.selectedStatus = null; this.open = false; this.showCustomInput = true;},
-                                                choose(id, name) {this.selectedName = name; this.selectedStatus = id; this.open = false; this.customText = '', this.showCustomInput = false;}
+                                                choose(id, name) {this.selectedName = name; this.selectedStatus = id; this.open = false; this.customText = ''; this.showCustomInput = false;}
                                            }">
-                                <p>Este item sea marcado con:</p>
+                                <div class="space-y-2">
+                                    <legend class="text-sm font-medium text-gray-700 mb-2">Este item sea</legend>
+
+                                    <div class="flex flex-col sm:flex-row gap-4">
+                                        <div class="flex items-center">
+                                            <input
+                                                type="radio"
+                                                id="igual"
+                                                name="comparison"
+                                                value="="
+                                                class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500 peer"
+                                                x-model="operador"
+                                                required
+                                            >
+                                            <label
+                                                for="igual"
+                                                class="ml-2 block text-sm text-gray-700 peer-checked:text-blue-600 peer-hover:text-blue-500 transition-colors"
+                                            >
+                                                Igual (=)
+                                            </label>
+                                        </div>
+
+                                        <div class="flex items-center">
+                                            <input
+                                                type="radio"
+                                                id="menor"
+                                                x-model="operador"
+                                                name="comparison"
+                                                value="<"
+                                                class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500 peer"
+                                            >
+                                            <label
+                                                for="menor"
+                                                class="ml-2 block text-sm text-gray-700 peer-checked:text-blue-600 peer-hover:text-blue-500 transition-colors"
+                                            >
+                                                Menor (&lt;)
+                                            </label>
+                                        </div>
+
+                                        <div class="flex items-center">
+                                            <input
+                                                type="radio"
+                                                id="mayor"
+                                                x-model="operador"
+                                                name="comparison"
+                                                value=">"
+                                                class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500 peer"
+                                            >
+                                            <label
+                                                for="mayor"
+                                                class="ml-2 block text-sm text-gray-700 peer-checked:text-blue-600 peer-hover:text-blue-500 transition-colors"
+                                            >
+                                                Mayor (&gt;)
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <p>Que el valor:</p>
 
                                 <div class="relative">
                                     <button
@@ -127,12 +198,11 @@
                                             <button @click="choose({{ $status->id }}, '{{ $status->nombre }}')"
                                                     class="cursor-pointer select-none relative py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600">
                                                 <div class="flex items-center">
-                                                        <span class="mr-3" style="color: {{ $status->color }}">
-                                                            <x-dynamic-component :component="$status->icono"
-                                                                                 class="h-5 w-5"/>
-                                                        </span>
-                                                    <span
-                                                        class="font-normal block truncate min-w-fit">{{ $status->nombre }}</span>
+                                                    <span class="mr-3" style="color: {{ $status->color }}">
+                                                        <x-dynamic-component :component="$status->icono"
+                                                                             class="h-5 w-5"/>
+                                                    </span>
+                                                    <span class="font-normal block truncate min-w-fit">{{ $status->nombre }}</span>
                                                 </div>
                                             </button>
                                         @endforeach
@@ -165,7 +235,7 @@
 
                                 <x-filament::button
                                     x-show="customText.length || selectedStatus != null"
-                                    @click.prevent="$wire.addAlert({{ $rowIndex }}, selectedStatus, customText)">
+                                    @click.prevent="$wire.addAlert({{ $rowIndex }}, selectedStatus, customText, operador)">
                                     Establecer
                                 </x-filament::button>
                             </div>
@@ -174,6 +244,7 @@
                 </tr>
             @endforeach
             <tr>
+                <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 bg-gray-50 dark:bg-gray-700"></td>
                 <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 bg-gray-50 dark:bg-gray-700"></td>
                 @foreach ($columns as $index => $column)
                     <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 bg-gray-50 dark:bg-gray-700"></td>
@@ -198,4 +269,3 @@
         <span>Tip: Haz clic en el lapiz de la celda para modificar su contenido. Usa los íconos '+' para agregar filas o columnas.</span>
     </div>
 </div>
-
