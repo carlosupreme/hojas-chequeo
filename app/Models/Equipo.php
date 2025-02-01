@@ -18,6 +18,10 @@ class Equipo extends Model
         'numeroControl'
     ];
 
+    public function tarjetones(): HasMany {
+        return $this->hasMany(Tarjeton::class);
+    }
+
     public function hojasChequeo(): HasMany {
         return $this->hasMany(HojaChequeo::class);
     }
