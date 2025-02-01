@@ -267,7 +267,7 @@ class EquiposSeeder extends Seeder
         $hoja = HojaChequeo::create([
             'equipo_id'     => $equipo->id,
             'area'          => HojaChequeoArea::TINTORERIA->value,
-            'version'       => rand(1,100),
+            'version'       => 1,
             'observaciones' => "<ul><li>DESCARGUE LA MAQUINA RAPIDAMENTE DESPUES DE CADA CICLO COMPLETADO PARA EVITAR LA ACUMULACION DE HUMEDAD.</li><li>DEJE LA PUERTA DE CARGA ABIERTA DESPUES DE CADA CICLO PARA PERMITIR QUE LA HUMEDAD SE EVAPORE.</li><li>CERRAR LAS VALVULAS PRINCIPALES DE AGUA, VAPOR  AL FINAL DE LA JORNADA ASI COMO TAMBIEN DESENERGIZAR EL EQUIPO.</li><li>EN LA OPCION DEL BLOQUEO DE PUERTA SE REALIZARA LOS SIGUIENTES PASOS:</li><ol><li>Intentar correr un programa  con la puerta abierta  (no debe funcionar).</li><li>Cierre la puerta y arranque la maquina después intente abrir la puerta mientras el ciclo esta en proceso (no debe de abrir).</li></ol></ul>"
         ]);
 
@@ -428,7 +428,7 @@ class EquiposSeeder extends Seeder
         $hoja = HojaChequeo::create([
             'equipo_id'     => $equipo->id,
             'area'          => HojaChequeoArea::LAVANDERIA_INSTITUCIONAL->value,
-            'version'       => rand(1,100),
+            'version'       => 1,
             'observaciones' => "<ul><li>DESCARGUE LA MAQUINA RAPIDAMENTE DESPUES DE CADA CICLO COMPLETADO PARA EVITAR LA ACUMULACION DE HUMEDAD.</li><li>DEJE LA PUERTA DE CARGA ABIERTA DESPUES DE CADA CICLO PARA PERMITIR QUE LA HUMEDAD SE EVAPORE.</li><li>CERRAR LAS VALVULAS PRINCIPALES DE AGUA, VAPOR  AL FINAL DE LA JORNADA ASI COMO TAMBIEN DESENERGIZAR EL EQUIPO.</li><li>EN LA OPCION DEL BLOQUEO DE PUERTA SE REALIZARA LOS SIGUIENTES PASOS:</li><ol><li>Intentar correr un programa  con la puerta abierta  (no debe funcionar).</li><li>Cierre la puerta y arranque la maquina después intente abrir la puerta mientras el ciclo esta en proceso (no debe de abrir).</li></ol></ul>"
         ]);
 
@@ -609,7 +609,7 @@ class EquiposSeeder extends Seeder
         $hoja = HojaChequeo::create([
             'equipo_id'     => $equipo->id,
             'area'          => $hojaArea,
-            'version'       =>rand(1,100),
+            'version'       => 1,
             'observaciones' => null
         ]);
 

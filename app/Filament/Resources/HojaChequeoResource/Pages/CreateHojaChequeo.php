@@ -60,7 +60,11 @@ class CreateHojaChequeo extends Page
                       })
                       ->required(),
                 Select::make('area')
-                      ->options(fn() => array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases()))
+                    ->options([
+                        HojaChequeoArea::TINTORERIA->value               => HojaChequeoArea::TINTORERIA->value,
+                        HojaChequeoArea::LAVANDERIA_INSTITUCIONAL->value => HojaChequeoArea::LAVANDERIA_INSTITUCIONAL->value,
+                        HojaChequeoArea::CUARTO_DE_MAQUINAS->value       => HojaChequeoArea::CUARTO_DE_MAQUINAS->value,
+                    ])
                       ->live()->required(),
                 TextInput::make('version')->readOnly()->live()->default(1)
                          ->helperText('Esta version se calcula automaticamente'),

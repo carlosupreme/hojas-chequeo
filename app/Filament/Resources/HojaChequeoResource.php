@@ -62,7 +62,14 @@ class HojaChequeoResource extends Resource
                                                HojaChequeoArea::TINTORERIA->value               => HojaChequeoArea::TINTORERIA->value,
                                                HojaChequeoArea::LAVANDERIA_INSTITUCIONAL->value => HojaChequeoArea::LAVANDERIA_INSTITUCIONAL->value,
                                                HojaChequeoArea::CUARTO_DE_MAQUINAS->value       => HojaChequeoArea::CUARTO_DE_MAQUINAS->value,
-                                           ])
+                                           ]),
+                Tables\Filters\TernaryFilter::make('active')
+                                            ->label("Publicada")
+                                            ->queries(
+                                                true : fn(Builder $query) => $query->where('active', true),
+                                                false: fn(Builder $query) => $query->where('active', false),
+                                                blank: fn(Builder $query) => $query->whereNull('active')
+                                            )
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

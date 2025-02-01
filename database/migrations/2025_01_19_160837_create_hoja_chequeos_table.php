@@ -14,9 +14,10 @@ return new class extends Migration {
             $table->foreignIdFor(\App\Models\Equipo::class)->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->integer('version')->default(1);
             $table->text('observaciones')->nullable();
+            $table->string('area');
             $table->timestamps();
 
-            $table->unique(['equipo_id', 'version']);
+            $table->unique(['equipo_id', 'version', 'area']);
         });
     }
 
