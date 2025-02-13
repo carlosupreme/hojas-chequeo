@@ -28,7 +28,7 @@ class EquiposSeeder extends Seeder
         $this->sua05();
         $this->fze03();
         $this->fca02();
-        $this->cm02Hid01();``
+        $this->cm02Hid01();
     }
     public function cm02Hid01(): void {
         $equipo = Equipo::create([
