@@ -11,7 +11,7 @@ use Illuminate\Database\Seeder;
 class EquiposSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Run the database seeds.b
      */
     public function run(): void {
         $this->cuartoDeMaquinas();
