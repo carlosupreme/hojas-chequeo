@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Equipo;
+use App\Models\HojaChequeo;
+use App\Models\Perfil;
 use App\Models\Simbologia;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -15,16 +18,30 @@ class DatabaseSeeder extends Seeder
      * Seed the application's database.
      */
     public function run(): void {
+        $this->call(EquiposSeeder::class);
+
+        $perfil = Perfil::create([
+            'name'     => 'Mangles',
+            'hoja_ids' => [
+                HojaChequeo::where('equipo_id', Equipo::where('tag', 'LV-MGL-01')->first()->id)->first()->id,
+                HojaChequeo::where('equipo_id', Equipo::where('tag', 'LV-MGL-02')->first()->id)->first()->id,
+                HojaChequeo::where('equipo_id', Equipo::where('tag', 'CM-CAL-02')->first()->id)->first()->id
+            ]
+        ]);
+
         $adminRole = Role::create(['name' => 'Administrador']);
         Role::create(['name' => 'Operador']);
+        Role::create(['name' => 'Supervisor']);
+
         $user = User::factory()->create([
-            'email'    => 'admin@admin.com',
-            'password' => \Hash::make('password')
+            'email'     => 'admin@admin.com',
+            'password'  => \Hash::make('password'),
+            'perfil_id' => $perfil->id
         ]);
 
 
         Simbologia::create([
-            'icono'      => 'heroicon-c-check',
+            'icono'       => 'heroicon-c-check',
             'nombre'      => 'Exito',
             'descripcion' => 'Se realizó y está bien',
             'color'       => '#27d623',
@@ -39,6 +56,5 @@ class DatabaseSeeder extends Seeder
 
         $user->assignRole($adminRole);
 
-        $this->call(EquiposSeeder::class);
     }
 }

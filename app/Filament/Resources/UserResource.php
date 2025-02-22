@@ -44,12 +44,18 @@ class UserResource extends Resource
                          ->maxLength(255)
                          ->hiddenOn('edit'),
                 Forms\Components\Select::make('roles')
-                      ->relationship('roles', 'name')
-                      ->multiple()
-                      ->required()
-                      ->placeholder('Selecciona los roles del usuario')
-                      ->preload()
-                      ->searchable(),
+                                       ->relationship('roles', 'name')
+                                       ->multiple()
+                                       ->required()
+                                       ->placeholder('Selecciona los roles del usuario')
+                                       ->preload()
+                                       ->searchable(),
+                Forms\Components\Select::make('perfil_id')
+                                       ->relationship('perfil', 'name')
+                                       ->required()
+                                       ->placeholder('Selecciona el perfil del usuario')
+                                       ->preload()
+                                       ->searchable(),
             ]);
     }
 
@@ -57,8 +63,8 @@ class UserResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\ImageColumn::make('avatarUrl')
-                           ->label(ucfirst(__('validation.attributes.photo')))
-                           ->circular(),
+                                          ->label(ucfirst(__('validation.attributes.photo')))
+                                          ->circular(),
                 TextColumn::make('name')
                           ->label(ucfirst(__('validation.attributes.name')))
                           ->searchable()
@@ -69,6 +75,9 @@ class UserResource extends Resource
                 TextColumn::make('roles.name')
                           ->searchable()
                           ->badge(),
+                TextColumn::make('perfil.name')
+                          ->searchable()
+                          ->badge()->color('gray'),
                 TextColumn::make('created_at')
                           ->label(ucfirst(__('validation.attributes.created_at')))
                           ->dateTime()
@@ -82,14 +91,14 @@ class UserResource extends Resource
             ])
             ->filters([
                 Tables\Filters\TernaryFilter::make('email_verified_at')
-                             ->label(__('Correo verificado'))
-                             ->nullable()
-                             ->placeholder('Todos')
-                             ->trueLabel('Verificados')
-                             ->falseLabel('No verificados'),
+                                            ->label(__('Correo verificado'))
+                                            ->nullable()
+                                            ->placeholder('Todos')
+                                            ->trueLabel('Verificados')
+                                            ->falseLabel('No verificados'),
                 Tables\Filters\SelectFilter::make('Rol')
-                            ->relationship('roles', 'name')
-                            ->preload()
+                                           ->relationship('roles', 'name')
+                                           ->preload()
             ])
             ->filtersFormColumns(2)
             ->actions([
