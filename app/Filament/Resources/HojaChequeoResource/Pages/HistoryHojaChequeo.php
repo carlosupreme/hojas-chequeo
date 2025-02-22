@@ -139,6 +139,8 @@ class HistoryHojaChequeo extends Page
             collect($data['checks'])->first() ? count(collect($data['checks'])->first()) : 0
         );
 
+        debug($data);
+
         return $data;
     }
 
@@ -150,6 +152,33 @@ class HistoryHojaChequeo extends Page
     #[Computed]
     public function availableDates(): array {
         return $this->dateRange;
+    }
+
+    public function calculateItemStats($index)
+    {
+        $sum = 0;
+        $count = 0;
+
+        foreach ($this->availableDates as $day) {
+            if (isset($this->tableData['checks'][$day][$index]['text'])) {
+                $value = filter_var(
+                    $this->tableData['checks'][$day][$index]['text'],
+                    FILTER_SANITIZE_NUMBER_FLOAT,
+                    FILTER_FLAG_ALLOW_FRACTION
+                );
+
+                if ($value !== false) {
+                    $sum += (float)$value;
+                    $count++;
+                }
+            }
+        }
+
+        return [
+            'sum' => $sum,
+            'average' => $count > 0 ? round($sum / $count, 2) : 0,
+            'count' => $count
+        ];
     }
 
     protected function getHeaderActions(): array {

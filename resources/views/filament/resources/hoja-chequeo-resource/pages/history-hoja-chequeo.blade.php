@@ -31,6 +31,13 @@
                                 {{ Carbon\Carbon::parse($day)->format('d/m/Y') }}
                             </th>
                         @endforeach
+
+                        <th class="border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400">
+                            Suma
+                        </th>
+                        <th class="border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400">
+                            Promedio
+                        </th>
                     </tr>
                     </thead>
 
@@ -67,6 +74,18 @@
                                     </div>
                                 </td>
                             @endforeach
+
+                            <td class="border border-gray-200 dark:border-gray-700 p-2 text-xs dark:text-gray-300">
+                                @php
+                                    $stats = $this->calculateItemStats($index);
+                                @endphp
+                                {{ $stats['sum'] }}
+                            </td>
+
+                            <!-- Reemplaza la celda de promedio -->
+                            <td class="border border-gray-200 dark:border-gray-700 p-2 text-xs dark:text-gray-300">
+                                {{ $stats['average'] }}
+                            </td>
                         </tr>
                     @endforeach
 
