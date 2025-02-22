@@ -42,7 +42,7 @@ class ReporteHistorico extends Page implements HasTable
                           ->sortable(),
                 TextColumn::make('failure')->label('Falla'),
                 TextColumn::make('observations')->label('Observaciones'),
-                TextColumn::make('area')->label('Area')->searchable(),
+                TextColumn::make('area')->label('Area')->extraAttributes(['class' => 'uppercase'])->searchable(),
                 TextColumn::make('priority')
                           ->label('Prioridad')
                           ->badge()

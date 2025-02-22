@@ -36,12 +36,12 @@ class EquiposSeeder extends Seeder
             'nombre' => 'HIDRONEUMATICO 1',
             'numeroControl' => '01',
             'revision' => 'NOM-020-STPS-2012',
-            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
         ]);
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
-            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
         ]);
 
         $items = [
@@ -131,12 +131,12 @@ class EquiposSeeder extends Seeder
             'nombre' => 'FILTRO CARBON ACTIVADO',
             'numeroControl' => '002',
             'revision' => 'N',
-            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
         ]);
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
-            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
         ]);
 
         $items = [
@@ -188,12 +188,12 @@ class EquiposSeeder extends Seeder
             'nombre' => 'FILTRO DE ZEOLITA',
             'numeroControl' => '001',
             'revision' => 'N',
-            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
         ]);
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
-            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
         ]);
 
         $items = [
@@ -246,12 +246,12 @@ class EquiposSeeder extends Seeder
             'nombre' => 'TANQUE DE CONDENSADOS',
             'numeroControl' => '001',
             'revision' => 'N',
-            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
         ]);
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
-            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
         ]);
 
         $items = [
@@ -328,7 +328,8 @@ class EquiposSeeder extends Seeder
                     'METODO DE CHEQUEO' => 'VISUAL',
                     'CRITERIO DE DETERMINACION' => '',
                     'QUIEN REALIZA' => 'OPERARIO',
-                    'OBSERVACIONES' => ''
+                    'OBSERVACION
+ES' => ''
                 ],
                 'categoria' => 'revision'
             ],
@@ -370,12 +371,12 @@ class EquiposSeeder extends Seeder
             'nombre' => 'COMPRESOR -01',
             'numeroControl' => 'AC-ES-248-RSP-012-2024',
             'revision' => 'NOM-020-STPS-2011',
-            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
         ]);
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
-            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
         ]);
 
         $items = [
@@ -402,7 +403,7 @@ class EquiposSeeder extends Seeder
                     'ITEM DE CHEQUEO' => 'ENCENDIDO DE INTERRUPTOR PRINCIPAL',
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'CRITERIO DE DETERMINACION' => 'REVISAR QUE ESTE ENCENDIDO EL INTERRUPTOR DEL COMPRESOR AL INICIAR TURNO',
-                    'OBSERVACIONES' => 'Pastilla termomagnetica en buen estado del tablero'
+                    'OBSERVACIONES' => 'PASTILLA TERMOMAGNETICA EN BUEN ESTADO DEL TABLERO' // Changes here
                 ],
                 'categoria' => 'operacion'
             ],
@@ -411,7 +412,7 @@ class EquiposSeeder extends Seeder
                     'ITEM DE CHEQUEO' => 'ENCENDIDO DE INTERRUPTOR SECUNDARIO',
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'CRITERIO DE DETERMINACION' => 'REVISAR QUE ESTE ENCENDIDO EL INTERRUPTOR DEL COMPRESOR AL INICIAR TURNO',
-                    'OBSERVACIONES' => 'Cola de rata en buen estado'
+                    'OBSERVACIONES' => 'COLA DE RATA EN BUEN ESTADO' // Changes here
                 ],
                 'categoria' => 'operacion'
             ],
@@ -428,7 +429,7 @@ class EquiposSeeder extends Seeder
                 'items' => [
                     'ITEM DE CHEQUEO' => 'PRESIÓN MANOMETRICA',
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
-                    'CRITERIO DE DETERMINACION' => '7 kg a 9 kg',
+                    'CRITERIO DE DETERMINACION' => '7 KG A 9 KG',  // Changes here
                     'OBSERVACIONES' => ''
                 ],
                 'categoria' => 'revision'
@@ -438,7 +439,7 @@ class EquiposSeeder extends Seeder
                     'ITEM DE CHEQUEO' => 'FUNCIONAMIENTO DE VALVULA DE ALIVIO',
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'CRITERIO DE DETERMINACION' => 'LIBERACION DE PRESION AL LLEGAR A LA PRESION DE TRABAJO',
-                    'OBSERVACIONES' => 'Revisar calibracion adecuada'
+                    'OBSERVACIONES' => 'REVISAR CALIBRACION ADECUADA' // Changes here
                 ],
                 'categoria' => 'revision'
             ],
@@ -447,7 +448,7 @@ class EquiposSeeder extends Seeder
                     'ITEM DE CHEQUEO' => 'REVISION DE BANDAS',
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'CRITERIO DE DETERMINACION' => 'VERIFICAR EL DESGASTE Y POSICION',
-                    'OBSERVACIONES' => 'Tension de la banda'
+                    'OBSERVACIONES' => 'TENSION DE LA BANDA' // Changes here
                 ],
                 'categoria' => 'revision'
             ],
@@ -456,7 +457,7 @@ class EquiposSeeder extends Seeder
                     'ITEM DE CHEQUEO' => 'REVISION FILTRO DE AIRE',
                     'FRECUENCIA' => '1 VEZ POR SEMANA',
                     'CRITERIO DE DETERMINACION' => 'VERIFICAR LA SUCIEDAD DEL FILTRO',
-                    'OBSERVACIONES' => 'Limpiar en contra del sentido'
+                    'OBSERVACIONES' => 'LIMPIAR EN CONTRA DEL SENTIDO'  // Changes here
                 ],
                 'categoria' => 'revision'
             ],
@@ -465,7 +466,7 @@ class EquiposSeeder extends Seeder
                     'ITEM DE CHEQUEO' => 'REVISIÓN NIVEL DE ACEITE',
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'CRITERIO DE DETERMINACION' => 'REVISAR QUE EL NIVEL DEL ACEITE ESTE A 3/4 DE SU CAPACIDAD',
-                    'OBSERVACIONES' => 'Lubricacion de los mecanismos'
+                    'OBSERVACIONES' => 'LUBRICACION DE LOS MECANISMOS' // Changes here
                 ],
                 'categoria' => 'revision'
             ],
@@ -474,7 +475,7 @@ class EquiposSeeder extends Seeder
                     'ITEM DE CHEQUEO' => 'LIMPIEZA EXTERIOR DE EQUIPO',
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'CRITERIO DE DETERMINACION' => 'LIBERACION DE PRESION AL LLEGAR A LA PRESION DE TRABAJO',
-                    'OBSERVACIONES' => 'Exceso de pelusa y grasa'
+                    'OBSERVACIONES' => 'EXCESO DE PELUSA Y GRASA'  // Changes here
                 ],
                 'categoria' => 'limpieza'
             ]
@@ -501,7 +502,7 @@ class EquiposSeeder extends Seeder
 
         $hoja = HojaChequeo::create([
             'equipo_id'     => $equipo->id,
-            'area'          => HojaChequeoArea::CUARTO_DE_MAQUINAS->value,
+            'area'          => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value,
             'version'       => 1,
             'observaciones' => null
         ]);
@@ -534,7 +535,7 @@ class EquiposSeeder extends Seeder
             [
                 'items'     => [
                     'ITEM'       => 'PURGAS DE COLUMNA DE CRISTAL DE NIVEL Y GRIFOS DE LA COLUMNA',
-                    'CRITERIO'   => 'SI o No',
+                    'CRITERIO'   => 'SI O NO',  // Changes here
                     'FRECUENCIA' => '2 VECES POR TURNO'
                 ],
                 'categoria' => 'operacion'
@@ -542,7 +543,7 @@ class EquiposSeeder extends Seeder
             [
                 'items'     => [
                     'ITEM'       => 'PURGA DE VALVULA DE PRUEBA',
-                    'CRITERIO'   => 'SI o No',
+                    'CRITERIO'   => 'SI O NO',  // Changes here
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
                 ],
                 'categoria' => 'operacion'
@@ -566,7 +567,7 @@ class EquiposSeeder extends Seeder
             [
                 'items'     => [
                     'ITEM'       => 'DISPARO DE VALVULA DE SEGURIDAD',
-                    'CRITERIO'   => 'ACCIONAMIENTO DE VALVULA MODO MANUAL',
+                    'CRITERIO'   => 'ACCIONAMIENTO DE VALVULA MODO MANUAL',  // Changes here
                     'FRECUENCIA' => '1 VEZ AL MES'
                 ],
                 'categoria' => 'operacion'
@@ -630,7 +631,7 @@ class EquiposSeeder extends Seeder
             [
                 'items'     => [
                     'ITEM'       => 'FUNCIONAMIENTO DE LA BOMBA',
-                    'CRITERIO'   => 'QUE ENCIENDA Y APAGUE AUTOMATICAMENTE',
+                    'CRITERIO'   => 'QUE ENCIENDA Y APAGUE AUTOMATICAMENTE',  // Changes here
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
                 ],
                 'categoria' => 'revision'
@@ -666,7 +667,8 @@ class EquiposSeeder extends Seeder
         $this->lvMgl01(1);
         $this->lvMgl01(2);
 
-        $area = HojaChequeoArea::LAVANDERIA_INSTITUCIONAL->value;
+        $area = HOJACHEQUEOAREA::LAVANDERIA_INSTITUCIONAL->value;
+
 
         $this->tombolas($area);
         $this->crearLavadoraLavanderia("LA-UNI-01", "UNIMAC 01");
@@ -688,7 +690,8 @@ class EquiposSeeder extends Seeder
         $this->lsHdc02();
         $this->lsPer01();
 
-        $area = HojaChequeoArea::TINTORERIA->value;
+        $area = HOJACHEQUEOAREA::TINTORERIA->value;
+
         $this->tombolas($area);
         $this->crearLavadoraTintoreria('LA-UNI-01', 'UNIMAC 01');
         $this->crearLavadoraTintoreria('LA02-UNI-01', 'UNIMAC 01 2');
@@ -720,148 +723,148 @@ class EquiposSeeder extends Seeder
         $equipo = Equipo::where('tag', $tag)->first();
         if(!$equipo)
         $equipo = Equipo::create([
-            'tag'           => $tag,
-            'nombre'        => $nombre,
-            'area'          => 'LAVADO EN AGUA',
-            'foto'          => null,
+            'tag' => strtoupper($tag),  // Changes here
+            'nombre' => strtoupper($nombre),  // Changes here
+            'area' => 'LAVADO EN AGUA',
+            'foto' => null,
             'numeroControl' => '001',
-            'revision'      => 'N'
+            'revision' => 'N'
         ]);
 
         $hoja = HojaChequeo::create([
-            'equipo_id'     => $equipo->id,
-            'area'          => HojaChequeoArea::TINTORERIA->value,
-            'version'       => 1,
+            'equipo_id' => $equipo->id,
+            'area' => HOJACHEQUEOAREA::TINTORERIA->value,
+            'version' => 1,
             'observaciones' => "<ul><li>DESCARGUE LA MAQUINA RAPIDAMENTE DESPUES DE CADA CICLO COMPLETADO PARA EVITAR LA ACUMULACION DE HUMEDAD.</li><li>DEJE LA PUERTA DE CARGA ABIERTA DESPUES DE CADA CICLO PARA PERMITIR QUE LA HUMEDAD SE EVAPORE.</li><li>CERRAR LAS VALVULAS PRINCIPALES DE AGUA, VAPOR  AL FINAL DE LA JORNADA ASI COMO TAMBIEN DESENERGIZAR EL EQUIPO.</li><li>EN LA OPCION DEL BLOQUEO DE PUERTA SE REALIZARA LOS SIGUIENTES PASOS:</li><ol><li>Intentar correr un programa  con la puerta abierta  (no debe funcionar).</li><li>Cierre la puerta y arranque la maquina después intente abrir la puerta mientras el ciclo esta en proceso (no debe de abrir).</li></ol></ul>"
         ]);
 
         $items = [
             [
-                'items'     => [
-                    'ITEM'          => 'TUBERIA',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'EXCESO DE POLVO Y RESPECTIVO AISLANTE',
+                'items' => [
+                    'ITEM' => 'TUBERIA',
+                    'FRECUENCIA' => 'AL INICIO DEL TURNO',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'EXCESO DE POLVO Y RESPECTIVO AISLANTE',
                     'OBSERVACIONES' => 'LIMPIEZA DE TUBERIA PARA EVITAR POLVO Y/O PELUSA'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'LIMPIEZA EXTERIOR DE EQUIPO',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'EXCESO DE POLVO Y RESPECTIVO AISLANTE',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA EXTERIOR DE EQUIPO',
+                    'FRECUENCIA' => 'AL INICIO DEL TURNO',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'EXCESO DE POLVO Y RESPECTIVO AISLANTE',
                     'OBSERVACIONES' => 'QUE NO TENGA SUCIEDAD EL GABINETE, LA JUNTA DE LA PUERTA Y RETIRAR LOS RESIDUOS DE DETERGENTE DEL DEPOSITO DE JABON'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'LIMPIEZA PARTE TRASERA DE EQUIPO',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'SIN POLVO Y SIN GRASA',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA PARTE TRASERA DE EQUIPO',
+                    'FRECUENCIA' => 'AL INICIO DEL TURNO',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'SIN POLVO Y SIN GRASA',
                     'OBSERVACIONES' => 'REVISAR QUE EL CABLE ELECTRICO QUE ESTE BIEN SUJETADO Y QUITAR POLVO O PELUSA DE LA TAPA.'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'LIMPIEZA DE PISOS',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'QUE NO TENGA POLVO O GRASA Y OBJETOS AJENOS AL LUGAR.',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA DE PISOS',
+                    'FRECUENCIA' => 'AL INICIO DEL TURNO',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'QUE NO TENGA POLVO O GRASA Y OBJETOS AJENOS AL LUGAR.',
                     'OBSERVACIONES' => 'NO DEBE HABER GRASA EN PISO Y/O OBJETOS EXTRAÑOS AL LUGAR'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'SUMINISTRO DE AGUA, VAPOR Y ELECTRICIDAD',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'VISUAL',
-                    'CRITERIO'      => 'VERIFICAR QUE SE CUENTE  CON LOS SERVICIOS',
+                'items' => [
+                    'ITEM' => 'SUMINISTRO DE AGUA, VAPOR Y ELECTRICIDAD',
+                    'FRECUENCIA' => 'AL INICIO DEL TURNO',
+                    'METODO' => 'VISUAL',
+                    'CRITERIO' => 'VERIFICAR QUE SE CUENTE  CON LOS SERVICIOS',
                     'OBSERVACIONES' => 'AL INICIO DE LA JORNADA ABRIR VALVULAS HACIA EL EQUIPO ASI COMO ENERGIZARLO. CERRAR VALVULAS Y DESENERGIZAR EL EQUIPO AL FINALIZAR LA JORNADA LABORAL'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'CONTROL DE ENCENDIDO Y APAGADO',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'AL INICIAR LA JORNADA VERIFICAR QUE ESTE ENERGIZADO',
+                'items' => [
+                    'ITEM' => 'CONTROL DE ENCENDIDO Y APAGADO',
+                    'FRECUENCIA' => 'AL INICIO DEL TURNO',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'AL INICIAR LA JORNADA VERIFICAR QUE ESTE ENERGIZADO',
                     'OBSERVACIONES' => 'QUE ESTE EN MODO ENCENDIDO Y QUE EL DISPLAY ESTE ENCENDIDO'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'FUGAS DE AGUA',
-                    'FRECUENCIA'    => 'AL INICIO Y DURANTE EL TURNO',
-                    'METODO'        => 'REVISAR FISICAMENTE',
-                    'CRITERIO'      => 'QUE NO GOTEEN LAS TUBERIAS',
+                'items' => [
+                    'ITEM' => 'FUGAS DE AGUA',
+                    'FRECUENCIA' => 'AL INICIO Y DURANTE EL TURNO',
+                    'METODO' => 'REVISAR FISICAMENTE',
+                    'CRITERIO' => 'QUE NO GOTEEN LAS TUBERIAS',
                     'OBSERVACIONES' => 'GENERA ENCHARCAMIENTO DE AGUA Y DAÑA TUBERIAS'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'FUGAS DE VAPOR',
-                    'FRECUENCIA'    => 'AL INICIO Y DURANTE EL TURNO',
-                    'METODO'        => 'REVISAR FISICAMENTE',
-                    'CRITERIO'      => 'FUGAS DE VAPOR EN CONEXIONES',
+                'items' => [
+                    'ITEM' => 'FUGAS DE VAPOR',
+                    'FRECUENCIA' => 'AL INICIO Y DURANTE EL TURNO',
+                    'METODO' => 'REVISAR FISICAMENTE',
+                    'CRITERIO' => 'FUGAS DE VAPOR EN CONEXIONES',
                     'OBSERVACIONES' => 'NO DEBEN EXISTIR FUGAS EN LAS CONEXIONES'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'PURGA',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'AL INICIAR LA JORNADA ABRIR LENTAMENTE LA VALVULA HASTA QUE SALGA VAPOR Y DESPUES CERRARLA.',
+                'items' => [
+                    'ITEM' => 'PURGA',
+                    'FRECUENCIA' => 'AL INICIO DEL TURNO',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'AL INICIAR LA JORNADA ABRIR LENTAMENTE LA VALVULA HASTA QUE SALGA VAPOR Y DESPUES CERRARLA.',
                     'OBSERVACIONES' => 'EVITAR CONDENSADOS DENTRO DEL EQUIPO Y TUBERIAS.'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'MOTOR',
-                    'FRECUENCIA'    => '1 VEZ POR TURNO',
-                    'METODO'        => 'REVISAR FISICAMENTE',
-                    'CRITERIO'      => 'FUNCIONAMIENTO OPTIMO',
+                'items' => [
+                    'ITEM' => 'MOTOR',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => 'REVISAR FISICAMENTE',
+                    'CRITERIO' => 'FUNCIONAMIENTO OPTIMO',
                     'OBSERVACIONES' => 'QUE GIRE LA CANASTA ADECUADAMENTE Y QUE NO EXISTA RUIDOS EXTRAÑOS'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'BLOQUEO DE PUERTA',
-                    'FRECUENCIA'    => '1 VEZ POR TURNO',
-                    'METODO'        => 'REVISAR FISICAMENTE',
-                    'CRITERIO'      => 'CERRADURA Y ENCLAVAMIENTO DE LA PUERTA',
+                'items' => [
+                    'ITEM' => 'BLOQUEO DE PUERTA',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => 'REVISAR FISICAMENTE',
+                    'CRITERIO' => 'CERRADURA Y ENCLAVAMIENTO DE LA PUERTA',
                     'OBSERVACIONES' => 'QUE CIERRE ADECUADAMENTE EN CUALQUIERA DE SUS ACTIVIDADES (VER NOTAS)'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'CICLOS',
-                    'FRECUENCIA'    => 'AL FINAL DEL TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'ANOTAR LOS CICLOS TRABAJADOS',
-                    'OBSERVACIONES' => 'AL FINAL DE LA JORNADA ANOTAR SUS CICLOS'
+                'items' => [
+                    'ITEM' => 'HORAS',
+                    'FRECUENCIA' => 'AL FINAL DEL TURNO',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'ANOTAR LAS HORAS TRABAJADAS',
+                    'OBSERVACIONES' => 'AL FINAL DE LA JORNADA ANOTAR SUS HORAS'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'CANASTA',
-                    'FRECUENCIA'    => '1 VEZ POR TURNO',
-                    'METODO'        => 'REVISAR VISUALMENTE',
-                    'CRITERIO'      => 'QUE GIRE LA CANASTA',
+                'items' => [
+                    'ITEM' => 'CANASTA',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => 'REVISAR VISUALMENTE',
+                    'CRITERIO' => 'QUE GIRE LA CANASTA',
                     'OBSERVACIONES' => 'CUANDO COLOQUE LA CARGA SE CERCIORE QUE LA CANASTA GIRE'
                 ],
                 'categoria' => 'operacion'
@@ -871,178 +874,181 @@ class EquiposSeeder extends Seeder
         foreach ($items as $item) {
             Item::create([
                 'hoja_chequeo_id' => $hoja->id,
-                'valores'         => $item['items'],
-                'categoria'       => $item['categoria']
+                'valores' => $item['items'],
+                'categoria' => $item['categoria']
             ]);
         }
     }
+
 
     public function crearLavadoraLavanderia($tag, $nombre) {
         $equipo = Equipo::where('tag', $tag)->first();
         if(!$equipo)
         $equipo = Equipo::create([
-            'tag'           => $tag,
-            'nombre'        => $nombre,
-            'area'          => 'LAVANDERIA',
-            'foto'          => null,
+            'tag' => strtoupper($tag),  // Changes here
+            'nombre' => strtoupper($nombre),  // Changes here
+            'area' => 'LAVANDERIA',
+            'foto' => null,
             'numeroControl' => '001',
-            'revision'      => 'N'
+            'revision' => 'N'
         ]);
 
         $hoja = HojaChequeo::create([
-            'equipo_id'     => $equipo->id,
-            'area'          => HojaChequeoArea::LAVANDERIA_INSTITUCIONAL->value,
-            'version'       => 1,
+            'equipo_id' => $equipo->id,
+            'area' => HOJACHEQUEOAREA::LAVANDERIA_INSTITUCIONAL->value,
+            'version' => 1,
             'observaciones' => "<ul><li>DESCARGUE LA MAQUINA RAPIDAMENTE DESPUES DE CADA CICLO COMPLETADO PARA EVITAR LA ACUMULACION DE HUMEDAD.</li><li>DEJE LA PUERTA DE CARGA ABIERTA DESPUES DE CADA CICLO PARA PERMITIR QUE LA HUMEDAD SE EVAPORE.</li><li>CERRAR LAS VALVULAS PRINCIPALES DE AGUA, VAPOR  AL FINAL DE LA JORNADA ASI COMO TAMBIEN DESENERGIZAR EL EQUIPO.</li><li>EN LA OPCION DEL BLOQUEO DE PUERTA SE REALIZARA LOS SIGUIENTES PASOS:</li><ol><li>Intentar correr un programa  con la puerta abierta  (no debe funcionar).</li><li>Cierre la puerta y arranque la maquina después intente abrir la puerta mientras el ciclo esta en proceso (no debe de abrir).</li></ol></ul>"
         ]);
 
+
         $items = [
             [
-                'items'     => [
-                    'ITEM'          => 'TUBERIA',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'EXCESO DE POLVO Y RESPECTIVO AISLANTE',
+                'items' => [
+                    'ITEM' => 'TUBERIA',
+                    'FRECUENCIA' => 'AL INICIO DEL TURNO',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'EXCESO DE POLVO Y RESPECTIVO AISLANTE',
                     'OBSERVACIONES' => 'LIMPIEZA DE TUBERIA PARA EVITAR POLVO Y/O PELUSA'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'LIMPIEZA EXTERIOR DE EQUIPO',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'EXCESO DE POLVO Y RESPECTIVO AISLANTE',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA EXTERIOR DE EQUIPO',
+                    'FRECUENCIA' => 'AL INICIO DEL TURNO',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'EXCESO DE POLVO Y RESPECTIVO AISLANTE',
                     'OBSERVACIONES' => 'QUE NO TENGA SUCIEDAD EL GABINETE, LA JUNTA DE LA PUERTA Y RETIRAR LOS RESIDUOS DE DETERGENTE DEL DEPOSITO DE JABON'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'LIMPIEZA PARTE TRASERA DE EQUIPO',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'SIN POLVO Y SIN GRASA',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA PARTE TRASERA DE EQUIPO',
+                    'FRECUENCIA' => 'AL INICIO DEL TURNO',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'SIN POLVO Y SIN GRASA',
                     'OBSERVACIONES' => 'REVISAR QUE EL CABLE ELECTRICO QUE ESTE BIEN SUJETADO Y QUITAR POLVO O PELUSA DE LA TAPA.'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'LIMPIEZA DE PISOS',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'QUE NO TENGA POLVO O GRASA Y OBJETOS AJENOS AL LUGAR.',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA DE PISOS',
+                    'FRECUENCIA' => 'AL INICIO DEL TURNO',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'QUE NO TENGA POLVO O GRASA Y OBJETOS AJENOS AL LUGAR.',
                     'OBSERVACIONES' => 'NO DEBE HABER GRASA EN PISO Y/O OBJETOS EXTRAÑOS AL LUGAR'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'SUMINISTRO DE AGUA, VAPOR Y ELECTRICIDAD',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'VISUAL',
-                    'CRITERIO'      => 'VERIFICAR QUE SE CUENTE  CON LOS SERVICIOS',
+                'items' => [
+                    'ITEM' => 'SUMINISTRO DE AGUA, VAPOR Y ELECTRICIDAD',
+                    'FRECUENCIA' => 'AL INICIO DEL TURNO',
+                    'METODO' => 'VISUAL',
+                    'CRITERIO' => 'VERIFICAR QUE SE CUENTE  CON LOS SERVICIOS',
                     'OBSERVACIONES' => 'AL INICIO DE LA JORNADA ABRIR VALVULAS HACIA EL EQUIPO ASI COMO ENERGIZARLO. CERRAR VALVULAS Y DESENERGIZAR EL EQUIPO AL FINALIZAR LA JORNADA LABORAL'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'CONTROL DE ENCENDIDO Y APAGADO',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'AL INICIAR LA JORNADA VERIFICAR QUE ESTE ENERGIZADO',
+                'items' => [
+                    'ITEM' => 'CONTROL DE ENCENDIDO Y APAGADO',
+                    'FRECUENCIA' => 'AL INICIO DEL TURNO',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'AL INICIAR LA JORNADA VERIFICAR QUE ESTE ENERGIZADO',
                     'OBSERVACIONES' => 'QUE ESTE EN MODO ENCENDIDO Y QUE EL DISPLAY ESTE ENCENDIDO'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'FUGAS DE AGUA',
-                    'FRECUENCIA'    => 'AL INICIO Y DURANTE EL TURNO',
-                    'METODO'        => 'REVISAR FISICAMENTE',
-                    'CRITERIO'      => 'QUE NO GOTEEN LAS TUBERIAS',
+                'items' => [
+                    'ITEM' => 'FUGAS DE AGUA',
+                    'FRECUENCIA' => 'AL INICIO Y DURANTE EL TURNO',
+                    'METODO' => 'REVISAR FISICAMENTE',
+                    'CRITERIO' => 'QUE NO GOTEEN LAS TUBERIAS',
                     'OBSERVACIONES' => 'GENERA ENCHARCAMIENTO DE AGUA Y DAÑA TUBERIAS'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'FUGAS DE VAPOR',
-                    'FRECUENCIA'    => 'AL INICIO Y DURANTE EL TURNO',
-                    'METODO'        => 'REVISAR FISICAMENTE',
-                    'CRITERIO'      => 'FUGAS DE VAPOR EN CONEXIONES',
+                'items' => [
+                    'ITEM' => 'FUGAS DE VAPOR',
+                    'FRECUENCIA' => 'AL INICIO Y DURANTE EL TURNO',
+                    'METODO' => 'REVISAR FISICAMENTE',
+                    'CRITERIO' => 'FUGAS DE VAPOR EN CONEXIONES',
                     'OBSERVACIONES' => 'NO DEBEN EXISTIR FUGAS EN LAS CONEXIONES'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'PURGA',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'AL INICIAR LA JORNADA ABRIR LENTAMENTE LA VALVULA HASTA QUE SALGA VAPOR Y DESPUES CERRARLA.',
+                'items' => [
+                    'ITEM' => 'PURGA',
+                    'FRECUENCIA' => 'AL INICIO DEL TURNO',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'AL INICIAR LA JORNADA ABRIR LENTAMENTE LA VALVULA HASTA QUE SALGA VAPOR Y DESPUES CERRARLA.',
                     'OBSERVACIONES' => 'EVITAR CONDENSADOS DENTRO DEL EQUIPO Y TUBERIAS.'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'MOTOR',
-                    'FRECUENCIA'    => '1 VEZ POR TURNO',
-                    'METODO'        => 'REVISAR FISICAMENTE',
-                    'CRITERIO'      => 'FUNCIONAMIENTO OPTIMO',
+                'items' => [
+                    'ITEM' => 'MOTOR',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => 'REVISAR FISICAMENTE',
+                    'CRITERIO' => 'FUNCIONAMIENTO OPTIMO',
                     'OBSERVACIONES' => 'QUE GIRE LA CANASTA ADECUADAMENTE Y QUE NO EXISTA RUIDOS EXTRAÑOS'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'BLOQUEO DE PUERTA',
-                    'FRECUENCIA'    => '1 VEZ POR TURNO',
-                    'METODO'        => 'REVISAR FISICAMENTE',
-                    'CRITERIO'      => 'CERRADURA Y ENCLAVAMIENTO DE LA PUERTA',
+                'items' => [
+                    'ITEM' => 'BLOQUEO DE PUERTA',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => 'REVISAR FISICAMENTE',
+                    'CRITERIO' => 'CERRADURA Y ENCLAVAMIENTO DE
+LA PUERTA',
                     'OBSERVACIONES' => 'QUE CIERRE ADECUADAMENTE EN CUALQUIERA DE SUS ACTIVIDADES (VER NOTAS)'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'DOSIFICADORES',
-                    'FRECUENCIA'    => 'AL INICIO Y FINAL DE TURNO',
-                    'METODO'        => 'REVISAR FISICAMENTE',
-                    'CRITERIO'      => 'AL INICIO: ENCENDER DOSIFICADOR Y ABRIR LA VALVULA DE PASO DE AGUA AL FINAL: CERRAR VALVULA Y APAGAR DOSIFICADOR',
+                'items' => [
+                    'ITEM' => 'DOSIFICADORES',
+                    'FRECUENCIA' => 'AL INICIO Y FINAL DE TURNO',
+                    'METODO' => 'REVISAR FISICAMENTE',
+                    'CRITERIO' => 'AL INICIO: ENCENDER DOSIFICADOR Y ABRIR LA VALVULA DE PASO DE AGUA AL FINAL: CERRAR VALVULA Y APAGAR DOSIFICADOR',
                     'OBSERVACIONES' => 'EVITAR FUGAS DE AGUA'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'PRODUCTO',
-                    'FRECUENCIA'    => '1 VEZ POR TURNO',
-                    'METODO'        => 'REVISAR FISICAMENTE',
-                    'CRITERIO'      => 'REVISAR QUE LOS BIDONES TENGAN PRODUCTO',
+                'items' => [
+                    'ITEM' => 'PRODUCTO',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => 'REVISAR FISICAMENTE',
+                    'CRITERIO' => 'REVISAR QUE LOS BIDONES TENGAN PRODUCTO',
                     'OBSERVACIONES' => 'EVITAR PAROS DE PRODUCCIÒN'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'CICLOS',
-                    'FRECUENCIA'    => 'AL FINAL DEL TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'ANOTAR LOS CICLOS TRABAJADOS',
-                    'OBSERVACIONES' => 'AL FINAL DE LA JORNADA ANOTAR SUS CICLOS'
+                'items' => [
+                    'ITEM' => 'HORAS',
+                    'FRECUENCIA' => 'AL FINAL DEL TURNO',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'ANOTAR LAS HORAS TRABAJADAS',
+                    'OBSERVACIONES' => 'AL FINAL DE LA JORNADA ANOTAR SUS HORAS'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'CANASTA',
-                    'FRECUENCIA'    => '1 VEZ POR TURNO',
-                    'METODO'        => 'REVISAR VISUALMENTE',
-                    'CRITERIO'      => 'QUE GIRE LA CANASTA',
+                'items' => [
+                    'ITEM' => 'CANASTA',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => 'REVISAR VISUALMENTE',
+                    'CRITERIO' => 'QUE GIRE LA CANASTA',
                     'OBSERVACIONES' => 'CUANDO COLOQUE LA CARGA SE CERCIORE QUE LA CANASTA GIRE'
                 ],
                 'categoria' => 'operacion'
@@ -1052,8 +1058,8 @@ class EquiposSeeder extends Seeder
         foreach ($items as $item) {
             Item::create([
                 'hoja_chequeo_id' => $hoja->id,
-                'valores'         => $item['items'],
-                'categoria'       => $item['categoria']
+                'valores' => $item['items'],
+                'categoria' => $item['categoria']
             ]);
         }
     }
@@ -1062,138 +1068,138 @@ class EquiposSeeder extends Seeder
         $equipo = Equipo::where('tag', $tag)->first();
         if(!$equipo)
         $equipo = Equipo::create([
-            'tag'           => $tag,
-            'nombre'        => $nombre,
-            'area'          => 'LAVADO EN AGUA',
-            'foto'          => null,
+            'tag' => strtoupper($tag),  // Changes here
+            'nombre' => strtoupper($nombre),  // Changes here
+            'area' => 'LAVADO EN AGUA',
+            'foto' => null,
             'numeroControl' => '009',
-            'revision'      => 'N'
+            'revision' => 'N'
         ]);
 
         $hoja = HojaChequeo::create([
-            'equipo_id'     => $equipo->id,
-            'area'          => $hojaArea,
-            'version'       => 1,
+            'equipo_id' => $equipo->id,
+            'area' => $hojaArea,
+            'version' => 1,
             'observaciones' => null
         ]);
 
         $items = [
             [
-                'items'     => [
-                    'ITEM'          => 'CONTROL DE ENCENDIDO Y APAGADO',
-                    'FRECUENCIA'    => '1 VEZ AL INICIO DEL TURNO (CUANDO SE REQUIERA)',
-                    'METODO'        => null,
-                    'CRITERIO'      => 'FUNCIONAMIENTO OPTIMO',
+                'items' => [
+                    'ITEM' => 'CONTROL DE ENCENDIDO Y APAGADO',
+                    'FRECUENCIA' => '1 VEZ AL INICIO DEL TURNO (CUANDO SE REQUIERA)',
+                    'METODO' => null,
+                    'CRITERIO' => 'FUNCIONAMIENTO OPTIMO',
                     'OBSERVACIONES' => null
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'MOTOR',
-                    'FRECUENCIA'    => '1 VEZ AL INICIO DE TURNO',
-                    'METODO'        => null,
-                    'CRITERIO'      => 'RUIDO EXTRAÑO',
+                'items' => [
+                    'ITEM' => 'MOTOR',
+                    'FRECUENCIA' => '1 VEZ AL INICIO DE TURNO',
+                    'METODO' => null,
+                    'CRITERIO' => 'RUIDO EXTRAÑO',
                     'OBSERVACIONES' => null
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'CABLE DE ENERGIA ELECTRICA',
-                    'FRECUENCIA'    => '1 VEZ POR TURNO',
-                    'METODO'        => null,
-                    'CRITERIO'      => 'SIN DAÑO',
+                'items' => [
+                    'ITEM' => 'CABLE DE ENERGIA ELECTRICA',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => null,
+                    'CRITERIO' => 'SIN DAÑO',
                     'OBSERVACIONES' => null
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'CICLOS',
-                    'FRECUENCIA'    => 'AL FINAL DEL DIA',
-                    'METODO'        => null,
-                    'CRITERIO'      => 'TOTALES',
+                'items' => [
+                    'ITEM' => 'HORAS',
+                    'FRECUENCIA' => 'AL FINAL DEL DIA',
+                    'METODO' => null,
+                    'CRITERIO' => 'TOTALES',
                     'OBSERVACIONES' => null
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'FUGAS DE VAPOR',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'REVISAR FISICAMENTE',
-                    'CRITERIO'      => 'QUE NO GOTEEN LAS TUBERIAS',
+                'items' => [
+                    'ITEM' => 'FUGAS DE VAPOR',
+                    'FRECUENCIA' => 'AL INICIO DEL TURNO',
+                    'METODO' => 'REVISAR FISICAMENTE',
+                    'CRITERIO' => 'QUE NO GOTEEN LAS TUBERIAS',
                     'OBSERVACIONES' => 'GENERA ENCHARCAMIENTO DE AGUA Y DAÑA TUBERIAS'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'LIMPIEZA DE PISOS',
-                    'FRECUENCIA'    => '1 VEZ POR TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'QUE NO TENGA POLVO O GRASA',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA DE PISOS',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'QUE NO TENGA POLVO O GRASA',
                     'OBSERVACIONES' => 'NO DEBE HABER GRASA EN PISO'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'LIMPIEZA EXTERIOR DE EQUIPO',
-                    'FRECUENCIA'    => '1 VEZ POR TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'QUE NO TENGA POLVO',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA EXTERIOR DE EQUIPO',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'QUE NO TENGA POLVO',
                     'OBSERVACIONES' => 'QUITAR EL EXCESO DE PELUSA PARA EL MEJOR FUNCIONAMIENTO DEL EQUIPO'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'TUBERIA',
-                    'FRECUENCIA'    => '1 VEZ POR TURNO',
-                    'METODO'        => 'VISUAL',
-                    'CRITERIO'      => 'EXCESO DE POLVO',
+                'items' => [
+                    'ITEM' => 'TUBERIA',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => 'VISUAL',
+                    'CRITERIO' => 'EXCESO DE POLVO',
                     'OBSERVACIONES' => 'NO DEBE EXISTIR FUGAS'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'LIMPIEZA DE MOTOR',
-                    'FRECUENCIA'    => '1 VEZ POR SEMANA',
-                    'METODO'        => 'LIMPIEZA MANUAL',
-                    'CRITERIO'      => 'QUE NO TENGA POLVO O GRASA',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA DE MOTOR',
+                    'FRECUENCIA' => '1 VEZ POR SEMANA',
+                    'METODO' => 'LIMPIEZA MANUAL',
+                    'CRITERIO' => 'QUE NO TENGA POLVO O GRASA',
                     'OBSERVACIONES' => 'QUITAR LA PELUSA Y POLVO, PARA QUE EL MOTOR NO SE FORCE'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'LIMPIEZA PARTE TRASERA DE EQUIPO',
-                    'FRECUENCIA'    => '1 VEZ POR SEMANA',
-                    'METODO'        => 'LIMPIEZA MANUAL',
-                    'CRITERIO'      => 'SIN POLVO Y SIN GRASA',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA PARTE TRASERA DE EQUIPO',
+                    'FRECUENCIA' => '1 VEZ POR SEMANA',
+                    'METODO' => 'LIMPIEZA MANUAL',
+                    'CRITERIO' => 'SIN POLVO Y SIN GRASA',
                     'OBSERVACIONES' => 'QUITAR EXCESO DE POLVO, GRASA U OTRO MATERIAL QUE AFECTE AL FUNCIONAMIENTO DEL EQUIPO.'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'LIMPIEZA DE TUBO (CHIMENEA)',
-                    'FRECUENCIA'    => '1 VEZ POR SEMANA',
-                    'METODO'        => 'LIMPIEZA MANUAL',
-                    'CRITERIO'      => 'SIN POLVO',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA DE TUBO (CHIMENEA)',
+                    'FRECUENCIA' => '1 VEZ POR SEMANA',
+                    'METODO' => 'LIMPIEZA MANUAL',
+                    'CRITERIO' => 'SIN POLVO',
                     'OBSERVACIONES' => 'QUITAR EL EXCESO DE PELUSA PARA EL MEJOR FUNCIONAMIENTO DEL EQUIPO'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'LIMPIEZA DE FILTROS',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO Y DESPUES DE COMIDA',
-                    'METODO'        => 'LIMPIEZA MANUAL',
-                    'CRITERIO'      => 'EXCESO DE PELUSA',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA DE FILTROS',
+                    'FRECUENCIA' => 'AL INICIO DEL TURNO Y DESPUES DE COMIDA',
+                    'METODO' => 'LIMPIEZA MANUAL',
+                    'CRITERIO' => 'EXCESO DE PELUSA',
                     'OBSERVACIONES' => 'QUITAR EL EXCESO DE PELUSA PARA EL MEJOR FUNCIONAMIENTO DEL EQUIPO'
                 ],
                 'categoria' => 'limpieza'
@@ -1203,156 +1209,156 @@ class EquiposSeeder extends Seeder
         foreach ($items as $item) {
             Item::create([
                 'hoja_chequeo_id' => $hoja->id,
-                'valores'         => $item['items'],
-                'categoria'       => $item['categoria']
+                'valores' => $item['items'],
+                'categoria' => $item['categoria']
             ]);
         }
     }
 
     public function lvMgl01($n) {
         $equipo = Equipo::create([
-            'tag'           => 'LV-MGL-0' . $n,
-            'nombre'        => 'MANGLE 0' . $n,
-            'area'          => 'LAVANDERIA INSTITUCIONAL',
-            'foto'          => null,
+            'tag' => 'LV-MGL-0' . $n,
+            'nombre' => 'MANGLE 0' . $n,
+            'area' => 'LAVANDERIA INSTITUCIONAL',
+            'foto' => null,
             'numeroControl' => '001',
-            'revision'      => 'N'
+            'revision' => 'N'
         ]);
 
         $hoja = HojaChequeo::create([
-            'equipo_id'     => $equipo->id,
-            'area'          => HojaChequeoArea::LAVANDERIA_INSTITUCIONAL->value,
-            'version'       => 1,
+            'equipo_id' => $equipo->id,
+            'area' => HOJACHEQUEOAREA::LAVANDERIA_INSTITUCIONAL->value,
+            'version' => 1,
             'observaciones' => null
         ]);
 
         $items = [
             [
-                'items'     => [
-                    'ITEM'          => 'CONTROL DE ENCENDIDO Y APAGADO',
-                    'FRECUENCIA'    => '1 VEZ AL INICIO DEL TURNO (CUANDO SE REQUIERA)',
-                    'METODO'        => null,
-                    'CRITERIO'      => 'FUNCIONAMIENTO OPTIMO',
+                'items' => [
+                    'ITEM' => 'CONTROL DE ENCENDIDO Y APAGADO',
+                    'FRECUENCIA' => '1 VEZ AL INICIO DEL TURNO (CUANDO SE REQUIERA)',
+                    'METODO' => null,
+                    'CRITERIO' => 'FUNCIONAMIENTO OPTIMO',
                     'OBSERVACIONES' => null
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'BOTON PARO DE EMERGENCIA',
-                    'FRECUENCIA'    => '1 VEZ AL INICIO DEL TURNO (CUANDO SE REQUIERA)',
-                    'METODO'        => null,
-                    'CRITERIO'      => 'FUNCIONAMIENTO OPTIMO',
+                'items' => [
+                    'ITEM' => 'BOTON PARO DE EMERGENCIA',
+                    'FRECUENCIA' => '1 VEZ AL INICIO DEL TURNO (CUANDO SE REQUIERA)',
+                    'METODO' => null,
+                    'CRITERIO' => 'FUNCIONAMIENTO OPTIMO',
                     'OBSERVACIONES' => null
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'BARRA PARO DE EMERGENCIA',
-                    'FRECUENCIA'    => '1 VEZ AL INICIO DEL TURNO (CUANDO SE REQUIERA)',
-                    'METODO'        => null,
-                    'CRITERIO'      => 'FUNCIONAMIENTO OPTIMO',
+                'items' => [
+                    'ITEM' => 'BARRA PARO DE EMERGENCIA',
+                    'FRECUENCIA' => '1 VEZ AL INICIO DEL TURNO (CUANDO SE REQUIERA)',
+                    'METODO' => null,
+                    'CRITERIO' => 'FUNCIONAMIENTO OPTIMO',
                     'OBSERVACIONES' => null
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'TERMOSTATO DE TEMPERATURA',
-                    'FRECUENCIA'    => '1 VEZ AL INICIO DEL TURNO (CUANDO SE REQUIERA)',
-                    'METODO'        => null,
-                    'CRITERIO'      => 'FUNCIONAMIENTO OPTIMO',
+                'items' => [
+                    'ITEM' => 'TERMOSTATO DE TEMPERATURA',
+                    'FRECUENCIA' => '1 VEZ AL INICIO DEL TURNO (CUANDO SE REQUIERA)',
+                    'METODO' => null,
+                    'CRITERIO' => 'FUNCIONAMIENTO OPTIMO',
                     'OBSERVACIONES' => null
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'CABLE DE ENERGIA ELECTRICA',
-                    'FRECUENCIA'    => '1 VEZ POR TURNO',
-                    'METODO'        => null,
-                    'CRITERIO'      => 'SIN DAÑO',
+                'items' => [
+                    'ITEM' => 'CABLE DE ENERGIA ELECTRICA',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => null,
+                    'CRITERIO' => 'SIN DAÑO',
                     'OBSERVACIONES' => null
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'FUGAS DE GAS L.P.',
-                    'FRECUENCIA'    => 'AL INICIO DEL TURNO',
-                    'METODO'        => 'REVISAR FISICAMENTE',
-                    'CRITERIO'      => 'FUGAS DE GAS EN CONEXIONES',
+                'items' => [
+                    'ITEM' => 'FUGAS DE GAS L.P.',
+                    'FRECUENCIA' => 'AL INICIO DEL TURNO',
+                    'METODO' => 'REVISAR FISICAMENTE',
+                    'CRITERIO' => 'FUGAS DE GAS EN CONEXIONES',
                     'OBSERVACIONES' => 'NO DEBEN EXISTIR FUGAS EN LAS CONEXIONES'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'ZAPATAS DE CONTACTO',
-                    'FRECUENCIA'    => '1 VEZ POR TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'ELIMINAR EL EXCESO DE POLVO Y RESPECTIVO AISLANTE',
+                'items' => [
+                    'ITEM' => 'ZAPATAS DE CONTACTO',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'ELIMINAR EL EXCESO DE POLVO Y RESPECTIVO AISLANTE',
                     'OBSERVACIONES' => 'CUANDO ESTE APAGADA Y FRIA'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'CINTAS GUIAS',
-                    'FRECUENCIA'    => '1 VEZ POR TURNO',
-                    'METODO'        => 'VISUAL',
-                    'CRITERIO'      => 'QUE NO ESTEN ROTAS, DESGASTADAS, FUERA DE SU LUGAR Y ENGRAPADAS',
+                'items' => [
+                    'ITEM' => 'CINTAS GUIAS',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => 'VISUAL',
+                    'CRITERIO' => 'QUE NO ESTEN ROTAS, DESGASTADAS, FUERA DE SU LUGAR Y ENGRAPADAS',
                     'OBSERVACIONES' => 'CUANDO ESTE APAGADA Y FRIA'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'LIMPIEZA INTERIOR DEL EQUIPO',
-                    'FRECUENCIA'    => '1 VEZ POR TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'ELIMINAR POLVO, PELUSA Y MATERIALES EXTRAÑOS.',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA INTERIOR DEL EQUIPO',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'ELIMINAR POLVO, PELUSA Y MATERIALES EXTRAÑOS.',
                     'OBSERVACIONES' => 'CUANDO ESTE APAGADA Y FRIA'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'LIMPIEZA EXTERIOR DEL EQUIPO',
-                    'FRECUENCIA'    => '1 VEZ POR TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'ELIMINAR POLVO, PELUSA Y MATERIALES EXTRAÑOS.',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA EXTERIOR DEL EQUIPO',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'ELIMINAR POLVO, PELUSA Y MATERIALES EXTRAÑOS.',
                     'OBSERVACIONES' => 'CUANDO ESTE APAGADA Y FRIA'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'LIMPIEZA DE PISOS',
-                    'FRECUENCIA'    => '2 VEZ POR TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'QUE NO TENGA POLVO O GRASA Y OBJETOS AJENOS AL LUGAR.',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA DE PISOS',
+                    'FRECUENCIA' => '2 VEZ POR TURNO',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'QUE NO TENGA POLVO O GRASA Y OBJETOS AJENOS AL LUGAR.',
                     'OBSERVACIONES' => 'NO DEBE HABER GRASA EN PISO'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'PASAR SABANA CON CERA',
-                    'FRECUENCIA'    => '1 VEZ POR TURNO',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'AL INICIO DE LA JORNADA',
+                'items' => [
+                    'ITEM' => 'PASAR SABANA CON CERA',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'AL INICIO DE LA JORNADA',
                     'OBSERVACIONES' => 'LUBRICA LOS RODILLOS'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'          => 'COLOCAR CERA A LA SABANA',
-                    'FRECUENCIA'    => 'CADA 4 DÍAS',
-                    'METODO'        => 'MANUAL',
-                    'CRITERIO'      => 'AL INICIO DE LA JORNADA',
+                'items' => [
+                    'ITEM' => 'COLOCAR CERA A LA SABANA',
+                    'FRECUENCIA' => 'CADA 4 DÍAS',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'AL INICIO DE LA JORNADA',
                     'OBSERVACIONES' => 'PARA MANTENER LA SABANA CON CERA'
                 ],
                 'categoria' => 'operacion'
@@ -1362,176 +1368,176 @@ class EquiposSeeder extends Seeder
         foreach ($items as $item) {
             Item::create([
                 'hoja_chequeo_id' => $hoja->id,
-                'valores'         => $item['items'],
-                'categoria'       => $item['categoria']
+                'valores' => $item['items'],
+                'categoria' => $item['categoria']
             ]);
         }
     }
 
     public function lsPer01() {
         $equipo = Equipo::create([
-            'tag'           => 'LS-PER-01',
-            'nombre'        => 'LAVADORA PERCLORO',
-            'area'          => 'LAVADO EN SECO',
-            'foto'          => null,
+            'tag' => 'LS-PER-01',
+            'nombre' => 'LAVADORA PERCLORO',
+            'area' => 'LAVADO EN SECO',
+            'foto' => null,
             'numeroControl' => '001',
-            'revision'      => 'N'
+            'revision' => 'N'
         ]);
 
         $hoja = HojaChequeo::create([
-            'equipo_id'     => $equipo->id,
-            'area'          => HojaChequeoArea::TINTORERIA->value,
-            'version'       => 1,
+            'equipo_id' => $equipo->id,
+            'area' => HOJACHEQUEOAREA::TINTORERIA->value,
+            'version' => 1,
             'observaciones' => null
         ]);
 
         $items = [
             [
-                'items'     => [
-                    'ITEM'        => 'LIMPIEZA DEL DESTILADOR',
-                    'FRECUENCIA'  => 'CADA 2 DÍAS',
-                    'METODO'      => null,
-                    'CRITERIO'    => 'CADA 8- 10 CICLOS',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA DEL DESTILADOR',
+                    'FRECUENCIA' => 'CADA 2 DÍAS',
+                    'METODO' => null,
+                    'CRITERIO' => 'CADA 8 - 10 CICLOS',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'        => 'TEMPERATURA DEL DESTILADOR',
-                    'FRECUENCIA'  => '1 VEZ AL DIA',
-                    'METODO'      => null,
-                    'CRITERIO'    => 'DE 110º A 127º C',
+                'items' => [
+                    'ITEM' => 'TEMPERATURA DEL DESTILADOR',
+                    'FRECUENCIA' => '1 VEZ AL DIA',
+                    'METODO' => null,
+                    'CRITERIO' => 'DE 110º A 127º C',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'        => 'PRESIÒN DEL SISTEMA REFRIGERANTE',
-                    'FRECUENCIA'  => '1 VEZ AL DIA',
-                    'METODO'      => 'DURANTE EL SECADO',
-                    'CRITERIO'    => 'PRESIÒN EN ALTA DE 3 A 5 BAR',
+                'items' => [
+                    'ITEM' => 'PRESIÒN DEL SISTEMA REFRIGERANTE',
+                    'FRECUENCIA' => '1 VEZ AL DIA',
+                    'METODO' => 'DURANTE EL SECADO',
+                    'CRITERIO' => 'PRESIÒN EN ALTA DE 3 A 5 BAR',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'        => 'PRESIÒN DEL SISTEMA REFRIGERANTE',
-                    'FRECUENCIA'  => '1 VEZ AL DIA',
-                    'METODO'      => 'DURANTE EL SECADO',
-                    'CRITERIO'    => 'PRESIÒN EN BAJA DE 19 A 21 BAR',
+                'items' => [
+                    'ITEM' => 'PRESIÒN DEL SISTEMA REFRIGERANTE',
+                    'FRECUENCIA' => '1 VEZ AL DIA',
+                    'METODO' => 'DURANTE EL SECADO',
+                    'CRITERIO' => 'PRESIÒN EN BAJA DE 19 A 21 BAR',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'        => 'PRESIÒN DEL SISTEMA REFRIGERANTE',
-                    'FRECUENCIA'  => '1 VEZ AL DIA',
-                    'METODO'      => 'DURANTE EL ENFRIAMIENTO',
-                    'CRITERIO'    => 'PRESIÒN EN ALTA DE 3 A 5 BAR',
+                'items' => [
+                    'ITEM' => 'PRESIÒN DEL SISTEMA REFRIGERANTE',
+                    'FRECUENCIA' => '1 VEZ AL DIA',
+                    'METODO' => 'DURANTE EL ENFRIAMIENTO',
+                    'CRITERIO' => 'PRESIÒN EN ALTA DE 3 A 5 BAR',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'        => 'PRESIÒN DEL SISTEMA REFRIGERANTE',
-                    'FRECUENCIA'  => '1 VEZ AL DIA',
-                    'METODO'      => 'DURANTE EL ENFRIAMIENTO',
-                    'CRITERIO'    => 'PRESIÒN EN BAJA DE 18 A 21 BAR',
+                'items' => [
+                    'ITEM' => 'PRESIÒN DEL SISTEMA REFRIGERANTE',
+                    'FRECUENCIA' => '1 VEZ AL DIA',
+                    'METODO' => 'DURANTE EL ENFRIAMIENTO',
+                    'CRITERIO' => 'PRESIÒN EN BAJA DE 18 A 21 BAR',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'        => 'LIMPIEZA DEL FILTRO ROTATIVO',
-                    'FRECUENCIA'  => '1 VEZ AL DÍA',
-                    'METODO'      => null,
-                    'CRITERIO'    => 'CADA 8-10 CICLOS',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA DEL FILTRO ROTATIVO',
+                    'FRECUENCIA' => '1 VEZ AL DÍA',
+                    'METODO' => null,
+                    'CRITERIO' => 'CADA 8-10 CICLOS',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'        => 'LIMPIEZA DEL FILTRO DE AIRE (Trampa de pelusa)',
-                    'FRECUENCIA'  => '1 VEZ AL DÍA',
-                    'METODO'      => null,
-                    'CRITERIO'    => 'LIMPIEZA PROFUNDA',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA DEL FILTRO DE AIRE (TRAMPA DE PELUSA)', // Changes here
+                    'FRECUENCIA' => '1 VEZ AL DÍA',
+                    'METODO' => null,
+                    'CRITERIO' => 'LIMPIEZA PROFUNDA',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'        => 'REGENERACIÓN MULTISORB',
-                    'FRECUENCIA'  => 'CADA 35 CICLOS O UNA VEZ A LA SEMANA',
-                    'METODO'      => null,
-                    'CRITERIO'    => 'MANTENIMIENTO',
+                'items' => [
+                    'ITEM' => 'REGENERACIÓN MULTISORB',
+                    'FRECUENCIA' => 'CADA 35 CICLOS O UNA VEZ A LA SEMANA',
+                    'METODO' => null,
+                    'CRITERIO' => 'MANTENIMIENTO',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'        => 'COMPRESOR',
-                    'FRECUENCIA'  => '1 VEZ AL DÍA',
-                    'METODO'      => null,
-                    'CRITERIO'    => 'PURGA',
+                'items' => [
+                    'ITEM' => 'COMPRESOR',
+                    'FRECUENCIA' => '1 VEZ AL DÍA',
+                    'METODO' => null,
+                    'CRITERIO' => 'PURGA',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'        => 'CICLOS AL FINAL DEL DÍA',
-                    'FRECUENCIA'  => null,
-                    'METODO'      => null,
-                    'CRITERIO'    => 'TOTALES',
+                'items' => [
+                    'ITEM' => 'HORAS AL FINAL DEL DÍA',
+                    'FRECUENCIA' => null,
+                    'METODO' => null,
+                    'CRITERIO' => 'TOTALES',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'        => 'SOLVENTE',
-                    'FRECUENCIA'  => 'SEMANAL',
-                    'METODO'      => null,
-                    'CRITERIO'    => 'RELLENAR NIVELES',
+                'items' => [
+                    'ITEM' => 'SOLVENTE',
+                    'FRECUENCIA' => 'SEMANAL',
+                    'METODO' => null,
+                    'CRITERIO' => 'RELLENAR NIVELES',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'        => 'PROGRAMA 16',
-                    'FRECUENCIA'  => '1 VEZ AL DÍA',
-                    'METODO'      => null,
-                    'CRITERIO'    => 'LIMPIEZA DE LA CANASTA',
+                'items' => [
+                    'ITEM' => 'PROGRAMA 16',
+                    'FRECUENCIA' => '1 VEZ AL DÍA',
+                    'METODO' => null,
+                    'CRITERIO' => 'LIMPIEZA DE LA CANASTA',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'        => 'MANTENIMIENTO CANASTA',
-                    'FRECUENCIA'  => '1 VEZ CADA 15 DIAS',
-                    'METODO'      => null,
-                    'CRITERIO'    => 'LIMPIEZA DE LA CANASTA MANUAL',
+                'items' => [
+                    'ITEM' => 'MANTENIMIENTO CANASTA',
+                    'FRECUENCIA' => '1 VEZ CADA 15 DIAS',
+                    'METODO' => null,
+                    'CRITERIO' => 'LIMPIEZA DE LA CANASTA MANUAL',  // Changes here
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'        => 'LIMPIEZA GENERAL',
-                    'FRECUENCIA'  => '1 VEZ POR TURNO',
-                    'METODO'      => null,
-                    'CRITERIO'    => 'LIMPIEZA PROFUNDA',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA GENERAL',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => null,
+                    'CRITERIO' => 'LIMPIEZA PROFUNDA',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'limpieza'
@@ -1541,8 +1547,8 @@ class EquiposSeeder extends Seeder
         foreach ($items as $item) {
             Item::create([
                 'hoja_chequeo_id' => $hoja->id,
-                'valores'         => $item['items'],
-                'categoria'       => $item['categoria']
+                'valores' => $item['items'],
+                'categoria' => $item['categoria']
             ]);
         }
     }
@@ -1553,12 +1559,12 @@ class EquiposSeeder extends Seeder
             'nombre' => 'SUAVIZADOR 05',
             'numeroControl' => '005',
             'revision' => 'N',
-            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
         ]);
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
-            'area' => HojaChequeoArea::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
         ]);
 
         $items = [
@@ -1608,11 +1614,11 @@ class EquiposSeeder extends Seeder
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'        => 'LIMPIEZA GENERAL',
-                    'FRECUENCIA'  => '1 VEZ POR TURNO',
-                    'METODO'      => '',
-                    'CRITERIO'    => 'LIMPIEZA PROFUNDA',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA GENERAL',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => '',
+                    'CRITERIO' => 'LIMPIEZA PROFUNDA'
                 ],
                 'categoria' => 'limpieza'
             ]
@@ -1629,163 +1635,163 @@ class EquiposSeeder extends Seeder
 
     public function lsHdc02() {
         $equipo = Equipo::create([
-            'tag'           => 'LS-HDC-02',
-            'nombre'        => 'LAV. HIDROCARBURO',
-            'area'          => 'Lavado en Seco',
-            'foto'          => null,
+            'tag' => 'LS-HDC-02',
+            'nombre' => 'LAV. HIDROCARBURO',
+            'area' => 'LAVADO EN SECO',  // Changes here
+            'foto' => null,
             'numeroControl' => '002',
-            'revision'      => 'N'
+            'revision' => 'N'
         ]);
 
         $hoja = HojaChequeo::create([
-            'equipo_id'     => $equipo->id,
-            'version'       => 1,
+            'equipo_id' => $equipo->id,
+            'version' => 1,
             'observaciones' => null,
-            'area'          => HojaChequeoArea::TINTORERIA->value
+            'area' => HOJACHEQUEOAREA::TINTORERIA->value
         ]);
 
         $items = [
             [
-                'items'     => [
-                    'ITEM'       => 'LIMPIAR EL DESTILADOR',
+                'items' => [
+                    'ITEM' => 'LIMPIAR EL DESTILADOR',
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO'   => 'CUANDO EL DESTILADOR ESTA FRIO'
+                    'CRITERIO' => 'CUANDO EL DESTILADOR ESTA FRIO'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'LIMPIAR EL FILTRO DE TRAMPA BOTÓN',
+                'items' => [
+                    'ITEM' => 'LIMPIAR EL FILTRO DE TRAMPA BOTÓN',
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO'   => 'CADA 3-4 CICLOS'
+                    'CRITERIO' => 'CADA 3-4 CICLOS'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'LIMPIAR EL FILTRO DE AIRE PRIMARIO Y SECUNDARIO',
+                'items' => [
+                    'ITEM' => 'LIMPIAR EL FILTRO DE AIRE PRIMARIO Y SECUNDARIO',
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO'   => 'MAQUINA EN PUNTO MUERTO'
+                    'CRITERIO' => 'MAQUINA EN PUNTO MUERTO'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'LIMPIAR LOS FILTROS SPIN (1 y 2)',
+                'items' => [
+                    'ITEM' => 'LIMPIAR LOS FILTROS SPIN (1 Y 2)',  // Changes here
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO'   => 'CADA 8-10 CICLOS'
+                    'CRITERIO' => 'CADA 8-10 CICLOS'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'CORRER EL PROGRAMA DE “GOOD MORNING”',
+                'items' => [
+                    'ITEM' => 'CORRER EL PROGRAMA DE “GOOD MORNING”',
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO'   => 'DESPUES DE LA LIMPIEZA DEL DESTILADOR'
+                    'CRITERIO' => 'DESPUES DE LA LIMPIEZA DEL DESTILADOR'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'LIMPIAR EL FILTRO DE LA BOMBA DE VACÍO',
+                'items' => [
+                    'ITEM' => 'LIMPIAR EL FILTRO DE LA BOMBA DE VACÍO',  // Changes here
                     'FRECUENCIA' => '2 VECES POR SEMANA',
-                    'CRITERIO'   => 'MAQUINA EN PUNTO MUERTO'
+                    'CRITERIO' => 'MAQUINA EN PUNTO MUERTO'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'LIMPIAR EL FILTRO DE AIRE PRIMARIO Y SECUNDARIO',
+                'items' => [
+                    'ITEM' => 'LIMPIAR EL FILTRO DE AIRE PRIMARIO Y SECUNDARIO',
                     'FRECUENCIA' => '1 VEZ POR SEMANA',
-                    'CRITERIO'   => 'LIMPIEZA PROFUNDA'
+                    'CRITERIO' => 'LIMPIEZA PROFUNDA'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'LIMPIAR EL FLOTADOR DE LA TRAMPA DE BOTONES',
+                'items' => [
+                    'ITEM' => 'LIMPIAR EL FLOTADOR DE LA TRAMPA DE BOTONES',
                     'FRECUENCIA' => 'CADA 2 MESES',
-                    'CRITERIO'   => 'LIMPIEZA PROFUNDA'
+                    'CRITERIO' => 'LIMPIEZA PROFUNDA'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'COMPRESOR',
+                'items' => [
+                    'ITEM' => 'COMPRESOR',
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO'   => 'PURGA'
+                    'CRITERIO' => 'PURGA'
                 ],
-                'categoria' => 'operacion' // Corregido operacon->operacion
+                'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'CICLOS',
+                'items' => [
+                    'ITEM' => 'HORAS',
                     'FRECUENCIA' => 'AL FINAL DEL DÍA',
-                    'CRITERIO'   => 'TOTALES'
+                    'CRITERIO' => 'TOTALES'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'SOLVENTE',
+                'items' => [
+                    'ITEM' => 'SOLVENTE',
                     'FRECUENCIA' => 'SEMANAL',
-                    'CRITERIO'   => 'RELLENAR NIVELES'
+                    'CRITERIO' => 'RELLENAR NIVELES'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'LIMPIEZA DE SEPARADOR DE AGUA',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA DE SEPARADOR DE AGUA',
                     'FRECUENCIA' => '1 VEZ AL MES',
-                    'CRITERIO'   => 'LIMPIEZA PROFUNDA'
+                    'CRITERIO' => 'LIMPIEZA PROFUNDA'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'LECTURA DEL MANOMETRO ST1',
+                'items' => [
+                    'ITEM' => 'LECTURA DEL MANOMETRO ST1',
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO'   => 'ESTADO OPTIMO DE CONDENSADOR Y DESTILADOR'
+                    'CRITERIO' => 'ESTADO OPTIMO DE CONDENSADOR Y DESTILADOR'  // Changes here
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'LECTURA DEL MANOMETRO ST3',
+                'items' => [
+                    'ITEM' => 'LECTURA DEL MANOMETRO ST3',
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO'   => 'ESTADO OPTIMO DE CONDENSADOR Y DESTILADOR'
+                    'CRITERIO' => 'ESTADO OPTIMO DE CONDENSADOR Y DESTILADOR'  // Changes here
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'LECTURA DEL MANOMETRO ST6',
+                'items' => [
+                    'ITEM' => 'LECTURA DEL MANOMETRO ST6',
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO'   => 'ESTADO OPTIMO DE CONDENSADOR Y DESTILADOR'
+                    'CRITERIO' => 'ESTADO OPTIMO DE CONDENSADOR Y DESTILADOR'  // Changes here
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'CICLOS DEL FILTRO ROTATIVO F1',
+                'items' => [
+                    'ITEM' => 'CICLOS DEL FILTRO ROTATIVO F1',
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO'   => 'ESTADO OPTIMO DEl FILTRO SPIN 1'
+                    'CRITERIO' => 'ESTADO OPTIMO DEL FILTRO SPIN 1'  // Changes here
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'CICLOS DEL FILTRO ROTATIVO F2',
+                'items' => [
+                    'ITEM' => 'CICLOS DEL FILTRO ROTATIVO F2',
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO'   => 'ESTADO OPTIMO DEl FILTRO SPIN 2'
+                    'CRITERIO' => 'ESTADO OPTIMO DEL FILTRO SPIN 2'  // Changes here
                 ],
-                'categoria' => 'revision' // Inferido de línea anterior
+                'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'limpieza general del equipo',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA GENERAL DEL EQUIPO',  // Changes here
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO'   => 'LIMPIEZA PROFUNDA'
+                    'CRITERIO' => 'LIMPIEZA PROFUNDA'
                 ],
                 'categoria' => 'limpieza'
             ]
@@ -1794,105 +1800,106 @@ class EquiposSeeder extends Seeder
         foreach ($items as $item) {
             Item::create([
                 'hoja_chequeo_id' => $hoja->id,
-                'valores'         => $item['items'],
-                'categoria'       => $item['categoria']
+                'valores' => $item['items'],
+                'categoria' => $item['categoria']
             ]);
         }
     }
 
     public function laHid02(): void {
         $equipo = Equipo::create([
-            'tag'           => 'LA-HID-02',
-            'nombre'        => 'HIDRONEUMATICO 02',
-            'area'          => 'Lavado en Agua',
-            'foto'          => null,
+            'tag' => 'LA-HID-02',
+            'nombre' => 'HIDRONEUMATICO 02',
+            'area' => 'LAVADO EN AGUA',  // Changes here
+            'foto' => null,
             'numeroControl' => '002',
-            'revision'      => 'NOM-020-STPS-2011'
+            'revision' => 'NOM-020-STPS-2011'
         ]);
 
         $hoja = HojaChequeo::create([
-            'equipo_id'     => $equipo->id, 'version' => 1,
-            'area'          => HojaChequeoArea::CUARTO_DE_MAQUINAS->value,
+            'equipo_id' => $equipo->id, 'version' => 1,
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value,
             'observaciones' => null
         ]);
 
         $items = [
             [
-                'items'     => [
-                    'ITEM'        => 'ENCENDIDO DE INTERRUPTOR PRINCIPAL',
-                    'FRECUENCIA'  => '1 VEZ POR TURNO',
-                    'METODO'      => 'VISUAL',
-                    'CRITERIO'    => 'REVISAR QUE ESTE ENCENDIDO EL INTERRUPTOR DEL COMPRESOR DEL HIDRONEUMATICO',
+                'items' => [
+                    'ITEM' => 'ENCENDIDO DE INTERRUPTOR PRINCIPAL',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => 'VISUAL',
+                    'CRITERIO' => 'REVISAR QUE ESTE ENCENDIDO EL INTERRUPTOR DEL COMPRESOR DEL HIDRONEUMATICO',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'        => 'ENCENDIDO DE INTERRUPTOR SECUNDARIO',
-                    'FRECUENCIA'  => '1 VEZ POR TURNO',
-                    'METODO'      => 'VISUAL Y AUDITIVO',
-                    'CRITERIO'    => 'REVISAR QUE ESTE ENCENDIDO EL INTERRUPTOR DEL COMPRESOR DEL HIDRONEUMATICO',
+                'items' => [
+                    'ITEM' => 'ENCENDIDO DE INTERRUPTOR SECUNDARIO',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => 'VISUAL Y AUDITIVO',
+                    'CRITERIO' => 'REVISAR QUE ESTE ENCENDIDO EL INTERRUPTOR DEL COMPRESOR DEL HIDRONEUMATICO',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'        => 'LIMPIEZA EXTERIOR DE EQUIPO',
-                    'FRECUENCIA'  => '1 VEZ POR TURNO',
-                    'METODO'      => 'VISUAL',
-                    'CRITERIO'    => 'REALIZAR AL INICIO DEL TURNO',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA EXTERIOR DE EQUIPO',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => 'VISUAL',
+                    'CRITERIO' => 'REALIZAR AL INICIO DEL TURNO',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'        => 'REVISION DE TUBERIA PRINCIPAL',
-                    'FRECUENCIA'  => '1 VEZ CADA SEMANA',
-                    'METODO'      => 'VISUAL',
-                    'CRITERIO'    => 'CHECAR SI HAY FUGAS EN UNIONES',
+                'items' => [
+                    '
+ITEM' => 'REVISION DE TUBERIA PRINCIPAL',
+                    'FRECUENCIA' => '1 VEZ CADA SEMANA',
+                    'METODO' => 'VISUAL',
+                    'CRITERIO' => 'CHECAR SI HAY FUGAS EN UNIONES',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'        => 'REVISION DE LLENADO DE CISTERNA',
-                    'FRECUENCIA'  => '1 VEZ POR TURNO',
-                    'METODO'      => 'VISUAL',
-                    'CRITERIO'    => 'VERIFICAR EL LLEANDO DE LA CISTERNA',
+                'items' => [
+                    'ITEM' => 'REVISION DE LLENADO DE CISTERNA',
+                    'FRECUENCIA' => '1 VEZ POR TURNO',
+                    'METODO' => 'VISUAL',
+                    'CRITERIO' => 'VERIFICAR EL LLENADO DE LA CISTERNA',  // Typo here. Should this be "LLENADO"?
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'        => 'LIMPIEZA GENERAL',
-                    'FRECUENCIA'  => '1 AL DIA',
-                    'METODO'      => 'MANUAL',
-                    'CRITERIO'    => 'LIMPIEZA PROFUNDA',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA GENERAL',
+                    'FRECUENCIA' => '1 AL DIA',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => 'LIMPIEZA PROFUNDA',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'        => 'PRESION DE TRABAJO',
-                    'FRECUENCIA'  => '1 VEZ DURANTE EL TURNO',
-                    'METODO'      => 'MANUAL',
-                    'CRITERIO'    => '40 PSI A 60 PSI',
+                'items' => [
+                    'ITEM' => 'PRESION DE TRABAJO',
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
+                    'METODO' => 'MANUAL',
+                    'CRITERIO' => '40 PSI A 60 PSI',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'        => 'PRESION DEL AIRE',
-                    'FRECUENCIA'  => '1 VEZ DURANTE EL TURNO',
-                    'METODO'      => 'VISUAL',
-                    'CRITERIO'    => '38 PSI',
+                'items' => [
+                    'ITEM' => 'PRESION DEL AIRE',
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
+                    'METODO' => 'VISUAL',
+                    'CRITERIO' => '38 PSI',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'revision'
@@ -1902,8 +1909,8 @@ class EquiposSeeder extends Seeder
         foreach ($items as $item) {
             Item::create([
                 'hoja_chequeo_id' => $hoja->id,
-                'valores'         => $item['items'],
-                'categoria'       => $item['categoria']
+                'valores' => $item['items'],
+                'categoria' => $item['categoria']
             ]);
         }
     }
