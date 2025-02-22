@@ -25,6 +25,9 @@ class ReporteHistorico extends Page implements HasTable
 
     protected static ?string $title = "Mis reportes";
 
+    public static function canAccess(): bool {
+        return \Auth::user()->hasRole('Operador');
+    }
 
     public function table(Table $table): Table {
         return $table
@@ -49,15 +52,15 @@ class ReporteHistorico extends Page implements HasTable
                               'alta'  => 'danger'
                           }),
                 TextColumn::make('estado')->label('Estado')
-                    ->badge()
-                    ->color(fn(string $state): string => match (strtolower($state)) {
-                        'pendiente' => 'warning',
-                        'realizado' => 'success',
-                    })
-                    ->icon(fn(string $state): string => match ($state) {
-                        'pendiente' => 'heroicon-o-clock',
-                        'realizado' => 'heroicon-o-check',
-                    }),
+                          ->badge()
+                          ->color(fn(string $state): string => match (strtolower($state)) {
+                              'pendiente' => 'warning',
+                              'realizado' => 'success',
+                          })
+                          ->icon(fn(string $state): string => match ($state) {
+                              'pendiente' => 'heroicon-o-clock',
+                              'realizado' => 'heroicon-o-check',
+                          }),
                 TextColumn::make('created_at')->label('Creado el')
                           ->dateTime()
                           ->sortable()
@@ -69,17 +72,17 @@ class ReporteHistorico extends Page implements HasTable
             ])
             ->filters([
                 SelectFilter::make('priority')
-                                           ->label('Prioridad')
-                                           ->options([
-                                               'alta'  => 'Alta',
-                                               'media' => 'Media',
-                                               'baja'  => 'Baja',
-                                           ]),
+                            ->label('Prioridad')
+                            ->options([
+                                'alta'  => 'Alta',
+                                'media' => 'Media',
+                                'baja'  => 'Baja',
+                            ]),
                 SelectFilter::make('area')->label('Area')
-                                           ->options(fn() => array_combine(
-                                               array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases()),
-                                               array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases())
-                                           ))
+                            ->options(fn() => array_combine(
+                                array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases()),
+                                array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases())
+                            ))
             ])
             ->actions([
                 ViewAction::make()->infolist([

@@ -11,4 +11,8 @@ class ChequeoDaily extends Page
     protected static string $view = 'filament.pages.chequeo-daily';
 
     protected static ?string $title = 'Chequeo diario';
+
+    public static function canAccess(): bool {
+        return \Auth::user()->hasRole('Operador');
+    }
 }

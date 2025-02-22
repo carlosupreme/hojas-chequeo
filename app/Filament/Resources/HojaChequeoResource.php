@@ -74,12 +74,14 @@ class HojaChequeoResource extends Resource
                                             )
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\Action::make('Historial')
-                                     ->url(fn(HojaChequeo $record): string => HojaChequeoResource::getUrl('history', ['record' => $record]))
-                                     ->icon('heroicon-o-calendar'),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\Action::make('Historial')
+                                         ->url(fn(HojaChequeo $record): string => HojaChequeoResource::getUrl('history', ['record' => $record]))
+                                         ->icon('heroicon-o-calendar'),
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

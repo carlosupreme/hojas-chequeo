@@ -27,6 +27,10 @@ class Reportar extends Page
 
     protected static string $view = 'filament.pages.reportar';
 
+    public static function canAccess(): bool {
+        return \Auth::user()->hasRole('Operador');
+    }
+
     public ?array $data = [];
 
     public function mount() {
