@@ -15,7 +15,7 @@ class EnsureIsOperador
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (\Auth::check() && \Auth::user()->hasRole('Operador')) {
+        if (\Auth::check() && (\Auth::user()->hasRole('Operador') || \Auth::user()->hasRole('Supervisor'))) {
             return $next($request);
         }
 
