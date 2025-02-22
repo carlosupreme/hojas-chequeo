@@ -52,7 +52,7 @@ class PerfilResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->closeModalByClickingAway(false),
                 Tables\Actions\DeleteAction::make()->hidden(fn(Perfil $record): bool => $record->users()->exists()),
 
             ])
