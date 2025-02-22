@@ -52,10 +52,9 @@ class AreaReportsChart extends Component
             $monthlyData = [];
 
             foreach ($months as $month) {
-                $count = Reporte::join('hoja_chequeos', 'reportes.hoja_chequeo_id', '=', 'hoja_chequeos.id')
-                                ->where('hoja_chequeos.area', $area)
-                                ->whereYear('reportes.fecha', $this->selectedYear)
-                                ->whereMonth('reportes.fecha', $month)
+                $count = Reporte::where('area', $area)
+                                ->whereYear('fecha', $this->selectedYear)
+                                ->whereMonth('fecha', $month)
                                 ->count();
 
                 $monthlyData[] = $count;

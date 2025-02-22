@@ -2,14 +2,21 @@
 
 namespace App\Filament\Pages;
 
-use App\Models\Equipo;
+use App\HojaChequeoArea;
 use App\Models\Reporte;
 use App\Models\User;
 use Carbon\Carbon;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Notifications\Actions;
 use Filament\Pages\Page;
-use Illuminate\Support\Facades\Auth;
 use Livewire\WithFileUploads;
 
 class Reportar extends Page
@@ -20,99 +27,99 @@ class Reportar extends Page
 
     protected static string $view = 'filament.pages.reportar';
 
-    public string $name;
-    public string $tag          = '';
-    public string $area         = '';
-    public string $department   = '';
-    public string $equipment    = '';
-    public string $vehicle      = '';
-    public string $failure      = '';
-    public string $observations = '';
-    public string $priority     = '';
-    public        $photo;
-
-    protected $rules = [
-        'name'     => 'required',
-        'failure'  => 'required',
-        'priority' => 'required',
-        'photo'    => 'nullable|image',
-    ];
-
-    public $formData = [
-        'areas'       => [
-            'Edificio centro',
-            'Edificio Universidad',
-            'Edificio Violetas',
-            'Santa Rosa',
-            'Tiendas',
-            'Fraccionamiento Elsa',
-            'Violetas'
-        ],
-        'departments' => [
-            'Costura',
-            'Planchado',
-            'Lavado en agua',
-            'Lavado en seco',
-            'Lavanderia',
-            'Empaque',
-            'Teñido',
-            'Cuarto de maquinas',
-            'Tienda Santa Rosa',
-            'Tienda Centro',
-            'Tienda Universidad',
-            'Tienda Xoxo',
-            'Tienda Deportivo',
-            'Departamento Jade',
-            'Departamento Verde Antequera',
-            'Departamento Cherry',
-            'Bodega',
-            'Cuartos',
-            'Local',
-            'Azotea',
-            'Administración'
-        ],
-        'equipments'  => [
-            'Luminarias',
-            'Lámpara de emergencia',
-            'Ventiladores',
-            'Nobreak',
-            'Interphone',
-            'Cerca eléctrica',
-            'Cisternas',
-            'Baño',
-            'Escritorio',
-            'N/A'
-        ],
-        'vehicles'    => ['Transit 2010', 'Transit 2016', 'Chasis NP 300', 'Partner', 'N/A'],
-        'tags'        => []
-    ];
+    public ?array $data = [];
 
     public function mount() {
-        $this->name = Auth::user()->name;
-        $this->formData['tags'] = Equipo::pluck('tag')->toArray();
-        $this->priority = "Baja";
+        $this->form->fill();
+    }
+
+    public function form(Form $form): Form {
+        return $form
+            ->schema([
+                Section::make('Datos del reporte')
+                       ->collapsible()
+                       ->schema([
+                           Grid::make(3)
+                               ->schema([
+                                   TextInput::make('user_id')->hidden()->default(fn() => \Auth::id()),
+                                   TextInput::make('name')
+                                            ->label('Nombre')
+                                            ->required()
+                                            ->default(fn() => \Auth::user()->name),
+                                   DatePicker::make('fecha')
+                                             ->label('Fecha')
+                                             ->default(Carbon::now())
+                                             ->readOnly()
+                                             ->native(false)
+                                             ->closeOnDateSelection(),
+
+                                   Select::make('priority')->label('Prioridad')
+                                         ->default("baja")
+                                         ->options([
+                                             'alta'  => 'Alta',
+                                             'media' => 'Media',
+                                             'baja'  => 'Baja'
+                                         ])
+                                         ->required()
+                                         ->native(false)
+                               ]),
+                       ]),
+
+                Section::make('Detalles del equipo')
+                       ->description('Selecciona el equipo que presenta la falla')
+                       ->collapsible()
+                       ->schema([
+                           Grid::make(2)
+                               ->schema([
+                                   Select::make('equipo_id')
+                                         ->label('Tag del Equipo')
+                                         ->relationship('equipo', 'tag')
+                                         ->searchable()
+                                         ->preload()
+                                         ->required(),
+                                   Select::make('area')->label('Area')
+                                         ->options(fn() => array_combine(
+                                             array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases()),
+                                             array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases())
+                                         ))
+                                         ->searchable()
+                                         ->preload()
+                                         ->required(),
+                               ]),
+                       ]),
+
+                Section::make('Detalles de la falla')
+                       ->description('Describe el problema que presenta')
+                       ->schema([
+                           Grid::make(1)
+                               ->schema([
+                                   TextInput::make('failure')
+                                            ->label('Falla')
+                                            ->required()
+                                            ->columnSpanFull(),
+                                   Textarea::make('observations')
+                                           ->label('Observaciones')
+                                           ->rows(3)
+                                           ->columnSpanFull(),
+                               ]),
+                       ]),
+
+                Section::make('Evidencia')
+                       ->schema([
+                           FileUpload::make('photo')
+                                     ->label('Foto')
+                                     ->image()
+                                     ->imageEditor()
+                                     ->columnSpanFull(),
+                       ]),
+            ])
+            ->statePath('data')
+            ->model(Reporte::class);
     }
 
     public function submit(): void {
-        $this->validate();
-
-        $equipo = Equipo::where('tag', $this->tag)->first();
-
-        $reporte = Reporte::create([
-            'equipo_id'    => $equipo ? $equipo->id : null,
-            'tag'          => $this->tag,
-            'area'         => $this->area,
-            'department'   => $this->department,
-            'equipment'    => $this->equipment,
-            'vehicle'      => $this->vehicle,
-            'failure'      => $this->failure,
-            'observations' => $this->observations,
-            'priority'     => $this->priority,
-            'photo'        => $this->photo ? $this->photo->store() : null,
-            'user_id'      => Auth::id(),
-            'fecha'        => Carbon::now()
-        ]);
-
+        $reporte = Reporte::create($this->form->getState());
+        $this->form->model($reporte)->saveRelationships();
         Notification::make()
                     ->success()
                     ->icon('heroicon-o-inbox-arrow-down')
@@ -125,13 +132,14 @@ class Reportar extends Page
                     ->danger()
                     ->icon('heroicon-o-inbox-arrow-down')
                     ->iconColor('danger')
-                    ->body(auth()->user()->name . ' ha reportado una falla de ' . $this->tag ? $this->tag : ($this->equipment ?: $this->vehicle))
+                    ->body(auth()->user()->name . ' ha reportado una falla de ' . $reporte->equipo->tag)
                     ->actions([
                         Actions\Action::make('Ver')
                                       ->button()
                                       ->url("/admin/reportes/")
                     ])
                     ->sendToDatabase(User::role('Administrador')->get(), isEventDispatched: true);
+        $this->form->fill();
     }
 
 }

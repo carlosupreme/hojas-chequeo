@@ -9,4 +9,8 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateReporte extends CreateRecord
 {
     protected static string $resource = ReporteResource::class;
+
+    protected function mutateFormDataBeforeCreate(array $data): array {
+        return $data;
+    }
 }

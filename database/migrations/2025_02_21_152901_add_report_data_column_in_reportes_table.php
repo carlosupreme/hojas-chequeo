@@ -13,10 +13,6 @@ return new class extends Migration {
         Schema::table('reportes', function (Blueprint $table) {
             $table->string("name")->nullable();
             $table->string("area")->nullable();
-            $table->string("department")->nullable();
-            $table->string("equipment")->nullable();
-            $table->string("vehicle")->nullable();
-            $table->string('tag')->nullable();
             $table->string("priority")->nullable();
             $table->string("observations")->nullable();
             $table->string("failure")->nullable();
@@ -33,10 +29,6 @@ return new class extends Migration {
         Schema::table('reportes', function (Blueprint $table) {
             $table->dropColumn("name");
             $table->dropColumn("area");
-            $table->dropColumn("department");
-            $table->dropColumn("equipment");
-            $table->dropColumn("vehicle");
-            $table->dropColumn('tag');
             $table->dropColumn("priority");
             $table->dropColumn("observations");
             $table->dropColumn("failure");
