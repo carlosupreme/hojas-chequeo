@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\HojaChequeoArea;
+use App\Models\Alerta;
 use App\Models\Equipo;
 use App\Models\HojaChequeo;
 use App\Models\Item;
@@ -13,13 +14,15 @@ class EquiposSeeder extends Seeder
     /**
      * Run the database seeds.b
      */
-    public function run(): void {
+    public function run(): void
+    {
         $this->cuartoDeMaquinas();
         $this->tintoreria();
         $this->lavanderia();
     }
 
-    public function cuartoDeMaquinas(): void {
+    public function cuartoDeMaquinas(): void
+    {
         $this->laHid02();
         $this->cmCal(1);
         $this->cmCal(2);
@@ -30,7 +33,8 @@ class EquiposSeeder extends Seeder
         $this->fca02();
         $this->cm02Hid01();
     }
-    public function cm02Hid01(): void {
+    public function cm02Hid01(): void
+    {
         $equipo = Equipo::create([
             'tag' => 'CM02-HID-01',
             'nombre' => 'HIDRONEUMATICO 1',
@@ -118,14 +122,37 @@ class EquiposSeeder extends Seeder
         ];
 
         foreach ($items as $item) {
-            Item::create([
+            $created =  Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
                 'categoria' => $item['categoria']
             ]);
+
+
+            if ($item['items']['ITEM'] === 'PRESION DEL AIRE') {
+                Alerta::create([
+                    'item_id' => $created->id,
+                    'valor' => 58,
+                    'operador' => '>'
+                ]);
+            }
+
+            if ($item['items']['ITEM'] === 'PRESION DE TRABAJO MANOMETRO') {
+                Alerta::create([
+                    'item_id' => $created->id,
+                    'valor' => 80,
+                    'operador' => '>'
+                ]);
+            }
+
+            Alerta::create([
+                'item_id' => $created->id,
+                'simbologia_id' => 2,
+            ]);
         }
     }
-    public function fca02(): void {
+    public function fca02(): void
+    {
         $equipo = Equipo::create([
             'tag' => 'FCA-02',
             'nombre' => 'FILTRO CARBON ACTIVADO',
@@ -175,14 +202,20 @@ class EquiposSeeder extends Seeder
         ];
 
         foreach ($items as $item) {
-            Item::create([
+            $created =  Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
                 'categoria' => $item['categoria']
             ]);
+
+            Alerta::create([
+                'item_id' => $created->id,
+                'simbologia_id' => 2,
+            ]);
         }
     }
-    public function fze03(): void {
+    public function fze03(): void
+    {
         $equipo = Equipo::create([
             'tag' => 'FZE-03',
             'nombre' => 'FILTRO DE ZEOLITA',
@@ -232,15 +265,29 @@ class EquiposSeeder extends Seeder
         ];
 
         foreach ($items as $item) {
-            Item::create([
+            $created =  Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
                 'categoria' => $item['categoria']
             ]);
+
+            if ($item['items']['ITEM'] === 'TURBIDEZ') {
+                Alerta::create([
+                    'item_id' => $created->id,
+                    'valor' => 5,
+                    'operador' => '>'
+                ]);
+            }
+
+            Alerta::create([
+                'item_id' => $created->id,
+                'simbologia_id' => 2,
+            ]);
         }
     }
 
-    public function cmTco01(): void {
+    public function cmTco01(): void
+    {
         $equipo = Equipo::create([
             'tag' => 'CM-TCO-01',
             'nombre' => 'TANQUE DE CONDENSADOS',
@@ -328,8 +375,7 @@ class EquiposSeeder extends Seeder
                     'METODO DE CHEQUEO' => 'VISUAL',
                     'CRITERIO DE DETERMINACION' => '',
                     'QUIEN REALIZA' => 'OPERARIO',
-                    'OBSERVACION
-ES' => ''
+                    'OBSERVACIONES' => ''
                 ],
                 'categoria' => 'revision'
             ],
@@ -358,14 +404,23 @@ ES' => ''
         ];
 
         foreach ($items as $item) {
-            Item::create([
+            $created =  Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
                 'categoria' => $item['categoria']
             ]);
+
+            if ($item['items']['ITEM DE CHEQUEO'] === 'TEMPERATURA INTERIOR') {
+                Alerta::create([
+                    'item_id' => $created->id,
+                    'valor' => 95,
+                    'operador' => '>'
+                ]);
+            }
         }
     }
-    public function cmCom01(): void {
+    public function cmCom01(): void
+    {
         $equipo = Equipo::create([
             'tag' => 'CM-COM-01',
             'nombre' => 'COMPRESOR -01',
@@ -393,7 +448,7 @@ ES' => ''
                 'items' => [
                     'ITEM DE CHEQUEO' => 'DISPARO VALVULA DE SEGURIDAD',
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
-                    'CRITERIO DE DETERMINACION' => 'ACCIOANMIENTO DE VALVULA MODO MANUAL',
+                    'CRITERIO DE DETERMINACION' => 'ACCIONAMIENTO DE VALVULA MODO MANUAL',
                     'OBSERVACIONES' => ''
                 ],
                 'categoria' => 'operacion'
@@ -482,172 +537,178 @@ ES' => ''
         ];
 
         foreach ($items as $item) {
-            Item::create([
+            $created =  Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
                 'categoria' => $item['categoria']
             ]);
+
+            Alerta::create([
+                'item_id' => $created->id,
+                'simbologia_id' => 2,
+            ]);
         }
     }
 
-    public function cmCal($tag) {
+    public function cmCal($tag)
+    {
         $equipo = Equipo::create([
-            'tag'           => 'CM-CAL-0'. $tag,
-            'nombre'        => 'CALDERA ' . $tag,
-            'area'          => 'CUARTO DE MAQUINAS',
-            'foto'          => null,
+            'tag' => 'CM-CAL-0' . $tag,
+            'nombre' => 'CALDERA ' . $tag,
+            'area' => 'CUARTO DE MAQUINAS',
+            'foto' => null,
             'numeroControl' => 'AC-ES-248-GV-391-2024',
-            'revision'      => 'NOM-020-STPS-2011'
+            'revision' => 'NOM-020-STPS-2011'
         ]);
 
         $hoja = HojaChequeo::create([
-            'equipo_id'     => $equipo->id,
-            'area'          => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value,
-            'version'       => 1,
+            'equipo_id' => $equipo->id,
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value,
+            'version' => 1,
             'observaciones' => null
         ]);
 
         $items = [
             [
-                'items'     => [
-                    'ITEM'       => 'LIMPIEZA EXTERIOR DE EQUIPO',
-                    'CRITERIO'   => 'REALIZARLO LOS LUNES DESPUES DEL APAGADO DE LA CALDERA',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA EXTERIOR DE EQUIPO',
+                    'CRITERIO' => 'REALIZARLO LOS LUNES DESPUES DEL APAGADO DE LA CALDERA',
                     'FRECUENCIA' => '1 VEZ POR QUINCENA'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'LIMPIEZA DEL CRISTAL DEL NIVEL DEL AGUA',
-                    'CRITERIO'   => 'REALIZAR DURANTE LAS PURGAS',
+                'items' => [
+                    'ITEM' => 'LIMPIEZA DEL CRISTAL DEL NIVEL DEL AGUA',
+                    'CRITERIO' => 'REALIZAR DURANTE LAS PURGAS',
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
                 ],
                 'categoria' => 'limpieza'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'COLOR DE HUMOS A LA SALIDA DE LA CHIMENEA',
-                    'CRITERIO'   => 'TRANSPARENTE',
+                'items' => [
+                    'ITEM' => 'COLOR DE HUMOS A LA SALIDA DE LA CHIMENEA',
+                    'CRITERIO' => 'TRANSPARENTE',
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'PURGAS DE COLUMNA DE CRISTAL DE NIVEL Y GRIFOS DE LA COLUMNA',
-                    'CRITERIO'   => 'SI O NO',  // Changes here
+                'items' => [
+                    'ITEM' => 'PURGAS DE COLUMNA DE CRISTAL DE NIVEL Y GRIFOS DE LA COLUMNA',
+                    'CRITERIO' => 'SI O NO',  // Changes here
                     'FRECUENCIA' => '2 VECES POR TURNO'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'PURGA DE VALVULA DE PRUEBA',
-                    'CRITERIO'   => 'SI O NO',  // Changes here
+                'items' => [
+                    'ITEM' => 'PURGA DE VALVULA DE PRUEBA',
+                    'CRITERIO' => 'SI O NO',  // Changes here
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'PURGA DE FONDO',
-                    'CRITERIO'   => 'HORA',
+                'items' => [
+                    'ITEM' => 'PURGA DE FONDO',
+                    'CRITERIO' => 'HORA',
                     'FRECUENCIA' => '2 VECES POR TURNO'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'CONTROL DE PRESIÓN',
-                    'CRITERIO'   => '5,2 KG',
+                'items' => [
+                    'ITEM' => 'CONTROL DE PRESIÓN',
+                    'CRITERIO' => '5,2 KG',
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'DISPARO DE VALVULA DE SEGURIDAD',
-                    'CRITERIO'   => 'ACCIONAMIENTO DE VALVULA MODO MANUAL',  // Changes here
+                'items' => [
+                    'ITEM' => 'DISPARO DE VALVULA DE SEGURIDAD',
+                    'CRITERIO' => 'ACCIONAMIENTO DE VALVULA MODO MANUAL',  // Changes here
                     'FRECUENCIA' => '1 VEZ AL MES'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'ALARMA DE NIVEL',
-                    'CRITERIO'   => 'ENCENDIDO Y APAGADO DEL QUEMADOR',
+                'items' => [
+                    'ITEM' => 'ALARMA DE NIVEL',
+                    'CRITERIO' => 'ENCENDIDO Y APAGADO DEL QUEMADOR',
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'DESINCRUSTANTE',
-                    'CRITERIO'   => 'DESPUES DE LA PURGA 5 LT HORA',
+                'items' => [
+                    'ITEM' => 'DESINCRUSTANTE',
+                    'CRITERIO' => 'DESPUES DE LA PURGA 5 LT HORA',
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
                 ],
                 'categoria' => 'operacion'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'TEMPERATURA TERMOMETRO CHIMENEA',
-                    'CRITERIO'   => '200°C A 270°C',
+                'items' => [
+                    'ITEM' => 'TEMPERATURA TERMOMETRO CHIMENEA',
+                    'CRITERIO' => '200°C A 270°C',
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'TEMPERATURAS DE LAS PARTES A PRESIÓN',
-                    'CRITERIO'   => '140°C A 160°C',
+                'items' => [
+                    'ITEM' => 'TEMPERATURAS DE LAS PARTES A PRESIÓN',
+                    'CRITERIO' => '140°C A 160°C',
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'PRESIÓN DE VAPOR',
-                    'CRITERIO'   => '4.4 A 5.2 KG/CM2',
+                'items' => [
+                    'ITEM' => 'PRESIÓN DE VAPOR',
+                    'CRITERIO' => '4.2 A 5.2 KG/CM2',
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'PRESION DEL COMBUSTIBLE',
-                    'CRITERIO'   => null,
+                'items' => [
+                    'ITEM' => 'PRESION DEL COMBUSTIBLE',
+                    'CRITERIO' => null,
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'TEMPERATURA ENTRADA DE AGUA',
-                    'CRITERIO'   => '80°C A 90°C',
+                'items' => [
+                    'ITEM' => 'TEMPERATURA ENTRADA DE AGUA',
+                    'CRITERIO' => '80°C A 90°C',
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'FUNCIONAMIENTO DE LA BOMBA',
-                    'CRITERIO'   => 'QUE ENCIENDA Y APAGUE AUTOMATICAMENTE',  // Changes here
+                'items' => [
+                    'ITEM' => 'FUNCIONAMIENTO DE LA BOMBA',
+                    'CRITERIO' => 'QUE ENCIENDA Y APAGUE AUTOMATICAMENTE',  // Changes here
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'FUNCIONAMIENTO DEL QUEMADOR',
-                    'CRITERIO'   => 'ENCENDIDO Y APAGADO EN MIRILLA',
+                'items' => [
+                    'ITEM' => 'FUNCIONAMIENTO DEL QUEMADOR',
+                    'CRITERIO' => 'ENCENDIDO Y APAGADO EN MIRILLA',
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
                 ],
                 'categoria' => 'revision'
             ],
             [
-                'items'     => [
-                    'ITEM'       => 'SUMINISTRO DE AGUA',
-                    'CRITERIO'   => 'REVISAR NIVEL EN MANGUERA',
+                'items' => [
+                    'ITEM' => 'SUMINISTRO DE AGUA',
+                    'CRITERIO' => 'REVISAR NIVEL EN MANGUERA',
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
                 ],
                 'categoria' => 'revision'
@@ -655,15 +716,47 @@ ES' => ''
         ];
 
         foreach ($items as $item) {
-            Item::create([
+            $created = Item::create([
                 'hoja_chequeo_id' => $hoja->id,
-                'valores'         => $item['items'],
-                'categoria'       => $item['categoria']
+                'valores' => $item['items'],
+                'categoria' => $item['categoria']
+            ]);
+
+            if ($item['items']['ITEM'] === 'TEMPERATURA TERMOMETRO CHIMENEA') {
+                Alerta::create([
+                    'item_id' => $created->id,
+                    'valor' => 270,
+                    'operador' => '>'
+                ]);
+            } elseif ($item['items']['ITEM'] === 'TEMPERATURAS DE LAS PARTES A PRESIÓN') {
+                Alerta::create([
+                    'item_id' => $created->id,
+                    'valor' => 160,
+                    'operador' => '>'
+                ]);
+            } elseif ($item['items']['ITEM'] === 'PRESIÓN DE VAPOR') {
+                Alerta::create([
+                    'item_id' => $created->id,
+                    'valor' => 5.2,
+                    'operador' => '>'
+                ]);
+            } elseif ($item['items']['ITEM'] === 'TEMPERATURA ENTRADA DE AGUA') {
+                Alerta::create([
+                    'item_id' => $created->id,
+                    'valor' => 90,
+                    'operador' => '>'
+                ]);
+            }
+
+            Alerta::create([
+                'item_id' => $created->id,
+                'simbologia_id' => 2,
             ]);
         }
     }
 
-    public function lavanderia() {
+    public function lavanderia()
+    {
         $this->lvMgl01(1);
         $this->lvMgl01(2);
 
@@ -686,7 +779,8 @@ ES' => ''
         $this->crearLavadoraLavanderia('LG-08', 'LG 08');
     }
 
-    public function tintoreria(): void {
+    public function tintoreria(): void
+    {
         $this->lsHdc02();
         $this->lsPer01();
 
@@ -708,7 +802,8 @@ ES' => ''
         $this->crearLavadoraTintoreria('LG-08', 'LG 08');
     }
 
-    public function tombolas($area) {
+    public function tombolas($area)
+    {
         $this->crearSecadora('LA02-TOM-01', 'TOMBOLA 1', $area);
         $this->crearSecadora('LA-TOM-07', 'TOMBOLA 7', $area);
         $this->crearSecadora('LA-TOM-08', 'TOMBOLA 8', $area);
@@ -719,17 +814,18 @@ ES' => ''
         $this->crearSecadora('TOM-13', 'TOMBOLA 13', $area);
     }
 
-    public function crearLavadoraTintoreria($tag, $nombre) {
+    public function crearLavadoraTintoreria($tag, $nombre)
+    {
         $equipo = Equipo::where('tag', $tag)->first();
-        if(!$equipo)
-        $equipo = Equipo::create([
-            'tag' => strtoupper($tag),  // Changes here
-            'nombre' => strtoupper($nombre),  // Changes here
-            'area' => 'LAVADO EN AGUA',
-            'foto' => null,
-            'numeroControl' => '001',
-            'revision' => 'N'
-        ]);
+        if (!$equipo)
+            $equipo = Equipo::create([
+                'tag' => strtoupper($tag),  // Changes here
+                'nombre' => strtoupper($nombre),  // Changes here
+                'area' => 'LAVADO EN AGUA',
+                'foto' => null,
+                'numeroControl' => '001',
+                'revision' => 'N'
+            ]);
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
@@ -872,26 +968,32 @@ ES' => ''
         ];
 
         foreach ($items as $item) {
-            Item::create([
+            $created =  Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
                 'categoria' => $item['categoria']
+            ]);
+
+            Alerta::create([
+                'item_id' => $created->id,
+                'simbologia_id' => 2,
             ]);
         }
     }
 
 
-    public function crearLavadoraLavanderia($tag, $nombre) {
+    public function crearLavadoraLavanderia($tag, $nombre)
+    {
         $equipo = Equipo::where('tag', $tag)->first();
-        if(!$equipo)
-        $equipo = Equipo::create([
-            'tag' => strtoupper($tag),  // Changes here
-            'nombre' => strtoupper($nombre),  // Changes here
-            'area' => 'LAVANDERIA',
-            'foto' => null,
-            'numeroControl' => '001',
-            'revision' => 'N'
-        ]);
+        if (!$equipo)
+            $equipo = Equipo::create([
+                'tag' => strtoupper($tag),  // Changes here
+                'nombre' => strtoupper($nombre),  // Changes here
+                'area' => 'LAVANDERIA',
+                'foto' => null,
+                'numeroControl' => '001',
+                'revision' => 'N'
+            ]);
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
@@ -1007,8 +1109,7 @@ ES' => ''
                     'ITEM' => 'BLOQUEO DE PUERTA',
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'REVISAR FISICAMENTE',
-                    'CRITERIO' => 'CERRADURA Y ENCLAVAMIENTO DE
-LA PUERTA',
+                    'CRITERIO' => 'CERRADURA Y ENCLAVAMIENTO DE LA PUERTA',
                     'OBSERVACIONES' => 'QUE CIERRE ADECUADAMENTE EN CUALQUIERA DE SUS ACTIVIDADES (VER NOTAS)'
                 ],
                 'categoria' => 'operacion'
@@ -1056,25 +1157,31 @@ LA PUERTA',
         ];
 
         foreach ($items as $item) {
-            Item::create([
+            $created =  Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
                 'categoria' => $item['categoria']
             ]);
+
+            Alerta::create([
+                'item_id' => $created->id,
+                'simbologia_id' => 2,
+            ]);
         }
     }
 
-    public function crearSecadora($tag, $nombre, $hojaArea) {
+    public function crearSecadora($tag, $nombre, $hojaArea)
+    {
         $equipo = Equipo::where('tag', $tag)->first();
-        if(!$equipo)
-        $equipo = Equipo::create([
-            'tag' => strtoupper($tag),  // Changes here
-            'nombre' => strtoupper($nombre),  // Changes here
-            'area' => 'LAVADO EN AGUA',
-            'foto' => null,
-            'numeroControl' => '009',
-            'revision' => 'N'
-        ]);
+        if (!$equipo)
+            $equipo = Equipo::create([
+                'tag' => strtoupper($tag),  // Changes here
+                'nombre' => strtoupper($nombre),  // Changes here
+                'area' => 'LAVADO EN AGUA',
+                'foto' => null,
+                'numeroControl' => '009',
+                'revision' => 'N'
+            ]);
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
@@ -1166,16 +1273,6 @@ LA PUERTA',
             ],
             [
                 'items' => [
-                    'ITEM' => 'LIMPIEZA DE MOTOR',
-                    'FRECUENCIA' => '1 VEZ POR SEMANA',
-                    'METODO' => 'LIMPIEZA MANUAL',
-                    'CRITERIO' => 'QUE NO TENGA POLVO O GRASA',
-                    'OBSERVACIONES' => 'QUITAR LA PELUSA Y POLVO, PARA QUE EL MOTOR NO SE FORCE'
-                ],
-                'categoria' => 'limpieza'
-            ],
-            [
-                'items' => [
                     'ITEM' => 'LIMPIEZA PARTE TRASERA DE EQUIPO',
                     'FRECUENCIA' => '1 VEZ POR SEMANA',
                     'METODO' => 'LIMPIEZA MANUAL',
@@ -1207,15 +1304,21 @@ LA PUERTA',
         ];
 
         foreach ($items as $item) {
-            Item::create([
+            $created =  Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
                 'categoria' => $item['categoria']
             ]);
+
+            Alerta::create([
+                'item_id' => $created->id,
+                'simbologia_id' => 2,
+            ]);
         }
     }
 
-    public function lvMgl01($n) {
+    public function lvMgl01($n)
+    {
         $equipo = Equipo::create([
             'tag' => 'LV-MGL-0' . $n,
             'nombre' => 'MANGLE 0' . $n,
@@ -1366,15 +1469,21 @@ LA PUERTA',
         ];
 
         foreach ($items as $item) {
-            Item::create([
+            $created =  Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
                 'categoria' => $item['categoria']
             ]);
+
+            Alerta::create([
+                'item_id' => $created->id,
+                'simbologia_id' => 2,
+            ]);
         }
     }
 
-    public function lsPer01() {
+    public function lsPer01()
+    {
         $equipo = Equipo::create([
             'tag' => 'LS-PER-01',
             'nombre' => 'LAVADORA PERCLORO',
@@ -1414,40 +1523,40 @@ LA PUERTA',
             ],
             [
                 'items' => [
-                    'ITEM' => 'PRESIÒN DEL SISTEMA REFRIGERANTE',
+                    'ITEM' => 'PRESIÓN DEL SISTEMA REFRIGERANTE',
                     'FRECUENCIA' => '1 VEZ AL DIA',
                     'METODO' => 'DURANTE EL SECADO',
-                    'CRITERIO' => 'PRESIÒN EN ALTA DE 3 A 5 BAR',
+                    'CRITERIO' => 'PRESIÓN EN ALTA DE 3 A 5 BAR',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'revision'
             ],
             [
                 'items' => [
-                    'ITEM' => 'PRESIÒN DEL SISTEMA REFRIGERANTE',
+                    'ITEM' => 'PRESIÓN DEL SISTEMA REFRIGERANTE',
                     'FRECUENCIA' => '1 VEZ AL DIA',
                     'METODO' => 'DURANTE EL SECADO',
-                    'CRITERIO' => 'PRESIÒN EN BAJA DE 19 A 21 BAR',
+                    'CRITERIO' => 'PRESIÓN EN BAJA DE 19 A 21 BAR',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'revision'
             ],
             [
                 'items' => [
-                    'ITEM' => 'PRESIÒN DEL SISTEMA REFRIGERANTE',
+                    'ITEM' => 'PRESIÓN DEL SISTEMA REFRIGERANTE',
                     'FRECUENCIA' => '1 VEZ AL DIA',
                     'METODO' => 'DURANTE EL ENFRIAMIENTO',
-                    'CRITERIO' => 'PRESIÒN EN ALTA DE 3 A 5 BAR',
+                    'CRITERIO' => 'PRESIÓN EN ALTA DE 3 A 5 BAR',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'revision'
             ],
             [
                 'items' => [
-                    'ITEM' => 'PRESIÒN DEL SISTEMA REFRIGERANTE',
+                    'ITEM' => 'PRESIÓN DEL SISTEMA REFRIGERANTE',
                     'FRECUENCIA' => '1 VEZ AL DIA',
                     'METODO' => 'DURANTE EL ENFRIAMIENTO',
-                    'CRITERIO' => 'PRESIÒN EN BAJA DE 18 A 21 BAR',
+                    'CRITERIO' => 'PRESIÓN EN BAJA DE 18 A 21 BAR',
                     'RESPONSABLE' => 'OPERARIO'
                 ],
                 'categoria' => 'revision'
@@ -1545,15 +1654,46 @@ LA PUERTA',
         ];
 
         foreach ($items as $item) {
-            Item::create([
+            $created =  Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
                 'categoria' => $item['categoria']
             ]);
+
+            if ($item['items']['ITEM'] == 'TEMPERATURA DEL DESTILADOR') {
+                Alerta::create([
+                    'item_id' => $created->id,
+                    'valor' => 127,
+                    'operador' => '>',
+                ]);
+            }
+
+            if(strpos($item['items']['CRITERIO'], "PRESIÓN EN BAJA") !== false){
+                Alerta::create([
+                    'item_id' => $created->id,
+                    'valor' => 21,
+                    'operador' => '>',
+                ]);
+            }
+
+            if($item['items']['CRITERIO'] == "PRESIÓN EN ALTA DE 3 A 5 BAR"){
+                Alerta::create([
+                    'item_id' => $created->id,
+                    'valor' => 5,
+                    'operador' => '>',
+                ]);
+            }
+
+            Alerta::create([
+                'item_id' => $created->id,
+                'simbologia_id' => 2,
+            ]);
+
         }
     }
 
-    public function sua05(): void {
+    public function sua05(): void
+    {
         $equipo = Equipo::create([
             'tag' => 'SUA-05',
             'nombre' => 'SUAVIZADOR 05',
@@ -1625,15 +1765,21 @@ LA PUERTA',
         ];
 
         foreach ($items as $item) {
-            Item::create([
+            $created = Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
                 'categoria' => $item['categoria']
             ]);
+
+            Alerta::create([
+                'item_id' => $created->id,
+                'simbologia_id' => 2
+            ]); 
         }
     }
 
-    public function lsHdc02() {
+    public function lsHdc02()
+    {
         $equipo = Equipo::create([
             'tag' => 'LS-HDC-02',
             'nombre' => 'LAV. HIDROCARBURO',
@@ -1798,15 +1944,21 @@ LA PUERTA',
         ];
 
         foreach ($items as $item) {
-            Item::create([
+            $created =  Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
                 'categoria' => $item['categoria']
             ]);
+
+            Alerta::create([
+                'item_id' => $created->id,
+                'simbologia_id' => 2,
+            ]);
         }
     }
 
-    public function laHid02(): void {
+    public function laHid02(): void
+    {
         $equipo = Equipo::create([
             'tag' => 'LA-HID-02',
             'nombre' => 'HIDRONEUMATICO 02',
@@ -1817,7 +1969,8 @@ LA PUERTA',
         ]);
 
         $hoja = HojaChequeo::create([
-            'equipo_id' => $equipo->id, 'version' => 1,
+            'equipo_id' => $equipo->id,
+            'version' => 1,
             'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value,
             'observaciones' => null
         ]);
@@ -1855,8 +2008,7 @@ LA PUERTA',
             ],
             [
                 'items' => [
-                    '
-ITEM' => 'REVISION DE TUBERIA PRINCIPAL',
+                    'ITEM' => 'REVISION DE TUBERIA PRINCIPAL',
                     'FRECUENCIA' => '1 VEZ CADA SEMANA',
                     'METODO' => 'VISUAL',
                     'CRITERIO' => 'CHECAR SI HAY FUGAS EN UNIONES',
@@ -1907,10 +2059,15 @@ ITEM' => 'REVISION DE TUBERIA PRINCIPAL',
         ];
 
         foreach ($items as $item) {
-            Item::create([
+            $created =  Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
                 'categoria' => $item['categoria']
+            ]);
+
+            Alerta::create([
+                'item_id' => $created->id,
+                'simbologia_id' => 2,
             ]);
         }
     }

@@ -17,11 +17,12 @@ class DatabaseSeeder extends Seeder
     /**
      * Seed the application's database.
      */
-    public function run(): void {
+    public function run(): void
+    {
         $this->call(EquiposSeeder::class);
 
-        $perfil = Perfil::create([
-            'name'     => 'Mangles',
+        Perfil::create([
+            'name' => 'MANGLES',
             'hoja_ids' => [
                 HojaChequeo::where('equipo_id', Equipo::where('tag', 'LV-MGL-01')->first()->id)->first()->id,
                 HojaChequeo::where('equipo_id', Equipo::where('tag', 'LV-MGL-02')->first()->id)->first()->id,
@@ -29,32 +30,37 @@ class DatabaseSeeder extends Seeder
             ]
         ]);
 
+        $perfil = Perfil::create([
+            'name' => 'ADMINISTRADOR',
+            'hoja_ids' => HojaChequeo::pluck('id')->toArray()
+        ]);
+
         $adminRole = Role::create(['name' => 'Administrador']);
         Role::create(['name' => 'Operador']);
         Role::create(['name' => 'Supervisor']);
 
         $user = User::factory()->create([
-            'email'     => 'admin@admin.com',
-            'password'  => \Hash::make('password'),
+            'email' => 'admin@admin.com',
+            'password' => \Hash::make('password'),
             'perfil_id' => $perfil->id
         ]);
 
 
         Simbologia::create([
-            'icono'       => 'heroicon-c-check',
-            'nombre'      => 'Exito',
+            'icono' => 'heroicon-c-check',
+            'nombre' => 'Exito',
             'descripcion' => 'Se realizó y está bien',
-            'color'       => '#27d623',
+            'color' => '#27d623',
         ]);
 
         Simbologia::create([
-            'icono'       => 'heroicon-o-x-mark',
-            'nombre'      => 'Error',
+            'icono' => 'heroicon-o-x-mark',
+            'nombre' => 'Error',
             'descripcion' => 'Se realizó y está mal',
-            'color'       => '#cc3434',
+            'color' => '#cc3434',
         ]);
 
         $user->assignRole($adminRole);
-
+        
     }
 }
