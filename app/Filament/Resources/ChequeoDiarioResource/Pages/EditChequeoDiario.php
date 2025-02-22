@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ChequeoDiarioResource\Pages;
 
 use App\Filament\Resources\ChequeoDiarioResource;
+use App\Models\Alerta;
 use App\Models\ChequeoDiario;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
@@ -52,6 +53,28 @@ class EditChequeoDiario extends Page
             $item->valor = $notes;
             $item->simbologia_id = $checkStatus;
             $item->save();
+
+            $alerta = Alerta::where('item_id', $item['item_id'])->first();
+
+            if (empty($alerta)) {
+                continue;
+            }
+
+            if (
+                !is_null($alerta->simbologia_id)
+                && !is_null($checkStatus)
+                && $alerta->simbologia_id == $checkStatus
+                || (
+                    !is_null($alerta->valor)
+                    && !is_null($notes)
+                    && $alerta->valor == $notes
+                )
+                || (!is_null($alerta->valor) && !is_null($notes) && $alerta->operador == '<' && intval($notes) < intval($alerta->valor))
+                || (!is_null($alerta->valor) && !is_null($notes) && $alerta->operador == '>' && intval($notes) > intval($alerta->valor))
+            ) {
+                $alerta->contador = $alerta->contador + 1;
+                $alerta->save();
+            }
         }
 
         Notification::make()

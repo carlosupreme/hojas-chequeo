@@ -5,12 +5,9 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ChequeoDiarioResource\Pages;
 use App\Filament\Resources\ChequeoDiarioResource\RelationManagers;
 use App\Infolists\Components\ViewChequeoDiarioItems;
-use App\Infolists\Components\ViewItems;
 use App\Models\ChequeoDiario;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Grid;
-use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
@@ -18,8 +15,6 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ChequeoDiarioResource extends Resource
 {
@@ -29,10 +24,6 @@ class ChequeoDiarioResource extends Resource
 
     public static function canCreate(): bool {
         return false;
-    }
-
-    public static function canAccess(): bool {
-        return auth()->user()->hasRole(['Administrador', 'Supervisor']);
     }
 
     public static function getPluralLabel(): ?string {
@@ -48,6 +39,10 @@ class ChequeoDiarioResource extends Resource
 
     public static function table(Table $table): Table {
         return $table
+            ->query(fn() => \Auth::user()->hasRole(["Administrador", 'Supervisor'])
+                ? ChequeoDiario::query()
+                : ChequeoDiario::where('operador_id', auth()->id())
+            )
             ->columns([
                 Tables\Columns\TextColumn::make('hojaChequeo.equipo.tag')->label("Tag")
                                          ->searchable()
@@ -74,7 +69,7 @@ class ChequeoDiarioResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make()->hidden(!\Auth::user()->hasRole('Administrador')),
                 ])
             ])
             ->bulkActions([

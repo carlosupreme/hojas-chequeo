@@ -109,14 +109,10 @@ class ChequeoItems extends Component
 
     #[On('requestForValidItems')]
     public function checkValidItems(): void {
-        if ($this->validateItems()) {
-            $this->dispatch('validItems', [
-                "checks"       => $this->checks,
-                "customInputs" => $this->customInputs
-            ]);
-        } else {
-            $this->dispatch('invalidItems');
-        }
+        $this->dispatch('validItems', [
+            "checks"       => $this->checks,
+            "customInputs" => $this->customInputs
+        ]);
     }
 
     public function render() {

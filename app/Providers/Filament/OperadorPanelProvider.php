@@ -43,7 +43,7 @@ class OperadorPanelProvider extends PanelProvider
                 'primary' => Color::Blue,
             ])
             ->resources([ChequeoDiarioResource::class])
-            ->pages([ChequeoDaily::class, Reportar::class, ReporteHistorico::class, ChequeoHistorico::class])
+            ->pages([ChequeoDaily::class, Reportar::class, ReporteHistorico::class])
             ->widgets([Widgets\AccountWidget::class])
             ->middleware([
                 EncryptCookies::class,
