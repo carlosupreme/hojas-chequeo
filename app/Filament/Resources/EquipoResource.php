@@ -56,7 +56,7 @@ class EquipoResource extends Resource
                 Tables\Columns\TextColumn::make('tag')
                                          ->sortable()
                                          ->searchable(),
-                Tables\Columns\TextColumn::make('area')
+                Tables\Columns\TextColumn::make('area')->extraAttributes(['class' => 'uppercase'])
                                          ->sortable()
                                          ->searchable(),
                 Tables\Columns\ImageColumn::make('foto'),
