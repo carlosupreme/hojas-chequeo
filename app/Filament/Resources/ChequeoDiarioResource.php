@@ -27,6 +27,10 @@ class ChequeoDiarioResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-pencil-square';
 
+    public static function canCreate(): bool {
+        return false;
+    }
+
     public static function canAccess(): bool {
         return auth()->user()->hasRole(['Administrador', 'Supervisor']);
     }
@@ -141,10 +145,9 @@ class ChequeoDiarioResource extends Resource
 
     public static function getPages(): array {
         return [
-            'index'  => Pages\ListChequeoDiarios::route('/'),
-            'create' => Pages\CreateChequeoDiario::route('/create'),
-            'edit'   => Pages\EditChequeoDiario::route('/{record}/edit'),
-            'view'   => Pages\ViewChequeoDiario::route('/{record}'),
+            'index' => Pages\ListChequeoDiarios::route('/'),
+            'edit'  => Pages\EditChequeoDiario::route('/{record}/edit'),
+            'view'  => Pages\ViewChequeoDiario::route('/{record}'),
         ];
     }
 }

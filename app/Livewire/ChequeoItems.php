@@ -15,7 +15,7 @@ class ChequeoItems extends Component
     public $checks       = [];
     public $customInputs = [];
 
-    public function mount(Collection $items): void {
+    public function mount(Collection $items, ?array $defaultValues = []): void {
         if (!$items->isEmpty() && !is_null($items->first()->valores)) {
             $this->headers = array_keys($items->first()->valores);
             $this->items = $items->map(function ($item) {
@@ -30,8 +30,8 @@ class ChequeoItems extends Component
             });
 
             foreach ($this->items as $item) {
-                $this->checks[$item['id']] = null;
-                $this->customInputs[$item['id']] = null;
+                $this->checks[$item['id']] = $defaultValues ? $defaultValues['checks'][$item['id']] : null;
+                $this->customInputs[$item['id']] = $defaultValues ? $defaultValues['custom'][$item['id']] : null;
             }
         }
     }
@@ -110,7 +110,10 @@ class ChequeoItems extends Component
     #[On('requestForValidItems')]
     public function checkValidItems(): void {
         if ($this->validateItems()) {
-            $this->dispatch('validItems');
+            $this->dispatch('validItems', [
+                "checks"       => $this->checks,
+                "customInputs" => $this->customInputs
+            ]);
         } else {
             $this->dispatch('invalidItems');
         }

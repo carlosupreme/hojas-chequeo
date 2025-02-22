@@ -38,13 +38,6 @@
             </div>
 
             <div class="flex w-full gap-2 my-5 items-center place-content-end">
-                <x-filament::button wire:click="saveAndReport"
-                                    tooltip="Ir a la pagina de reportes"
-                                    color="danger"
-                                    class="mt-4"
-                >
-                    Guardar y reportar
-                </x-filament::button>
                 <x-filament::button wire:click="save" class="mt-4">Guardar</x-filament::button>
             </div>
             <x-filament-actions::modals/>
