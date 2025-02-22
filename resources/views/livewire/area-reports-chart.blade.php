@@ -16,9 +16,6 @@
     <div wire:ignore class="w-full h-96">
         <canvas id="areaReportsChart"></canvas>
     </div>
-    @assets
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    @endassets
     @script
     <script>
         let areaChart = null;
@@ -89,17 +86,17 @@
         }
 
         // Add dark mode change listener
-            const darkModeObserver = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    if (mutation.attributeName === 'class') {
-                        initAreaChart($wire.chartData);
-                    }
-                });
+        const darkModeObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'class') {
+                    initAreaChart($wire.chartData);
+                }
             });
-            darkModeObserver.observe(document.documentElement, {
-                attributes: true,
-                attributeFilter: ['class']
-            });
+        });
+        darkModeObserver.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
 
         function updateAreaChart(chartData) {
             if (areaChart) {

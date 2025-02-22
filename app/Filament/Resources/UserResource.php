@@ -75,7 +75,7 @@ class UserResource extends Resource
                           ->sortable()
                           ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                          ->label(__('filament-shield::filament-shield.column.updated_at'))
+                          ->label(ucfirst(__('validation.attributes.updated_at')))
                           ->dateTime()
                           ->sortable()
                           ->toggleable(isToggledHiddenByDefault: true),

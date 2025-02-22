@@ -10,7 +10,17 @@ class Reporte extends Model
     protected $fillable = [
         'equipo_id',
         'hoja_chequeo_id',
-        'fecha'
+        'fecha',
+        'name',
+        'area',
+        'department',
+        'equipment',
+        'vehicle',
+        'tag',
+        'priority',
+        'observations',
+        'failure',
+        'photo'
     ];
 
     public function equipo(): BelongsTo {

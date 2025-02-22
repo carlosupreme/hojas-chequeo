@@ -40,8 +40,8 @@ class HojaChequeoResource extends Resource
                 Tables\Columns\ToggleColumn::make('active')
                                            ->label('Publicada')
                                            ->beforeStateUpdated(fn($record) => HojaChequeo::
-                                               where('equipo_id', $record->equipo_id)
-                                               ->where('area', $record->area)
+                                           where('equipo_id', $record->equipo_id)
+                                                                                          ->where('area', $record->area)
                                                                                           ->update(['active' => false])),
                 Tables\Columns\TextColumn::make('area')
                                          ->searchable()
