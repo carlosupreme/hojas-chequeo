@@ -54,12 +54,18 @@ class ReporteResource extends Resource
                                                                                                           })
                                                                                                           ->icon('heroicon-o-exclamation-triangle'),
 
-                                                                                                 TextEntry::make('status')
+                                                                                                 TextEntry::make('estado')
                                                                                                           ->label('Estado')
                                                                                                           ->default('Pendiente')
                                                                                                           ->badge()
-                                                                                                          ->color('warning')
-                                                                                                          ->icon('heroicon-o-clock'),
+                                                                                                          ->color(fn(string $state): string => match (strtolower($state)) {
+                                                                                                              'pendiente' => 'warning',
+                                                                                                              'realizado' => 'success',
+                                                                                                          })
+                                                                                                          ->icon(fn(string $state):string=> match($state){
+                                                                                                              'pendiente' => 'heroicon-o-clock',
+                                                                                                              'realizado' => 'heroicon-o-check',
+                                                                                                          }),
                                                                                              ]),
                                                       ])
                                                       ->collapsible(),
@@ -185,10 +191,10 @@ class ReporteResource extends Resource
                                          ->preload()
                                          ->required(),
                                    Select::make('area')->label('Area')
-                                       ->options(fn() => array_combine(
-                                           array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases()),
-                                           array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases())
-                                       ))
+                                         ->options(fn() => array_combine(
+                                             array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases()),
+                                             array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases())
+                                         ))
                                          ->searchable()
                                          ->preload()
                                          ->required(),
@@ -244,6 +250,10 @@ class ReporteResource extends Resource
                               'media' => 'warning',
                               'alta'  => 'danger'
                           }),
+                Tables\Columns\SelectColumn::make("estado")->label("Estado")->options([
+                    "pendiente" => "Pendiente",
+                    "realizado" => "Realizado"
+                ])->selectablePlaceholder(false),
                 TextColumn::make('created_at')->label('Creado el')
                           ->dateTime()
                           ->sortable()
@@ -254,12 +264,24 @@ class ReporteResource extends Resource
                           ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('priority')
+                                           ->label('Prioridad')
+                                           ->options([
+                                               'alta'  => 'Alta',
+                                               'media' => 'Media',
+                                               'baja'  => 'Baja',
+                                           ]),
+                Tables\Filters\SelectFilter::make('area')->label('Area')
+                                           ->options(fn() => array_combine(
+                                               array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases()),
+                                               array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases())
+                                           ))
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([Tables\Actions\ViewAction::make(),
+                                                  Tables\Actions\EditAction::make(),
+                                                  Tables\Actions\DeleteAction::make(),
+                ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

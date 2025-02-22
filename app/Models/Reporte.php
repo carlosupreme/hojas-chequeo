@@ -17,7 +17,7 @@ class Reporte extends Model
         'observations',
         'failure',
         'photo',
-        'user_id'
+        'user_id',
     ];
 
     public function equipo(): BelongsTo {
