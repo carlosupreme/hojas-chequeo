@@ -241,7 +241,7 @@
                                     <span class="text-sm"> {{$tableData['checks'][$day][$index]['text']}}</span>
                                 @endif
                             @else
-                                <span class="empty-check"></span>
+                                <span></span>
                             @endif
                         </td>
                     @endforeach
@@ -268,7 +268,7 @@
                                  alt="Firma del Operador"
                                  class="signature-img">
                         @else
-                            <span class="empty-check"></span>
+                            <span ></span>
                         @endif
                     </td>
                 @endforeach

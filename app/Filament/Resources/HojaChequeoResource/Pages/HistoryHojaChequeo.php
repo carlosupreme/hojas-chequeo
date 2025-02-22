@@ -61,14 +61,12 @@ class HistoryHojaChequeo extends Page
             ]);
     }
 
-
     #[Computed]
     public function dateRange(): array {
         return collect(CarbonPeriod::create(Carbon::parse($this->startDate), Carbon::parse($this->endDate)))
             ->map(fn($date) => $date->format('Y-m-d'))
             ->toArray();
     }
-
 
     private function normalizeArrayKeys(array $items, int $limit): array {
         if (empty($items)) {
@@ -127,6 +125,15 @@ class HistoryHojaChequeo extends Page
             }
         }
 
+        foreach ($this->dateRange as $date) {
+            if (!isset($data['checks'][$date])) {
+                $data['checks'][$date] = [];
+                $data['operatorSignatures'][$date] = null;
+                $data['supervisorSignatures'][$date] = null;
+                $data['operatorNames'][$date] = null;
+            }
+        }
+
         $data['items'] = $this->normalizeArrayKeys(
             $data['items'],
             collect($data['checks'])->first() ? count(collect($data['checks'])->first()) : 0
@@ -142,9 +149,7 @@ class HistoryHojaChequeo extends Page
 
     #[Computed]
     public function availableDates(): array {
-        return array_filter($this->dateRange, fn($date) => isset($this->tableData['checks'][$date]) ||
-            isset($this->tableData['operatorSignatures'][$date])
-        );
+        return $this->dateRange;
     }
 
     protected function getHeaderActions(): array {

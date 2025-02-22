@@ -62,8 +62,7 @@
                                                     class="text-xs">{{$this->tableData['checks'][$day][$index]['text']}}</span>
                                             @endif
                                         @else
-                                            <span
-                                                class="w-6 h-6 rounded-full border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center text-xs">○</span>
+                                            <span></span>
                                         @endif
                                     </div>
                                 </td>
@@ -99,8 +98,7 @@
                                          alt="Firma del Operador"
                                          class="mx-auto max-w-[100px] max-h-[50px]">
                                 @else
-                                    <span
-                                        class="w-6 h-6 rounded-full border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center text-xs">○</span>
+                                    <span></span>
                                 @endif
                             </td>
                         @endforeach

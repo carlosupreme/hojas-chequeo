@@ -10,8 +10,7 @@ class ManagePerfils extends ManageRecords
 {
     protected static string $resource = PerfilResource::class;
 
-    protected function getHeaderActions(): array
-    {
+    protected function getHeaderActions(): array {
         return [
             Actions\CreateAction::make(),
         ];

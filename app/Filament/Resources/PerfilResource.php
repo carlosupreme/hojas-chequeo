@@ -6,7 +6,6 @@ use App\Filament\Resources\PerfilResource\Pages;
 use App\Filament\Resources\PerfilResource\RelationManagers;
 use App\Forms\Components\SelectHojas;
 use App\Models\Perfil;
-use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
