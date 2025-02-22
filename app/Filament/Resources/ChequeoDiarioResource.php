@@ -104,7 +104,8 @@ class ChequeoDiarioResource extends Resource
                                             ->label('Operador')
                                             ->columnSpan(1),
                                ]),
-                               ImageEntry::make('firma_operador')->alignCenter()
+                               ImageEntry::make('firma_operador')->alignCenter()->maxWidth("200px")
+                                         ->extraAttributes(["class" => "overflow-x-auto"])
                            ])->columnSpan(1),
                     Section::make('Datos del equipo')->columnSpan(1)
                            ->icon('heroicon-o-wrench-screwdriver')

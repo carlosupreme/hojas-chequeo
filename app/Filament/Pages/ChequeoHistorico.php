@@ -73,7 +73,7 @@ class ChequeoHistorico extends Page implements HasTable
                                             ->dateTimeTooltip()->badge(),
                                    TextEntry::make('nombre_operador')
                                             ->label('Operador')
-                                            ->columnSpan(1)
+                                            ->columnSpan(1),
                                ]),
 
                            ])->columnSpan(1),
