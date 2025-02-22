@@ -41,7 +41,6 @@ class Reportar extends Page
                        ->schema([
                            Grid::make(3)
                                ->schema([
-                                   TextInput::make('user_id')->hidden()->default(fn() => \Auth::id()),
                                    TextInput::make('name')
                                             ->label('Nombre')
                                             ->required()
@@ -118,7 +117,8 @@ class Reportar extends Page
     }
 
     public function submit(): void {
-        $reporte = Reporte::create($this->form->getState());
+        $data = [...$this->form->getState(), 'user_id' => auth()->user()->id];
+        $reporte = Reporte::create($data);
         $this->form->model($reporte)->saveRelationships();
         Notification::make()
                     ->success()
@@ -140,6 +140,7 @@ class Reportar extends Page
                     ])
                     ->sendToDatabase(User::role('Administrador')->get(), isEventDispatched: true);
         $this->form->fill();
+        $this->redirect("reporte-historico");
     }
 
 }

@@ -1,39 +1,64 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Pages;
 
-use App\Filament\Resources\ReporteResource\Pages;
-use App\Filament\Resources\ReporteResource\RelationManagers;
-use App\HojaChequeoArea;
 use App\Models\Reporte;
-use Carbon\Carbon;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
-use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Pages\Page;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class ReporteResource extends Resource
+class ReporteHistorico extends Page implements HasTable
 {
-    protected static ?string $model = Reporte::class;
+    use InteractsWithTable;
 
-    protected static ?string $navigationIcon = 'heroicon-o-inbox-arrow-down';
+    protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    public static function infolist(Infolist $infolist): Infolist {
-        return $infolist
-            ->schema([
+    protected static string $view = 'filament.pages.reporte-historico';
+
+    protected static ?string $title = "Mis reportes";
+
+
+    public function table(Table $table): Table {
+        return $table
+            ->query(Reporte::where('user_id', auth()->id()))
+            ->columns([
+                TextColumn::make('equipo.tag')
+                          ->label('Equipo')
+                          ->searchable()
+                          ->sortable(),
+                TextColumn::make('fecha')->label('Reportado el')
+                          ->date()
+                          ->sortable(),
+                TextColumn::make('failure')->label('Falla'),
+                TextColumn::make('observations')->label('Observaciones'),
+                TextColumn::make('area')->label('Area')->searchable(),
+                TextColumn::make('priority')
+                          ->label('Prioridad')
+                          ->badge()
+                          ->color(fn(string $state): string => match (strtolower($state)) {
+                              'baja'  => 'gray',
+                              'media' => 'warning',
+                              'alta'  => 'danger'
+                          }),
+                TextColumn::make('created_at')->label('Creado el')
+                          ->dateTime()
+                          ->sortable()
+                          ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')->label('Actualizado el')
+                          ->dateTime()
+                          ->sortable()
+                          ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                //
+            ])
+            ->actions([
+                ViewAction::make()->infolist([
                 \Filament\Infolists\Components\Section::make('Estado del Reporte')
                                                       ->schema([
 
@@ -138,147 +163,11 @@ class ReporteResource extends Resource
                                                                                              ]),
                                                       ])
                                                       ->collapsible(),
-            ]);
-    }
-
-    public static function form(Form $form): Form {
-        return $form
-            ->schema([
-                Section::make('Datos del reporte')
-                       ->collapsible()
-                       ->schema([
-                           Grid::make(3)
-                               ->schema([
-                                   TextInput::make('name')
-                                            ->label('Nombre')
-                                            ->required()
-                                            ->default(fn() => \Auth::user()->name),
-                                   DatePicker::make('fecha')
-                                             ->label('Fecha')
-                                             ->default(Carbon::now())
-                                             ->readOnly()
-                                             ->native(false)
-                                             ->closeOnDateSelection(),
-
-                                   Select::make('priority')->label('Prioridad')
-                                         ->default('baja')
-                                         ->options([
-                                             'alta'  => 'Alta',
-                                             'media' => 'Media',
-                                             'baja'  => 'Baja'
-                                         ])
-                                         ->required()
-                                         ->native(false)
-                               ]),
-                       ]),
-
-                Section::make('Detalles del equipo')
-                       ->description('Selecciona el equipo que presenta la falla')
-                       ->collapsible()
-                       ->schema([
-                           Grid::make()
-                               ->schema([
-                                   Select::make('equipo_id')
-                                         ->label('Tag del Equipo')
-                                         ->relationship('equipo', 'tag')
-                                         ->searchable()
-                                         ->preload()
-                                         ->required(),
-                                   Select::make('area')->label('Area')
-                                       ->options(fn() => array_combine(
-                                           array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases()),
-                                           array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases())
-                                       ))
-                                         ->searchable()
-                                         ->preload()
-                                         ->required(),
-                               ]),
-                       ]),
-
-                Section::make('Detalles de la falla')
-                       ->description('Describe el problema que presenta')
-                       ->schema([
-                           Grid::make(1)
-                               ->schema([
-                                   TextInput::make('failure')
-                                            ->label('Falla')
-                                            ->required()
-                                            ->columnSpanFull(),
-                                   Textarea::make('observations')
-                                           ->label('Observaciones')
-                                           ->rows(3)
-                                           ->columnSpanFull(),
-                               ]),
-                       ]),
-
-                Section::make('Evidencia')
-                       ->schema([
-                           FileUpload::make('photo')
-                                     ->label('Foto')
-                                     ->image()
-                                     ->imageEditor()
-                                     ->columnSpanFull(),
-                       ]),
-            ]);
-
-    }
-
-    public static function table(Table $table): Table {
-        return $table
-            ->columns([
-                TextColumn::make('equipo.tag')
-                          ->label("Equipo")
-                          ->searchable()
-                          ->sortable(),
-                TextColumn::make('fecha')->label('Reportado el')
-                          ->date()
-                          ->sortable(),
-                TextColumn::make('failure')->label('Falla'),
-                TextColumn::make('observations')->label('Observaciones'),
-                TextColumn::make('area')->label('Area')->searchable(),
-                TextColumn::make('priority')
-                          ->label('Prioridad')
-                          ->badge()
-                          ->color(fn(string $state): string => match (strtolower($state)) {
-                              'baja'  => 'gray',
-                              'media' => 'warning',
-                              'alta'  => 'danger'
-                          }),
-                TextColumn::make('created_at')->label('Creado el')
-                          ->dateTime()
-                          ->sortable()
-                          ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')->label('Actualizado el')
-                          ->dateTime()
-                          ->sortable()
-                          ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-                //
-            ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+
             ]);
     }
 
-    public static function getRelations(): array {
-        return [
-            //
-        ];
-    }
-
-    public static function getPages(): array {
-        return [
-            'index'  => Pages\ListReportes::route('/'),
-            'create' => Pages\CreateReporte::route('/create'),
-            'edit'   => Pages\EditReporte::route('/{record}/edit'),
-        ];
-    }
 }

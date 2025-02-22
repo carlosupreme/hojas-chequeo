@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Pages\ChequeoDaily;
 use App\Filament\Pages\Reportar;
+use App\Filament\Pages\ReporteHistorico;
 use App\Http\Middleware\EnsureIsOperador;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -39,7 +40,7 @@ class OperadorPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
-            ->pages([ChequeoDaily::class, Reportar::class])
+            ->pages([ChequeoDaily::class, Reportar::class, ReporteHistorico::class])
             ->widgets([Widgets\AccountWidget::class])
             ->middleware([
                 EncryptCookies::class,
