@@ -14,7 +14,8 @@ class ChequeoDiario extends Model
         'operador_id',
         'firma_operador',
         'firma_supervisor',
-        'observaciones'
+        'observaciones',
+        'created_at'
     ];
 
     public function hojaChequeo(): BelongsTo {
