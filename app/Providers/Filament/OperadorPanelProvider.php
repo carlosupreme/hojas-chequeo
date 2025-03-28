@@ -7,6 +7,7 @@ use App\Filament\Pages\ChequeoHistorico;
 use App\Filament\Pages\Reportar;
 use App\Filament\Pages\ReporteHistorico;
 use App\Filament\Resources\ChequeoDiarioResource;
+use App\Filament\Resources\TarjetonResource;
 use App\Http\Middleware\EnsureIsOperador;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -42,7 +43,7 @@ class OperadorPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
-            ->resources([ChequeoDiarioResource::class])
+            ->resources([ChequeoDiarioResource::class, TarjetonResource::class])
             ->pages([ChequeoDaily::class, Reportar::class, ReporteHistorico::class])
             ->widgets([Widgets\AccountWidget::class])
             ->middleware([
