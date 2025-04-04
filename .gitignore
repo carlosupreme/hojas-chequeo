@@ -21,3 +21,7 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+# Directorios de backup generados por scripts de actualización
+backup_*
+*.log
+actualizacion_*.log
