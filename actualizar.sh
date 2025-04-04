@@ -72,6 +72,51 @@ else
     exit 1
 fi
 
+# Verificar y configurar la conexión con el remoto
+show_progress "Verificando configuración del repositorio Git"
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+REMOTE_CONFIGURED=$(git config --get branch.$CURRENT_BRANCH.remote || echo "")
+
+if [ -z "$REMOTE_CONFIGURED" ]; then
+    show_completed
+    log "No hay 'upstream' configurado para la rama '$CURRENT_BRANCH'" "$YELLOW"
+    
+    # Verificar si existe el remoto 'origin'
+    if git remote | grep -q "origin"; then
+        log "Configurando la rama '$CURRENT_BRANCH' para seguir a 'origin/$CURRENT_BRANCH'" "$BLUE"
+        git branch --set-upstream-to=origin/$CURRENT_BRANCH $CURRENT_BRANCH || handle_error "No se pudo configurar el upstream"
+        log "Configuración completada exitosamente" "$GREEN"
+    else
+        log "No se encontró un remoto 'origin' configurado" "$RED"
+        read -p "Ingresa la URL del repositorio remoto: " REMOTE_URL
+        if [ -n "$REMOTE_URL" ]; then
+            git remote add origin "$REMOTE_URL" || handle_error "No se pudo añadir el remoto"
+            git branch --set-upstream-to=origin/$CURRENT_BRANCH $CURRENT_BRANCH || handle_error "No se pudo configurar el upstream"
+            log "Remoto 'origin' añadido y configurado como upstream" "$GREEN"
+        else
+            handle_error "No se proporcionó una URL de repositorio remoto"
+        fi
+    fi
+else
+    show_completed
+fi
+
+# Modificar la sección de obtener cambios
+show_progress "Obteniendo cambios del repositorio"
+if git pull; then
+    show_completed
+else
+    log "Error al hacer pull desde GitHub" "$RED"
+    log "Intentando obtener cambios específicamente de 'origin/$CURRENT_BRANCH'" "$YELLOW"
+    
+    if git pull origin $CURRENT_BRANCH; then
+        show_completed
+        log "Cambios obtenidos exitosamente de 'origin/$CURRENT_BRANCH'" "$GREEN"
+    else
+        handle_error "No se pudieron obtener los cambios del repositorio remoto"
+    fi
+fi
+
 # Crear copia de seguridad
 log "Creando copia de seguridad..." "$YELLOW"
 BACKUP_DIR="backup_$(date +%Y-%m-%d)"
