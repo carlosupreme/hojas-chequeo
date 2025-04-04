@@ -28,7 +28,7 @@ class EditHojaChequeo extends Page
 
     public function mount(HojaChequeo $record): void {
         $this->record = $record;
-        debug($record);
+        
         $this->form->fill([
             ...$this->record->attributesToArray(),
             'version' => HojaChequeo::where('equipo_id', $record->equipo_id)

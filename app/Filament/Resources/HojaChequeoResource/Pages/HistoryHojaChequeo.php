@@ -145,8 +145,6 @@ class HistoryHojaChequeo extends Page
             collect($data['checks'])->first() ? count(collect($data['checks'])->first()) : 0
         );
 
-        debug($data);
-
         return $data;
     }
 

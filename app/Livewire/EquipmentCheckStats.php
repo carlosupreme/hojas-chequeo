@@ -123,8 +123,6 @@ class EquipmentCheckStats extends Component
                 ]
             ]
         ];
-
-        debug($this->chartData);
     }
 
     public function updated($property) {

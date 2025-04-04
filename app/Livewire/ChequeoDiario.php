@@ -69,7 +69,6 @@ class ChequeoDiario extends Component implements HasForms
     {
         $this->page = 2;
         $this->checkSheet = HojaChequeo::with('items')->find($checkSheet);
-        debug($this->checkSheet);
     }
 
     public function hasItems(): bool

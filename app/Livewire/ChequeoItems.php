@@ -77,7 +77,6 @@ class ChequeoItems extends Component
 
             $this->dispatch('dailyCheckItemsSaved');
         } catch (\Exception $e) {
-            debug($e);
             $this->dispatch('dailyCheckItemsFailed', $id);
         }
     }
