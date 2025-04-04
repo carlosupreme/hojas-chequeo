@@ -85,6 +85,8 @@ class EquipmentAlertsWidget extends BaseWidget
                                 }
                             }),
             ],layout: Tables\Enums\FiltersLayout::Modal)
+            ->persistSortInSession()
+            ->persistFiltersInSession()
             ->actions([
                 // Acciones adicionales si son necesarias
             ])

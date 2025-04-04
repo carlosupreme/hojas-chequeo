@@ -76,6 +76,8 @@ class EquipoResource extends Resource
             ->filters([
                 //
             ])
+            ->persistSortInSession()
+            ->persistFiltersInSession()
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make()->closeModalByClickingAway(false),

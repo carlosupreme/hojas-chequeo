@@ -60,11 +60,13 @@ class ChequeoDiarioResource extends Resource
                 Tables\Columns\TextColumn::make('nombre_operador')->label("Operador")
                                          ->searchable(),
                 Tables\Columns\TextColumn::make('observaciones'),
-                Tables\Columns\TextColumn::make('created_at')->dateTime()->label("Fecha y hora")
+                Tables\Columns\TextColumn::make('created_at')->dateTime()->label("Fecha y hora")->sortable()
             ])
             ->filters([
                 //
             ])
+            ->persistSortInSession()
+            ->persistFiltersInSession()
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),

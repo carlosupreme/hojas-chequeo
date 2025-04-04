@@ -53,6 +53,8 @@ class TarjetonResource extends Resource
             ->filters([
                 //
             ])
+            ->persistSortInSession()
+            ->persistFiltersInSession()
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

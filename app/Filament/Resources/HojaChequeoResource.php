@@ -74,6 +74,8 @@ class HojaChequeoResource extends Resource
                         blank: fn(Builder $query) => $query
                     )
             ])
+            ->persistSortInSession()
+            ->persistFiltersInSession()
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
