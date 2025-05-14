@@ -13,6 +13,6 @@ class ChequeoDaily extends Page
     protected static ?string $title = 'Chequeo diario';
 
     public static function canAccess(): bool {
-        return \Auth::user()->hasRole('Operador');
+        return \Auth::user()->hasRole(['Operador', 'Supervisor']);
     }
 }

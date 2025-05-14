@@ -7,6 +7,7 @@ use App\Filament\Pages\ChequeoHistorico;
 use App\Filament\Pages\Reportar;
 use App\Filament\Pages\ReporteHistorico;
 use App\Filament\Resources\ChequeoDiarioResource;
+use App\Filament\Resources\ReporteResource;
 use App\Filament\Resources\TarjetonResource;
 use App\Http\Middleware\EnsureIsOperador;
 use Filament\Http\Middleware\Authenticate;
@@ -27,7 +28,8 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class OperadorPanelProvider extends PanelProvider
 {
-    public function panel(Panel $panel): Panel {
+    public function panel(Panel $panel): Panel
+    {
         return $panel
             ->id('operador')
             ->viteTheme('resources/css/filament/operador/theme.css')
@@ -43,7 +45,7 @@ class OperadorPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
-            ->resources([ChequeoDiarioResource::class, TarjetonResource::class])
+            ->resources([ReporteResource::class, ChequeoDiarioResource::class, TarjetonResource::class])
             ->pages([ChequeoDaily::class, Reportar::class, ReporteHistorico::class])
             ->widgets([Widgets\AccountWidget::class])
             ->middleware([

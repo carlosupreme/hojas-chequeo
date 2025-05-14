@@ -31,6 +31,10 @@ class ReporteResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-inbox-arrow-down';
 
+     public static function canAccess(): bool {
+        return \Auth::user()->hasRole(["Administrador", 'Supervisor']); 
+    }
+
     public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
