@@ -132,7 +132,7 @@ fi
 show_progress "Verificando cambios locales"
 if [[ -n $(git status -s) ]]; then
     show_completed
-    log "ADVERTENCIA: Hay cambios locales sin confirmar" "$YELLOW"
+    log "ADVERTENCIA: Hay cambios locales sin confirmar que un desarrollador debe ver" "$YELLOW"
     git status -s | while read line; do
         log "  $line" "$YELLOW"
     done
