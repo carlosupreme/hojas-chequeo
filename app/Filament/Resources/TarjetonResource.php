@@ -29,6 +29,7 @@ class TarjetonResource extends Resource
                     ->relationship('equipo', 'tag')
                     ->required(),
                 Forms\Components\DatePicker::make('fecha')
+                    ->default(now())
                     ->required(),
                 Forms\Components\TextInput::make('hora_encendido')
                     ->maxLength(255),

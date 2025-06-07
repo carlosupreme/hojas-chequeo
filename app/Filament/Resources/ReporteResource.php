@@ -35,6 +35,11 @@ class ReporteResource extends Resource
         return \Auth::user()->hasRole(["Administrador", 'Supervisor']); 
     }
 
+    public static function getPluralLabel(): ?string {
+        return "Solicitudes de mantenimiento";
+    }
+
+
     public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
