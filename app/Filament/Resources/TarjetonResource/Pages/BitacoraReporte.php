@@ -98,13 +98,11 @@ class BitacoraReporte extends Page implements HasForms
 
     public function exportarPdf():? StreamedResponse
     {
-        if (!$this->mostrarReporte || $this->registros->isEmpty()) {
+        if (!$this->mostrarReporte) {
             Notification::make()
-                ->error()
                 ->title('Error')
                 ->body('Genera el reporte primero.')
                 ->send();
-            return response()->noContent();
         }
 
         $data = $this->form->getState();
