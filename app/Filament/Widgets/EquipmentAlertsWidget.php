@@ -84,12 +84,13 @@ class EquipmentAlertsWidget extends BaseWidget
                                     $query->where('equipos.id', $data['value']);
                                 }
                             }),
-            ],layout: Tables\Enums\FiltersLayout::Modal)
+            ], layout: Tables\Enums\FiltersLayout::Modal)
             ->persistSortInSession()
             ->persistFiltersInSession()
             ->actions([
                 // Acciones adicionales si son necesarias
             ])
+            ->defaultPaginationPageOption(5)
             ->emptyStateHeading('No se encontraron equipos')
             ->emptyStateDescription('Crea tu primer equipo para comenzar')
             ->emptyStateIcon('heroicon-o-beaker');

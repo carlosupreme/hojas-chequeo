@@ -17,7 +17,7 @@
                 <x-filament::badge color="warning">{{$this->checkSheet->equipo->tag}}</x-filament::badge>
             </div>
             <div class="flex items-center space-x-2">
-                <x-filament::button class="text-gray-800 dark:text-gray-200" color="secondary" size="sm" x-data="{}"
+                <x-filament::button class="text-gray-800 dark:text-gray-200 border-2" color="neutral" size="sm" x-data="{}"
                     x-on:click="$dispatch('open-modal', { id: 'date-picker-modal' })">
                     <span class="flex items-center gap-1 text-gray-800 dark:text-gray-200">
                         <x-heroicon-o-calendar class="w-4 h-4" />
@@ -30,8 +30,8 @@
                     </x-slot>
 
                     <div class="space-y-4">
-                        <input 
-                        type="date" 
+                        <input
+                        type="date"
                         wire:model.live="tempDateSelected"
                         class="block w-full rounded-md border-gray-300 bg-gray-100 text-gray-800 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                         x-on:change="$wire.updateSelectedDate()"
@@ -56,7 +56,7 @@
             <livewire:chequeo-items :items=" $checkSheet->items" />
 
             <div class="my-5">
-               
+
                 {!! $this->checkSheet->observaciones !!}
             </div>
 
@@ -80,5 +80,5 @@
                 <x-filament::button wire:click="resetState" color="gray" class="mt-4">Elegir otra</x-filament::button>
             </div>
         @endif
-    @endif 
+    @endif
 </div>
