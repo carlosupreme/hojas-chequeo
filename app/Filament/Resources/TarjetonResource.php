@@ -27,7 +27,7 @@ class TarjetonResource extends Resource
 
     public static function getPluralLabel(): string {
         return "Tarjetones";
-    }  
+    }
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -48,11 +48,11 @@ class TarjetonResource extends Resource
                             $set('estado', 'encendido');
                         }
                     })
-                    ->unique(modifyRuleUsing: function (Unique $rule, callable $get) {
+                    ->unique(ignoreRecord: true, modifyRuleUsing: function (Unique $rule, callable $get) {
                         return $rule
                         ->where('fecha', $get('fecha'))
-                        ->where('user_id', $get('user_id'));
-                    }, ignoreRecord: true)
+                        ->where('equipo_id', $get('equipo_id'));
+                    })
                     ->required(),
         Forms\Components\DatePicker::make('fecha')
             ->default(now())
@@ -90,7 +90,7 @@ class TarjetonResource extends Resource
                     ->afterStateUpdated(function (Forms\Set $set) {
                         $set('encendido_por', auth()->user()->name);
                     }),
-                    
+
                 Forms\Components\TextInput::make('encendido_por')
                     ->default(fn() => auth()->user()->name)
                     ->label('Encendido por')
@@ -98,7 +98,7 @@ class TarjetonResource extends Resource
                     ->maxLength(255),
             ])
             ->columns(2),
-            
+
         // Sección de Apagado
         Forms\Components\Section::make('Registro de Apagado')
             ->schema([
@@ -110,7 +110,7 @@ class TarjetonResource extends Resource
                         if ($state) {
                             $set('apagado_por', auth()->user()->name);
                             $set('estado', 'apagado');
-                            
+
                             // Validar que la hora de apagado sea posterior a la de encendido
                             $horaEncendido = $get('hora_encendido');
                             if ($horaEncendido && $state <= $horaEncendido) {
@@ -122,7 +122,7 @@ class TarjetonResource extends Resource
                             }
                         }
                     }),
-                    
+
                 Forms\Components\TextInput::make('apagado_por')
                     ->label('Apagado por')
                     ->maxLength(255),
@@ -130,7 +130,7 @@ class TarjetonResource extends Resource
             ->columns(2)
             ->collapsed()
             ->collapsible(),
-            
+
         // Sección adicional
         Forms\Components\Section::make('Información Adicional')
             ->schema([
@@ -143,25 +143,25 @@ class TarjetonResource extends Resource
                     ->default('encendido')
                     ->required()
                     ->live(),
-                    
+
                 Forms\Components\Textarea::make('observaciones')
                     ->label('Observaciones')
                     ->placeholder('Agregar notas sobre el funcionamiento del equipo...')
                     ->rows(3)
                     ->columnSpanFull(),
-                    
+
                 // Campo calculado para mostrar tiempo total
                 Forms\Components\Placeholder::make('tiempo_total')
                     ->label('Tiempo Total de Operación')
                     ->content(function (Forms\Get $get): string {
                         $horaEncendido = $get('hora_encendido');
                         $horaApagado = $get('hora_apagado');
-                        
+
                         if ($horaEncendido && $horaApagado) {
                             try {
                                 $inicio = \Carbon\Carbon::createFromFormat('H:i', $horaEncendido);
                                 $fin = \Carbon\Carbon::createFromFormat('H:i', $horaApagado);
-                                
+
                                 if ($fin->greaterThan($inicio)) {
                                     $diff = $fin->diff($inicio);
                                     return $diff->format('%h horas y %i minutos');
@@ -172,7 +172,7 @@ class TarjetonResource extends Resource
                                 return 'Formato de hora inválido';
                             }
                         }
-                        
+
                         return 'Registra ambas horas para calcular';
                     })
                     ->live(),
@@ -182,7 +182,7 @@ class TarjetonResource extends Resource
             ->collapsible(),
     ]);
     }
- 
+
 
  public static function table(Table $table): Table
 {
@@ -192,31 +192,31 @@ class TarjetonResource extends Resource
                 ->label('Equipo')
                 ->searchable()
                 ->sortable(),
-                
+
             Tables\Columns\TextColumn::make('fecha')
                 ->label('Fecha')
                 ->date('d/M/Y')
                 ->sortable(),
-                
+
             Tables\Columns\TextColumn::make('hora_encendido')
                 ->label('Encendido')
                 ->badge()
                 ->color('success')
                 ->formatStateUsing(fn (string $state): string => $state ?: 'N/A'),
-                
+
             Tables\Columns\TextColumn::make('hora_apagado')
                 ->label('Apagado')
                 ->badge()
                 ->color('danger')
                 ->formatStateUsing(fn (?string $state): string => $state ?: 'En operación')
                 ->placeholder('En operación'),
-                
+
             Tables\Columns\TextColumn::make('tiempo_operacion_formateado')
                 ->label('Tiempo Total')
                 ->badge()
                 ->color('info')
                 ->placeholder('Calculando...'),
-                
+
             Tables\Columns\TextColumn::make('encendido_por')
                 ->label('Op. Encendido')
                 ->limit(12)
@@ -225,7 +225,7 @@ class TarjetonResource extends Resource
                     return strlen($state) > 12 ? $state : null;
                 })
                 ->placeholder('N/A'),
-                
+
             Tables\Columns\TextColumn::make('apagado_por')
                 ->label('Op. Apagado')
                 ->limit(12)
@@ -234,7 +234,7 @@ class TarjetonResource extends Resource
                     return strlen($state) > 12 ? $state : null;
                 })
                 ->placeholder('Pendiente'),
-                
+
             Tables\Columns\BadgeColumn::make('estado')
                 ->label('Estado')
                 ->colors([
@@ -250,7 +250,7 @@ class TarjetonResource extends Resource
                 ->label('Equipo')
                 ->multiple()
                 ->preload(),
-                
+
             Tables\Filters\Filter::make('fecha')
                 ->form([
                     Forms\Components\DatePicker::make('desde')
@@ -279,7 +279,7 @@ class TarjetonResource extends Resource
                     }
                     return $indicators;
                 }),
-                
+
             Tables\Filters\SelectFilter::make('estado')
                 ->options([
                     'encendido' => 'Encendido',
@@ -287,7 +287,7 @@ class TarjetonResource extends Resource
                     'mantenimiento' => 'Mantenimiento',
                 ])
                 ->multiple(),
-                
+
             Tables\Filters\Filter::make('solo_hoy')
                 ->label('Solo Hoy')
                 ->query(fn (Builder $query): Builder => $query->whereDate('fecha', today()))
@@ -295,7 +295,7 @@ class TarjetonResource extends Resource
         ])
         ->actions([
             Tables\Actions\ViewAction::make(),
-            Tables\Actions\EditAction::make(),            
+            Tables\Actions\EditAction::make(),
             Tables\Actions\Action::make('toggle_estado')
                 ->label(fn (Tarjeton $record) => $record->estado === 'encendido' ? 'Apagar' : 'Encender')
                 ->icon(fn (Tarjeton $record) => $record->estado === 'encendido' ? 'heroicon-o-stop' : 'heroicon-o-play')
@@ -307,7 +307,7 @@ class TarjetonResource extends Resource
                             'apagado_por' => auth()->user()->name,
                             'estado' => 'apagado'
                         ]);
-                        
+
                         \Filament\Notifications\Notification::make()
                             ->success()
                             ->title('Equipo Apagado')
@@ -319,7 +319,7 @@ class TarjetonResource extends Resource
                             'encendido_por' => auth()->user()->name,
                             'estado' => 'encendido'
                         ]);
-                        
+
                         \Filament\Notifications\Notification::make()
                             ->success()
                             ->title('Equipo Encendido')
@@ -330,7 +330,7 @@ class TarjetonResource extends Resource
                 ->requiresConfirmation()
                 ->modalHeading(fn (Tarjeton $record) => $record->estado === 'encendido' ? 'Apagar Equipo' : 'Encender Equipo')
                 ->modalDescription(fn (Tarjeton $record) => "¿Confirmas que quieres " . ($record->estado === 'encendido' ? 'apagar' : 'encender') . " el equipo {$record->equipo->tag}?"),
-                
+
             Tables\Actions\Action::make('mantenimiento')
                 ->label('Mantenimiento')
                 ->icon('heroicon-o-wrench-screwdriver')
@@ -347,7 +347,7 @@ class TarjetonResource extends Resource
         ->bulkActions([
             Tables\Actions\BulkActionGroup::make([
                 Tables\Actions\DeleteBulkAction::make(),
-                
+
                 Tables\Actions\BulkAction::make('cambiar_estado')
                     ->label('Cambiar Estado')
                     ->icon('heroicon-o-arrow-path')
@@ -368,7 +368,7 @@ class TarjetonResource extends Resource
                                 'apagado_por' => auth()->user()->name,
                             ]);
                         });
-                        
+
                         \Filament\Notifications\Notification::make()
                             ->success()
                             ->title('Estados Actualizados')

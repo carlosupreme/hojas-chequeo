@@ -296,25 +296,58 @@ class HistoryHojaChequeo extends Page
             }
 
             // Agregar firmas
+            $currentRow += 2; // Espacio entre datos y firmas
+            
+            // Fila de nombres de operadores
             $col = count($headers);
             $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $currentRow;
             $sheet->setCellValue($cellCoordinate, 'NOMBRE DE OPERADOR:');
+            
+            foreach ($availableDates as $day) {
+                $col++;
+                $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $currentRow;
+                $operatorName = $tableData['operatorNames'][$day] ?? '';
+                $sheet->setCellValue($cellCoordinate, $operatorName);
+            }
 
             $currentRow++;
+            // Fila de firmas de operadores
+            $col = count($headers);
             $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $currentRow;
             $sheet->setCellValue($cellCoordinate, 'FIRMA DEL OPERADOR:');
+            
+            foreach ($availableDates as $day) {
+                $col++;
+                $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $currentRow;
+                $operatorSignature = $tableData['operatorSignatures'][$day] ?? '';
+                // Para Excel, indicamos si hay firma o no con texto
+                $signatureText = !empty($operatorSignature) ? '[FIRMADO]' : '';
+                $sheet->setCellValue($cellCoordinate, $signatureText);
+            }
 
             $currentRow++;
+            // Fila de firmas de supervisores
+            $col = count($headers);
             $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $currentRow;
             $sheet->setCellValue($cellCoordinate, 'FIRMA DEL SUPERVISOR:');
+            
+            foreach ($availableDates as $day) {
+                $col++;
+                $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $currentRow;
+                $supervisorSignature = $tableData['supervisorSignatures'][$day] ?? '';
+                // Para Excel, indicamos si hay firma o no con texto
+                $signatureText = !empty($supervisorSignature) ? '[FIRMADO]' : '';
+                $sheet->setCellValue($cellCoordinate, $signatureText);
+            }
 
             // Aplicar bordes a toda la tabla
             $lastRow = $currentRow;
             $sheet->getStyle("A{$tableStartRow}:{$lastCol}{$lastRow}")->applyFromArray($borderStyle);
 
             // Ajustar columnas
-            foreach (range('A', $lastCol) as $column) {
-                $sheet->getColumnDimension($column)->setAutoSize(true);
+            for ($columnIndex = 1; $columnIndex <= $col; $columnIndex++) {
+                $columnLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($columnIndex);
+                $sheet->getColumnDimension($columnLetter)->setAutoSize(true);
             }
 
             // Generar archivo
