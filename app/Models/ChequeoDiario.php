@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -28,5 +29,11 @@ class ChequeoDiario extends Model
 
     public function itemsChequeoDiario(): HasMany {
         return $this->hasMany(ItemChequeoDiario::class);
+    }
+
+    protected static function booted() {
+        static::addGlobalScope('recent_first', function (Builder $builder) {
+            $builder->orderByDesc('created_at');
+        });
     }
 }

@@ -4,6 +4,8 @@ namespace App\Filament\Pages;
 
 use App\Infolists\Components\ViewChequeoDiarioItems;
 use App\Models\ChequeoDiario;
+use Carbon\Carbon;
+use Filament\Forms\Components\DatePicker;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\Section;
@@ -12,7 +14,10 @@ use Filament\Pages\Page;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\Indicator;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ChequeoHistorico extends Page implements HasTable
 {
@@ -54,8 +59,45 @@ class ChequeoHistorico extends Page implements HasTable
                 TextColumn::make('observaciones'),
                 TextColumn::make('created_at')->dateTime()->label('Fecha y hora')
             ])
+            ->persistSortInSession()
+            ->persistFiltersInSession()
             ->filters([
-                //
+                Filter::make('rango_fechas')
+                      ->label('Rango de Fechas')
+                      ->form([
+                          DatePicker::make('fecha_inicio')
+                                                     ->label('Fecha Inicio'),
+                          DatePicker::make('fecha_fin')
+                                                     ->label('Fecha Fin'),
+                      ])
+                      ->query(function (Builder $query, array $data): Builder {
+                          return $query
+                              ->when(
+                                  $data['fecha_inicio'] ?? null,
+                                  fn(Builder $query, $date) => $query->whereDate('created_at', '>=', $date)
+                              )
+                              ->when(
+                                  $data['fecha_fin'] ?? null,
+                                  fn(Builder $query, $date) => $query->whereDate('created_at', '<=', $date)
+                              );
+                      })
+                      ->indicateUsing(function (array $data): array {
+                          $indicators = [];
+
+                          if ($data['fecha_inicio'] ?? null) {
+                              $indicators[] = Indicator::make('Desde: ' . Carbon::parse($data['fecha_inicio'])
+                                                                                ->format('d/m/Y'))
+                                                       ->removeField('fecha_inicio');
+                          }
+
+                          if ($data['fecha_fin'] ?? null) {
+                              $indicators[] = Indicator::make('Hasta: ' . Carbon::parse($data['fecha_fin'])
+                                                                                ->format('d/m/Y'))
+                                                       ->removeField('fecha_fin');
+                          }
+
+                          return $indicators;
+                      }),
             ])
             ->actions([
                 \Filament\Tables\Actions\ViewAction::make()->infolist([Grid::make()->schema([

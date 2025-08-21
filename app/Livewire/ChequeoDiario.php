@@ -7,15 +7,15 @@ use App\Models\Reporte;
 use App\Models\User;
 use Carbon\Carbon;
 use Coolsam\SignaturePad\Forms\Components\Fields\SignaturePad;
-use Filament\Notifications\Actions;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
+use Filament\Notifications\Actions;
 use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -26,12 +26,13 @@ class ChequeoDiario extends Component implements HasForms
     public bool $reported = false;
 
     public int $page = 1;
+
     public ?HojaChequeo $checkSheet;
 
     public ?array $data = [];
 
-
     public $dateSelected;
+
     public $tempDateSelected;
 
     public function mount(): void
@@ -51,7 +52,7 @@ class ChequeoDiario extends Component implements HasForms
                         ->hideDownloadButtons()
                         ->required(),
                     TextInput::make('nombre_operador')
-                        ->default(fn() => auth()->user()->name)
+                        ->default(fn () => auth()->user()->name)
                         ->label('Nombre')
                         ->required(),
                 ]),
@@ -63,12 +64,14 @@ class ChequeoDiario extends Component implements HasForms
             ->model(\App\Models\ChequeoDiario::class);
     }
 
-
     #[On('checkSheetSelected')]
     public function nextPage(int $checkSheet): void
     {
         $this->page = 2;
-        $this->checkSheet = HojaChequeo::with('items')->find($checkSheet);
+        $this->checkSheet = HojaChequeo::with([
+            'items:id,hoja_chequeo_id,valores,categoria',
+            'equipo:id,nombre,tag,area',
+        ])->find($checkSheet);
     }
 
     public function hasItems(): bool
@@ -76,6 +79,7 @@ class ChequeoDiario extends Component implements HasForms
         if ($this->checkSheet) {
             return $this->checkSheet->items->count() > 0;
         }
+
         return false;
     }
 
@@ -92,12 +96,12 @@ class ChequeoDiario extends Component implements HasForms
             ...$data,
             'hoja_chequeo_id' => $this->checkSheet->id,
             'operador_id' => auth()->id(),
-            'created_at' => $this->dateSelected
+            'created_at' => $this->dateSelected,
         ]);
         $this->dispatch('dailyCheckCreated', $created->id);
     }
 
-    public function updateSelectedDate()
+    public function updateSelectedDate(): void
     {
 
         $this->dateSelected = Carbon::parse($this->tempDateSelected);
@@ -131,19 +135,19 @@ class ChequeoDiario extends Component implements HasForms
             ->success()
             ->icon('heroicon-o-document-text')
             ->iconColor('success')
-            ->body(auth()->user()->name . ' ha completado un chequeo diario para la hoja ' . $this->checkSheet->name)
+            ->body(auth()->user()->name.' ha completado un chequeo diario para la hoja '.$this->checkSheet->name)
             ->actions([
                 Actions\Action::make('Ver')
                     ->button()
-                    ->url("/admin/hoja-chequeos/{$this->checkSheet->id}/historial?startDate=" . now()->format('Y-m-d') . '&endDate=' . now()->format('Y-m-d'))
+                    ->url("/admin/hoja-chequeos/{$this->checkSheet->id}/historial?startDate=".now()->format('Y-m-d').'&endDate='.now()->format('Y-m-d')),
             ])
-            ->sendToDatabase(User::role('Administrador')->get(), isEventDispatched: true);
+            ->sendToDatabase(User::role('Administrador')->select(['id', 'name', 'email'])->get(), isEventDispatched: true);
 
         if ($this->reported) {
             Reporte::create([
                 'equipo_id' => $this->checkSheet->equipo->id,
                 'hoja_chequeo_id' => $this->checkSheet->id,
-                'fecha' => Carbon::now()
+                'fecha' => Carbon::now(),
             ]);
             $this->redirect('https://mantenimientotintoreriatacuba.netlify.app/');
         } else {
@@ -164,8 +168,8 @@ class ChequeoDiario extends Component implements HasForms
         $this->page = 1;
     }
 
-    public function render()
+    public function render(): View
     {
-        return view('livewire.chequeo-diario', ['user' => Auth::user()]);
+        return view('livewire.chequeo-diario');
     }
 }

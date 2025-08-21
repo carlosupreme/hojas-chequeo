@@ -14,8 +14,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
 use Filament\Notifications\Actions;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Livewire\WithFileUploads;
 
@@ -32,10 +32,10 @@ class Reportar extends Page
         return \Auth::user()->hasRole(['Operador', 'Supervisor']);
     }
 
-    public static function getNavigationGroup(): ?string {
+    public static function getNavigationGroup(): ?string
+    {
         return 'Reportes';
     }
-
 
     public ?array $data = [];
 
@@ -56,7 +56,7 @@ class Reportar extends Page
                                 TextInput::make('name')
                                     ->label('Nombre')
                                     ->required()
-                                    ->default(fn() => \Auth::user()->name),
+                                    ->default(fn () => \Auth::user()->name),
                                 DatePicker::make('fecha')
                                     ->label('Fecha')
                                     ->default(Carbon::now())
@@ -65,14 +65,14 @@ class Reportar extends Page
                                     ->closeOnDateSelection(),
 
                                 Select::make('priority')->label('Prioridad')
-                                    ->default("baja")
+                                    ->default('baja')
                                     ->options([
                                         'alta' => 'Alta',
                                         'media' => 'Media',
-                                        'baja' => 'Baja'
+                                        'baja' => 'Baja',
                                     ])
                                     ->required()
-                                    ->native(false)
+                                    ->native(false),
                             ]),
                     ]),
 
@@ -89,9 +89,9 @@ class Reportar extends Page
                                     ->preload()
                                     ->required(),
                                 Select::make('area')->label('Area')
-                                    ->options(fn() => array_combine(
-                                        array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases()),
-                                        array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases())
+                                    ->options(fn () => array_combine(
+                                        array_map(fn (HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases()),
+                                        array_map(fn (HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases())
                                     ))
                                     ->searchable()
                                     ->preload()
@@ -145,15 +145,14 @@ class Reportar extends Page
             ->danger()
             ->icon('heroicon-o-inbox-arrow-down')
             ->iconColor('danger')
-            ->body(auth()->user()->name . ' ha reportado una falla de ' . $reporte->equipo->tag)
+            ->body(auth()->user()->name.' ha reportado una falla de '.$reporte->equipo->tag)
             ->actions([
                 Actions\Action::make('Ver')
                     ->button()
-                    ->url("/admin/reportes/")
+                    ->url('/admin/reportes/'),
             ])
-            ->sendToDatabase(User::role('Administrador')->get(), isEventDispatched: true);
+            ->sendToDatabase(User::role('Administrador')->select(['id', 'name', 'email'])->get(), isEventDispatched: true);
         $this->form->fill();
-        $this->redirect("reporte-historico");
+        $this->redirect('reporte-historico');
     }
-
 }
