@@ -24,6 +24,10 @@ class HojaChequeoResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-wrench';
 
+
+    public static function getNavigationGroup(): ?string {
+        return 'Mantenimiento';
+    }
     public static function table(Table $table): Table
     {
         return $table

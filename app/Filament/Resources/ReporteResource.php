@@ -32,12 +32,17 @@ class ReporteResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-inbox-arrow-down';
 
      public static function canAccess(): bool {
-        return \Auth::user()->hasRole(["Administrador", 'Supervisor']); 
+        return \Auth::user()->hasRole(["Administrador", 'Supervisor']);
     }
 
     public static function getPluralLabel(): ?string {
         return "Solicitudes de mantenimiento";
     }
+
+    public static function getNavigationGroup(): ?string {
+        return 'Reportes';
+    }
+
 
 
     public static function infolist(Infolist $infolist): Infolist

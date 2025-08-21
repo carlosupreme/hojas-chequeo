@@ -26,12 +26,16 @@ class ChequeoDiarioResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-pencil-square';
 
+    public static function getNavigationGroup(): ?string {
+        return 'Mantenimiento';
+    }
+
     public static function canCreate(): bool {
         return false;
     }
 
     public static function getPluralLabel(): ?string {
-        return "Chequeos";
+        return "Todos los chequeos";
     }
 
     public static function form(Form $form): Form {

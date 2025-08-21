@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use Auth;
 use Filament\Pages\Page;
 
 class ChequeoDaily extends Page
@@ -13,6 +14,10 @@ class ChequeoDaily extends Page
     protected static ?string $title = 'Chequeo diario';
 
     public static function canAccess(): bool {
-        return \Auth::user()->hasRole(['Operador', 'Supervisor']);
+        return Auth::user()->hasRole(['Operador', 'Supervisor']);
+    }
+
+    public static function getNavigationGroup(): ?string {
+        return 'Mantenimiento';
     }
 }

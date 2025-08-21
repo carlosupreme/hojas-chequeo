@@ -32,6 +32,11 @@ class Reportar extends Page
         return \Auth::user()->hasRole(['Operador', 'Supervisor']);
     }
 
+    public static function getNavigationGroup(): ?string {
+        return 'Reportes';
+    }
+
+
     public ?array $data = [];
 
     public function mount()

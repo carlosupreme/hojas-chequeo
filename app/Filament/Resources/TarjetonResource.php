@@ -29,6 +29,10 @@ class TarjetonResource extends Resource
         return "Tarjetones";
     }
 
+    public static function getNavigationGroup(): ?string {
+        return 'Mantenimiento';
+    }
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form

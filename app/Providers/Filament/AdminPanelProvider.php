@@ -32,8 +32,8 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->passwordReset()
             ->profile()
-            ->favicon(asset(path: '/lg.png'))
-            ->brandLogo(asset("lg.png"))
+            ->favicon(asset(path: '/logo.png'))
+            ->brandLogo(asset("logo.png"))
             ->darkModeBrandLogo(asset("dark.png"))
             ->brandName('Tacuba')
             ->brandLogoHeight('50px')
@@ -43,7 +43,7 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
-            //->topNavigation()
+//            ->topNavigation()
             ->unsavedChangesAlerts()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')

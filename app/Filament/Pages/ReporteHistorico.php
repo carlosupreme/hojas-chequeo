@@ -25,6 +25,10 @@ class ReporteHistorico extends Page implements HasTable
 
     protected static ?string $title = "Mis reportes";
 
+    public static function getNavigationGroup(): ?string {
+        return 'Reportes';
+    }
+
     public static function canAccess(): bool {
         return \Auth::user()->hasRole('Operador');
     }

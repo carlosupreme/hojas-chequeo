@@ -24,6 +24,10 @@ class PerfilResource extends Resource
         return "Perfiles";
     }
 
+    public static function getNavigationGroup(): ?string {
+        return 'Administracion';
+    }
+
     public static function form(Form $form): Form {
         return $form
             ->schema([

@@ -22,6 +22,10 @@ class SimbologiaResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'nombre';
 
+    public static function getNavigationGroup(): ?string {
+        return 'Administracion';
+    }
+
 
     public static function form(Form $form): Form {
         return $form

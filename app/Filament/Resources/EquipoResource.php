@@ -17,6 +17,10 @@ class EquipoResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
 
+    public static function getNavigationGroup(): ?string {
+        return 'Mantenimiento';
+    }
+
     public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array {
         return [
             'Nombre' => $record->nombre,

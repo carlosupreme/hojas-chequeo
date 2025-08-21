@@ -24,6 +24,10 @@ class ChequeoHistorico extends Page implements HasTable
 
     protected static ?string $title = 'Mis chequeos';
 
+    public static function getNavigationGroup(): ?string {
+        return 'Mantenimiento';
+    }
+
     public static function canAccess(): bool {
         return \Auth::user()->hasRole('Operador');
     }
