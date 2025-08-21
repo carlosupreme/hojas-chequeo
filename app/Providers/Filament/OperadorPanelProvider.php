@@ -28,18 +28,17 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class OperadorPanelProvider extends PanelProvider
 {
-    public function panel(Panel $panel): Panel
-    {
+    public function panel(Panel $panel): Panel {
         return $panel
             ->id('operador')
             ->viteTheme('resources/css/filament/operador/theme.css')
             ->path('operador')
             ->login()
-            ->favicon(asset(path: '/lg.png'))
-            ->brandLogo(asset('lg.png'))
+            ->favicon(asset('/logo.png'))
+            ->brandLogo(asset('logo.png'))
             ->darkModeBrandLogo(asset('dark.png'))
             ->brandName('Tacuba')
-            ->brandLogoHeight('50px')
+            ->brandLogoHeight('35px')
             ->sidebarCollapsibleOnDesktop()
             ->sidebarWidth('300px')
             ->colors([
