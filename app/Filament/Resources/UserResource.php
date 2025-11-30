@@ -45,8 +45,7 @@ class UserResource extends Resource
                          ->password()
                          ->revealable()
                          ->required()
-                         ->maxLength(255)
-                         ->hiddenOn('edit'),
+                         ->maxLength(255),
                 Forms\Components\Select::make('roles')
                                        ->relationship('roles', 'name')
                                        ->multiple()
