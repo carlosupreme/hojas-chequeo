@@ -25,13 +25,14 @@ class HistoryHojaChequeo extends Page
     public HojaChequeo $record;
 
     public ?string $startDate = null;
+
     public ?string $endDate = null;
 
     protected array $queryString = ['startDate', 'endDate'];
 
     public function getTitle(): string
     {
-        return 'Historial de ' . $this->record->equipo->tag;
+        return 'Historial de '.$this->record->equipo->tag;
     }
 
     public function mount(): void
@@ -60,7 +61,7 @@ class HistoryHojaChequeo extends Page
                         ->afterOrEqual('startDate')
                         ->maxDate(now())
                         ->required(),
-                ])
+                ]),
             ]);
     }
 
@@ -68,7 +69,7 @@ class HistoryHojaChequeo extends Page
     public function dateRange(): array
     {
         return collect(CarbonPeriod::create(Carbon::parse($this->startDate), Carbon::parse($this->endDate)))
-            ->map(fn($date) => $date->format('Y-m-d'))
+            ->map(fn ($date) => $date->format('Y-m-d'))
             ->toArray();
     }
 
@@ -102,13 +103,13 @@ class HistoryHojaChequeo extends Page
             'operatorSignatures' => [],
             'supervisorSignatures' => [],
             'checks' => [],
-            'operatorNames' => []
+            'operatorNames' => [],
         ];
 
         $endDate = Carbon::parse($this->endDate)->addDay()->format('Y-m-d');
         $items = $this->record->chequeosDiarios()
             ->whereBetween('created_at', [$this->startDate, $endDate])
-            ->with('itemsChequeoDiario.simbologia')
+            ->with('itemsChequeoDiario.simbologia', 'itemsChequeoDiario.item')
             ->get();
 
         foreach ($items as $item) {
@@ -124,7 +125,7 @@ class HistoryHojaChequeo extends Page
                 $value = [
                     'icon' => $checkItem->simbologia?->icono,
                     'color' => $checkItem->simbologia?->color,
-                    'text' => $checkItem->valor
+                    'text' => $checkItem->valor,
                 ];
 
                 $data['checks'][$dayOfCheck][] = $value;
@@ -132,7 +133,7 @@ class HistoryHojaChequeo extends Page
         }
 
         foreach ($this->dateRange as $date) {
-            if (!isset($data['checks'][$date])) {
+            if (! isset($data['checks'][$date])) {
                 $data['checks'][$date] = [];
                 $data['operatorSignatures'][$date] = null;
                 $data['supervisorSignatures'][$date] = null;
@@ -183,7 +184,7 @@ class HistoryHojaChequeo extends Page
         return [
             'sum' => $sum,
             'average' => $count > 0 ? round($sum / $count, 2) : 0,
-            'count' => $count
+            'count' => $count,
         ];
     }
 
@@ -193,11 +194,11 @@ class HistoryHojaChequeo extends Page
             Action::make('exportPdf')
                 ->label('Exportar a PDF')
                 ->icon('heroicon-o-document-arrow-down')
-                ->action(fn() => $this->exportPdf()),
+                ->action(fn () => $this->exportPdf()),
             Action::make('exportExcel')
                 ->label('Exportar a Excel')
                 ->icon('heroicon-o-document-arrow-down')
-                ->action(fn() => $this->exportExcel()),
+                ->action(fn () => $this->exportExcel()),
         ];
     }
 
@@ -208,7 +209,7 @@ class HistoryHojaChequeo extends Page
             $tableData = $this->tableData;
             $availableDates = $this->availableDates;
 
-            $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+            $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet;
             $sheet = $spreadsheet->getActiveSheet();
 
             // Estilo para bordes
@@ -238,7 +239,7 @@ class HistoryHojaChequeo extends Page
             // Información del equipo
             $sheet->setCellValue('A3', 'AREA');
             $sheet->setCellValue('B3', 'TAG');
-            $sheet->setCellValue('C3', 'HOJA DE CHEQUEO EQUIPO ' . $this->record->equipo->nombre);
+            $sheet->setCellValue('C3', 'HOJA DE CHEQUEO EQUIPO '.$this->record->equipo->nombre);
             $sheet->setCellValue('D3', 'No DE CONTROL');
             $sheet->setCellValue('E3', 'REVISION');
 
@@ -255,12 +256,12 @@ class HistoryHojaChequeo extends Page
             $col = 0;
             foreach ($headers as $header) {
                 $col++;
-                $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $tableStartRow;
+                $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col).$tableStartRow;
                 $sheet->setCellValue($cellCoordinate, $header);
             }
             foreach ($availableDates as $date) {
                 $col++;
-                $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $tableStartRow;
+                $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col).$tableStartRow;
                 $sheet->setCellValue($cellCoordinate, Carbon::parse($date)->format('d/m'));
             }
 
@@ -274,7 +275,7 @@ class HistoryHojaChequeo extends Page
                 $col = 0;
                 foreach ($headers as $header) {
                     $col++;
-                    $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $currentRow;
+                    $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col).$currentRow;
                     $sheet->setCellValue($cellCoordinate, $item[$header]);
                 }
 
@@ -289,7 +290,7 @@ class HistoryHojaChequeo extends Page
                         }
                     }
                     $col++;
-                    $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $currentRow;
+                    $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col).$currentRow;
                     $sheet->setCellValue($cellCoordinate, $cellValue);
                 }
                 $currentRow++;
@@ -297,15 +298,15 @@ class HistoryHojaChequeo extends Page
 
             // Agregar firmas
             $currentRow += 2; // Espacio entre datos y firmas
-            
+
             // Fila de nombres de operadores
             $col = count($headers);
-            $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $currentRow;
+            $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col).$currentRow;
             $sheet->setCellValue($cellCoordinate, 'NOMBRE DE OPERADOR:');
-            
+
             foreach ($availableDates as $day) {
                 $col++;
-                $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $currentRow;
+                $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col).$currentRow;
                 $operatorName = $tableData['operatorNames'][$day] ?? '';
                 $sheet->setCellValue($cellCoordinate, $operatorName);
             }
@@ -313,30 +314,30 @@ class HistoryHojaChequeo extends Page
             $currentRow++;
             // Fila de firmas de operadores
             $col = count($headers);
-            $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $currentRow;
+            $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col).$currentRow;
             $sheet->setCellValue($cellCoordinate, 'FIRMA DEL OPERADOR:');
-            
+
             foreach ($availableDates as $day) {
                 $col++;
-                $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $currentRow;
+                $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col).$currentRow;
                 $operatorSignature = $tableData['operatorSignatures'][$day] ?? '';
                 // Para Excel, indicamos si hay firma o no con texto
-                $signatureText = !empty($operatorSignature) ? '[FIRMADO]' : '';
+                $signatureText = ! empty($operatorSignature) ? '[FIRMADO]' : '';
                 $sheet->setCellValue($cellCoordinate, $signatureText);
             }
 
             $currentRow++;
             // Fila de firmas de supervisores
             $col = count($headers);
-            $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $currentRow;
+            $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col).$currentRow;
             $sheet->setCellValue($cellCoordinate, 'FIRMA DEL SUPERVISOR:');
-            
+
             foreach ($availableDates as $day) {
                 $col++;
-                $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $currentRow;
+                $cellCoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col).$currentRow;
                 $supervisorSignature = $tableData['supervisorSignatures'][$day] ?? '';
                 // Para Excel, indicamos si hay firma o no con texto
-                $signatureText = !empty($supervisorSignature) ? '[FIRMADO]' : '';
+                $signatureText = ! empty($supervisorSignature) ? '[FIRMADO]' : '';
                 $sheet->setCellValue($cellCoordinate, $signatureText);
             }
 
@@ -351,7 +352,7 @@ class HistoryHojaChequeo extends Page
             }
 
             // Generar archivo
-            $fileName = 'hoja-chequeo-' . $this->record->equipo->tag . '-' . now()->format('Y-m-d') . '.xlsx';
+            $fileName = 'hoja-chequeo-'.$this->record->equipo->tag.'-'.now()->format('Y-m-d').'.xlsx';
 
             return response()->streamDownload(function () use ($spreadsheet) {
                 $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
@@ -361,8 +362,8 @@ class HistoryHojaChequeo extends Page
             ]);
 
         } catch (\Exception $e) {
-            \Log::error('Error exportando Excel: ' . $e->getMessage());
-            throw new \Exception('Error al generar el archivo Excel: ' . $e->getMessage());
+            \Log::error('Error exportando Excel: '.$e->getMessage());
+            throw new \Exception('Error al generar el archivo Excel: '.$e->getMessage());
         }
     }
 
@@ -383,7 +384,6 @@ class HistoryHojaChequeo extends Page
         };
     }
 
-
     public function exportPdf()
     {
         $headers = $this->headers;
@@ -402,10 +402,10 @@ class HistoryHojaChequeo extends Page
             ->setOption('isPhpEnabled', true)
             ->setOption('isRemoteEnabled', true);
 
-        $fileName = 'checksheet-history-' . Str::random(10) . '.pdf';
+        $fileName = 'checksheet-history-'.Str::random(10).'.pdf';
 
         return response()->streamDownload(
-            fn() => print ($pdf->output()),
+            fn () => print ($pdf->output()),
             $fileName
         );
     }

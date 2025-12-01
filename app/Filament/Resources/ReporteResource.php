@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReporteResource\Pages;
-use App\Filament\Resources\ReporteResource\RelationManagers;
 use App\HojaChequeoArea;
 use App\Models\Reporte;
 use Carbon\Carbon;
@@ -22,8 +21,6 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ReporteResource extends Resource
 {
@@ -31,19 +28,20 @@ class ReporteResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-inbox-arrow-down';
 
-     public static function canAccess(): bool {
-        return \Auth::user()->hasRole(["Administrador", 'Supervisor']);
+    public static function canAccess(): bool
+    {
+        return \Auth::user()->hasRole(['Administrador', 'Supervisor']);
     }
 
-    public static function getPluralLabel(): ?string {
-        return "Solicitudes de mantenimiento";
+    public static function getPluralLabel(): ?string
+    {
+        return 'Solicitudes de mantenimiento';
     }
 
-    public static function getNavigationGroup(): ?string {
+    public static function getNavigationGroup(): ?string
+    {
         return 'Reportes';
     }
-
-
 
     public static function infolist(Infolist $infolist): Infolist
     {
@@ -62,7 +60,7 @@ class ReporteResource extends Resource
                                 TextEntry::make('priority')
                                     ->label('Prioridad')
                                     ->badge()
-                                    ->color(fn(string $state): string => match (strtolower($state)) {
+                                    ->color(fn (string $state): string => match (strtolower($state)) {
                                         'baja' => 'gray',
                                         'media' => 'warning',
                                         'alta' => 'danger',
@@ -73,11 +71,11 @@ class ReporteResource extends Resource
                                     ->label('Estado')
                                     ->default('Pendiente')
                                     ->badge()
-                                    ->color(fn(string $state): string => match (strtolower($state)) {
+                                    ->color(fn (string $state): string => match (strtolower($state)) {
                                         'pendiente' => 'warning',
                                         'realizado' => 'success',
                                     })
-                                    ->icon(fn(string $state): string => match ($state) {
+                                    ->icon(fn (string $state): string => match ($state) {
                                         'pendiente' => 'heroicon-o-clock',
                                         'realizado' => 'heroicon-o-check',
                                     }),
@@ -154,7 +152,7 @@ class ReporteResource extends Resource
 
                                 TextEntry::make('user')
                                     ->label('Reportado por')
-                                    ->default(fn($record) => $record->user?->name ?? $record->name)
+                                    ->default(fn ($record) => $record->user?->name ?? $record->name)
                                     ->icon('heroicon-o-user'),
                             ]),
                     ])
@@ -174,7 +172,7 @@ class ReporteResource extends Resource
                                 TextInput::make('name')
                                     ->label('Nombre')
                                     ->required()
-                                    ->default(fn() => \Auth::user()->name),
+                                    ->default(fn () => \Auth::user()->name),
                                 DatePicker::make('fecha')
                                     ->label('Fecha')
                                     ->default(Carbon::now())
@@ -187,10 +185,10 @@ class ReporteResource extends Resource
                                     ->options([
                                         'alta' => 'Alta',
                                         'media' => 'Media',
-                                        'baja' => 'Baja'
+                                        'baja' => 'Baja',
                                     ])
                                     ->required()
-                                    ->native(false)
+                                    ->native(false),
                             ]),
                     ]),
 
@@ -207,9 +205,9 @@ class ReporteResource extends Resource
                                     ->preload()
                                     ->required(),
                                 Select::make('area')->label('Area')
-                                    ->options(fn() => array_combine(
-                                        array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases()),
-                                        array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases())
+                                    ->options(fn () => array_combine(
+                                        array_map(fn (HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases()),
+                                        array_map(fn (HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases())
                                     ))
                                     ->searchable()
                                     ->preload()
@@ -248,9 +246,10 @@ class ReporteResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->query(fn () => Reporte::query()->with('equipo'))
             ->columns([
                 TextColumn::make('equipo.tag')
-                    ->label("Equipo")
+                    ->label('Equipo')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('fecha')->label('Reportado el')
@@ -262,14 +261,14 @@ class ReporteResource extends Resource
                 TextColumn::make('priority')
                     ->label('Prioridad')
                     ->badge()
-                    ->color(fn(string $state): string => match (strtolower($state)) {
+                    ->color(fn (string $state): string => match (strtolower($state)) {
                         'baja' => 'gray',
                         'media' => 'warning',
                         'alta' => 'danger'
                     }),
-                Tables\Columns\SelectColumn::make("estado")->label("Estado")->options([
-                    "pendiente" => "Pendiente",
-                    "realizado" => "Realizado"
+                Tables\Columns\SelectColumn::make('estado')->label('Estado')->options([
+                    'pendiente' => 'Pendiente',
+                    'realizado' => 'Realizado',
                 ])->selectablePlaceholder(false),
                 TextColumn::make('created_at')->label('Creado el')
                     ->dateTime()
@@ -289,10 +288,10 @@ class ReporteResource extends Resource
                         'baja' => 'Baja',
                     ]),
                 Tables\Filters\SelectFilter::make('area')->label('Area')
-                    ->options(fn() => array_combine(
-                        array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases()),
-                        array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases())
-                    ))
+                    ->options(fn () => array_combine(
+                        array_map(fn (HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases()),
+                        array_map(fn (HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases())
+                    )),
             ])
             ->persistSortInSession()
             ->persistFiltersInSession()
@@ -301,7 +300,7 @@ class ReporteResource extends Resource
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make(),
-                ])
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

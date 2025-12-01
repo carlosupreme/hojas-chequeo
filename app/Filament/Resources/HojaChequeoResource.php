@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\HojaChequeoResource\Pages;
-use App\Filament\Resources\HojaChequeoResource\RelationManagers;
 use App\HojaChequeoArea;
 use App\Infolists\Components\ViewItems;
 use App\Models\HojaChequeo;
@@ -24,13 +23,15 @@ class HojaChequeoResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-wrench';
 
-
-    public static function getNavigationGroup(): ?string {
+    public static function getNavigationGroup(): ?string
+    {
         return 'Mantenimiento';
     }
+
     public static function table(Table $table): Table
     {
         return $table
+            ->query(fn () => HojaChequeo::query()->with('equipo'))
             ->columns([
                 Tables\Columns\TextColumn::make('equipo.tag')
                     ->searchable()
@@ -44,8 +45,7 @@ class HojaChequeoResource extends Resource
                     ->sortable(),
                 Tables\Columns\ToggleColumn::make('active')
                     ->label('Publicada')
-                    ->beforeStateUpdated(fn($record) => HojaChequeo::
-                        where('equipo_id', $record->equipo_id)
+                    ->beforeStateUpdated(fn ($record) => HojaChequeo::where('equipo_id', $record->equipo_id)
                         ->where('area', $record->area)
                         ->update(['active' => false])),
                 Tables\Columns\TextColumn::make('area')->extraAttributes(['class' => 'uppercase'])
@@ -71,12 +71,12 @@ class HojaChequeoResource extends Resource
                         HojaChequeoArea::CUARTO_DE_MAQUINAS->value => HojaChequeoArea::CUARTO_DE_MAQUINAS->value,
                     ]),
                 Tables\Filters\TernaryFilter::make('active')
-                    ->label("Publicada")
+                    ->label('Publicada')
                     ->queries(
-                        true: fn(Builder $query) => $query->where('active', true),
-                        false: fn(Builder $query) => $query->where('active', false),
-                        blank: fn(Builder $query) => $query
-                    )
+                        true: fn (Builder $query) => $query->where('active', true),
+                        false: fn (Builder $query) => $query->where('active', false),
+                        blank: fn (Builder $query) => $query
+                    ),
             ])
             ->persistSortInSession()
             ->persistFiltersInSession()
@@ -84,11 +84,11 @@ class HojaChequeoResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\Action::make('Historial')
-                        ->url(fn(HojaChequeo $record): string => HojaChequeoResource::getUrl('history', ['record' => $record]))
+                        ->url(fn (HojaChequeo $record): string => HojaChequeoResource::getUrl('history', ['record' => $record]))
                         ->icon('heroicon-o-calendar'),
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make(),
-                ])
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -96,7 +96,6 @@ class HojaChequeoResource extends Resource
                 ]),
             ]);
     }
-
 
     public static function infolist(Infolist $infolist): Infolist
     {
@@ -108,7 +107,7 @@ class HojaChequeoResource extends Resource
                         ->schema([
                             Grid::make()->schema([
                                 TextEntry::make('version'),
-                                TextEntry::make('area')
+                                TextEntry::make('area'),
                             ]),
                             TextEntry::make('observaciones')->html(),
                             Grid::make(3)->schema([
@@ -123,7 +122,7 @@ class HojaChequeoResource extends Resource
                                     ->label('Activa')
                                     ->boolean()
                                     ->columnSpan(1),
-                            ])
+                            ]),
                         ])->columnSpan(1),
                     Section::make('Datos del equipo')->columnSpan(1)
                         ->icon('heroicon-o-wrench-screwdriver')
@@ -132,25 +131,24 @@ class HojaChequeoResource extends Resource
                                 TextEntry::make('equipo.nombre')
                                     ->label('Equipo'),
                                 ImageEntry::make('equipo.foto')->label('Foto')
-                                    ->extraImgAttributes(['class' => 'rounded-lg'])
+                                    ->extraImgAttributes(['class' => 'rounded-lg']),
                             ]),
                             Grid::make()->schema([
                                 TextEntry::make('equipo.tag')
                                     ->label('Tag')
                                     ->columnSpan(1),
                                 TextEntry::make('equipo.area')
-                                    ->label('Area')
+                                    ->label('Area'),
                             ]),
                         ]),
                     Section::make('Items')->columnSpanFull()
                         ->icon('heroicon-o-table-cells')
                         ->schema([
-                            ViewItems::make('items')->hiddenLabel()
-                        ])
-                ])
+                            ViewItems::make('items')->hiddenLabel(),
+                        ]),
+                ]),
             ]);
     }
-
 
     public static function getRelations(): array
     {
@@ -166,7 +164,7 @@ class HojaChequeoResource extends Resource
             'create' => Pages\CreateHojaChequeo::route('/crear'),
             'view' => Pages\ViewHojaChequeo::route('/{record}'),
             'edit' => Pages\EditHojaChequeo::route('/{record}/editar'),
-            'history' => Pages\HistoryHojaChequeo::route('/{record}/historial')
+            'history' => Pages\HistoryHojaChequeo::route('/{record}/historial'),
         ];
     }
 }
