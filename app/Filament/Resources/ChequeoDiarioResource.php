@@ -20,6 +20,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Filament\Tables\Filters\Indicator;
 use Illuminate\Database\Eloquent\Builder;
+
 class ChequeoDiarioResource extends Resource
 {
     protected static ?string $model = ChequeoDiario::class;
@@ -108,6 +109,7 @@ class ChequeoDiarioResource extends Resource
                           return $indicators;
                       }),
             ])
+            ->paginated([10, 25, 50, 100])
             ->persistSortInSession()
             ->persistFiltersInSession()
             ->actions([
