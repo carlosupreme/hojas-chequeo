@@ -19,24 +19,23 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
-class AdminPanelProvider extends PanelProvider
+class OperadorPanelProvider extends PanelProvider
 {
-    public function panel(Panel $panel): Panel
-    {
+    public function panel(Panel $panel): Panel {
         return $panel
-            ->default()
-            ->id('admin')
-            ->path('admin')
-            ->login()
+            ->id('operador')
+            ->path('operador')
+            ->topbar(false)
+            ->sidebarCollapsibleOnDesktop()
             ->colors([
-                'primary' => Color::Neutral,
+                'primary' => Color::Amber,
             ])
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
+            ->discoverResources(in: app_path('Filament/Operador/Resources'), for: 'App\Filament\Operador\Resources')
+            ->discoverPages(in: app_path('Filament/Operador/Pages'), for: 'App\Filament\Operador\Pages')
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Operador/Widgets'), for: 'App\Filament\Operador\Widgets')
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,
