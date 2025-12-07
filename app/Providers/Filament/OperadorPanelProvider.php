@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use Filament\Enums\GlobalSearchPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -21,15 +22,27 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class OperadorPanelProvider extends PanelProvider
 {
-    public function panel(Panel $panel): Panel {
+    public function panel(Panel $panel): Panel
+    {
         return $panel
             ->id('operador')
             ->path('operador')
-            ->topbar(false)
-            ->sidebarCollapsibleOnDesktop()
+            ->login(fn () => redirect()->route('login.selection'))
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Blue,
             ])
+            ->favicon(asset('/logo.png'))
+            ->brandLogo(asset('logo.png'))
+            ->darkModeBrandLogo(asset('dark.png'))
+            ->brandName('Tacuba')
+            ->brandLogoHeight('35px')
+            ->sidebarCollapsibleOnDesktop()
+            ->globalSearch()
+            ->topbar(false)
+            ->unsavedChangesAlerts()
+            ->globalSearch(position: GlobalSearchPosition::Sidebar)
+            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
+            ->sidebarWidth('300px')
             ->discoverResources(in: app_path('Filament/Operador/Resources'), for: 'App\Filament\Operador\Resources')
             ->discoverPages(in: app_path('Filament/Operador/Pages'), for: 'App\Filament\Operador\Pages')
             ->pages([

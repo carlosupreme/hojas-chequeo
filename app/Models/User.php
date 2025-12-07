@@ -13,7 +13,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, HasRoles, Notifiable;
 
     protected $fillable = [
         'name',
@@ -26,20 +26,32 @@ class User extends Authenticatable implements FilamentUser
         'remember_token',
     ];
 
-    protected function casts(): array {
+    protected function casts(): array
+    {
         return [
             'email_verified_at' => 'datetime',
-            'password'          => 'hashed',
+            'password' => 'hashed',
         ];
     }
 
-    public function canAccessPanel(Panel $panel): bool {
+    public function canAccessPanel(Panel $panel): bool
+    {
         $isPanelAdmin = $panel->getId() === 'admin';
 
-        if($isPanelAdmin) {
+        if ($isPanelAdmin) {
             return $this->hasRole('Administrador');
         }
 
         return true;
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('Administrador');
+    }
+
+    public function isSupervisor(): bool
+    {
+        return $this->hasRole('Supervisor');
     }
 }
