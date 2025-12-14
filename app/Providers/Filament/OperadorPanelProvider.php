@@ -31,6 +31,7 @@ class OperadorPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
+            ->viteTheme('resources/css/filament/operador/theme.css')
             ->favicon(asset('/logo.png'))
             ->brandLogo(asset('logo.png'))
             ->darkModeBrandLogo(asset('dark.png'))
