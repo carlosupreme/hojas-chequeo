@@ -15,6 +15,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Actions;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -25,9 +26,9 @@ class ChequeoDiario extends Component implements HasForms
 
     public bool $reported = false;
 
-    public int $page = 1;
+    public ?int $hojaId = null;
 
-    public ?HojaChequeo $checkSheet;
+    public ?HojaChequeo $checkSheet = null;
 
     public ?array $data = [];
 
@@ -35,11 +36,19 @@ class ChequeoDiario extends Component implements HasForms
 
     public $tempDateSelected;
 
+    protected $queryString = [
+        'hojaId' => ['except' => null, 'as' => 'hoja'],
+    ];
+
     public function mount(): void
     {
         $this->form->fill();
         $this->dateSelected = Carbon::now();
         $this->tempDateSelected = $this->dateSelected->format('Y-m-d');
+
+        if ($this->hojaId) {
+            $this->loadCheckSheet($this->hojaId);
+        }
     }
 
     public function form(Form $form): Form
@@ -67,11 +76,25 @@ class ChequeoDiario extends Component implements HasForms
     #[On('checkSheetSelected')]
     public function nextPage(int $checkSheet): void
     {
-        $this->page = 2;
-        $this->checkSheet = HojaChequeo::with([
-            'items:id,hoja_chequeo_id,valores,categoria',
-            'equipo:id,nombre,tag,area',
-        ])->find($checkSheet);
+        $this->hojaId = $checkSheet;
+        $this->loadCheckSheet($checkSheet);
+    }
+
+    protected function loadCheckSheet(int $checkSheetId): void
+    {
+        $cacheKey = "hoja:detail:{$checkSheetId}";
+        $cacheTtl = now()->addHours(2);
+
+        $this->checkSheet = Cache::tags(['hojas', "hoja:{$checkSheetId}"])->remember(
+            $cacheKey,
+            $cacheTtl,
+            fn () => HojaChequeo::with([
+                'items:id,hoja_chequeo_id,valores,categoria',
+                'equipo:id,nombre,tag,area',
+            ])
+                ->select(['id', 'equipo_id', 'observaciones'])
+                ->find($checkSheetId)
+        );
     }
 
     public function hasItems(): bool
@@ -103,9 +126,7 @@ class ChequeoDiario extends Component implements HasForms
 
     public function updateSelectedDate(): void
     {
-
         $this->dateSelected = Carbon::parse($this->tempDateSelected);
-
     }
 
     #[On('invalidItems')]
@@ -163,9 +184,9 @@ class ChequeoDiario extends Component implements HasForms
 
     public function resetState(): void
     {
+        $this->hojaId = null;
         $this->checkSheet = null;
         $this->form->fill();
-        $this->page = 1;
     }
 
     public function render(): View

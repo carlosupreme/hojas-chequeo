@@ -1,5 +1,5 @@
 <div class="bg-white dark:bg-gray-900 sm:px-4 py-5 rounded-lg px-2">
-    @if($page === 1)
+    @if(!$checkSheet)
         <livewire:select-hoja-chequeo />
     @else
         <button wire:click="resetState"
