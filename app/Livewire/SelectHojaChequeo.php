@@ -28,33 +28,28 @@ class SelectHojaChequeo extends Component
 
     public function render()
     {
-        $availableIds = \Auth::user()->perfil->hoja_ids;
+        $availableIds = auth()->user()->perfil->hoja_ids;
 
-        $query = HojaChequeo::with(['equipo:id,nombre,tag,area'])
-            ->whereActive(true)
-            ->whereIn('id', $availableIds);
-
-        if ($this->activeFilter) {
-            $query = $query->where('area', $this->activeFilter->value);
-        }
-
-        if (! empty($this->search)) {
-            $searchTerm = strtolower($this->search);
-            $query = $query->whereHas('equipo', function ($query) use ($searchTerm) {
-                $query->where(function ($subQuery) use ($searchTerm) {
-                    $subQuery->whereRaw('LOWER(nombre) LIKE ?', ["%{$searchTerm}%"])
-                        ->orWhereRaw('LOWER(tag) LIKE ?', ["%{$searchTerm}%"])
-                        ->orWhereRaw('LOWER(area) LIKE ?', ["%{$searchTerm}%"]);
-                });
-            });
-        }
-
-        $hojas = $query->select(['id', 'equipo_id', 'area', 'active'])
+        $hojas = HojaChequeo::with([
+            'equipo:id,nombre,tag,area,foto',
+            'latestChequeoDiario',
+        ])
+            ->select(['id', 'equipo_id', 'area', 'active'])
+            ->active()
+            ->whereIn('id', $availableIds)
+            ->when($this->activeFilter, fn ($q) => $q->where('area', $this->activeFilter->value))
+            ->when($this->search, function ($q) {
+                $term = strtolower($this->search);
+                $q->whereHas('equipo', fn ($q2) => $q2->where(function ($sub) use ($term) {
+                    $sub->whereRaw('LOWER(nombre) LIKE ?', ["%{$term}%"])
+                        ->orWhereRaw('LOWER(tag) LIKE ?', ["%{$term}%"])
+                        ->orWhereRaw('LOWER(area) LIKE ?', ["%{$term}%"]);
+                })
+                );
+            })
             ->limit(50)
             ->get();
 
-        return view('livewire.select-hoja-chequeo', [
-            'hojas' => $hojas,
-        ]);
+        return view('livewire.select-hoja-chequeo', ['hojas' => $hojas]);
     }
 }

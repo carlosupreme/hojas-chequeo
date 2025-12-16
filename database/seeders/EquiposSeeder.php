@@ -33,6 +33,7 @@ class EquiposSeeder extends Seeder
         $this->fca02();
         $this->cm02Hid01();
     }
+
     public function cm02Hid01(): void
     {
         $equipo = Equipo::create([
@@ -40,12 +41,12 @@ class EquiposSeeder extends Seeder
             'nombre' => 'HIDRONEUMATICO 1',
             'numeroControl' => '01',
             'revision' => 'NOM-020-STPS-2012',
-            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value,
         ]);
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
-            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value,
         ]);
 
         $items = [
@@ -55,9 +56,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'VISUAL',
                     'CRITERIO' => 'REVISAR QUE ESTE ENCENDIDO EL INTERRUPTOR DEL COMPRESOR DEL HIDRONEUMATICO',
-                    'QUIEN REALIZA' => 'OPERARIO'
+                    'QUIEN REALIZA' => 'OPERARIO',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -65,9 +66,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'VISUAL Y AUDITIVO',
                     'CRITERIO' => 'REVISAR QUE ESTE ENCENDIDO EL INTERRUPTOR DEL COMPRESOR DEL HIDRONEUMATICO',
-                    'QUIEN REALIZA' => 'OPERARIO'
+                    'QUIEN REALIZA' => 'OPERARIO',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -75,9 +76,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ CADA TURNO',
                     'METODO' => 'VISUAL',
                     'CRITERIO' => 'REALIZAR AL INICIO DEL TURNO',
-                    'QUIEN REALIZA' => 'OPERARIO'
+                    'QUIEN REALIZA' => 'OPERARIO',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -85,9 +86,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ CADA SEMANA',
                     'METODO' => 'VISUAL',
                     'CRITERIO' => 'CHECAR SI HAY FUGAS EN UNIONES',
-                    'QUIEN REALIZA' => 'OPERARIO'
+                    'QUIEN REALIZA' => 'OPERARIO',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -95,9 +96,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'VISUAL',
                     'CRITERIO' => 'VERIFICAR EL LLEANDO DE LA CISTERNA',
-                    'QUIEN REALIZA' => 'OPERARIO'
+                    'QUIEN REALIZA' => 'OPERARIO',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -105,9 +106,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => '',
                     'CRITERIO' => '60 PSI A 80 PSI',
-                    'QUIEN REALIZA' => 'OPERARIO'
+                    'QUIEN REALIZA' => 'OPERARIO',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -115,25 +116,24 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => '',
                     'CRITERIO' => '58 PSI',
-                    'QUIEN REALIZA' => 'OPERARIO'
+                    'QUIEN REALIZA' => 'OPERARIO',
                 ],
-                'categoria' => 'revision'
-            ]
+                'categoria' => 'revision',
+            ],
         ];
 
         foreach ($items as $item) {
-            $created =  Item::create([
+            $created = Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
-                'categoria' => $item['categoria']
+                'categoria' => $item['categoria'],
             ]);
-
 
             if ($item['items']['ITEM'] === 'PRESION DEL AIRE') {
                 Alerta::create([
                     'item_id' => $created->id,
                     'valor' => 58,
-                    'operador' => '>'
+                    'operador' => '>',
                 ]);
             }
 
@@ -141,7 +141,7 @@ class EquiposSeeder extends Seeder
                 Alerta::create([
                     'item_id' => $created->id,
                     'valor' => 80,
-                    'operador' => '>'
+                    'operador' => '>',
                 ]);
             }
 
@@ -151,6 +151,7 @@ class EquiposSeeder extends Seeder
             ]);
         }
     }
+
     public function fca02(): void
     {
         $equipo = Equipo::create([
@@ -158,12 +159,12 @@ class EquiposSeeder extends Seeder
             'nombre' => 'FILTRO CARBON ACTIVADO',
             'numeroControl' => '002',
             'revision' => 'N',
-            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value,
         ]);
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
-            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value,
         ]);
 
         $items = [
@@ -171,41 +172,41 @@ class EquiposSeeder extends Seeder
                 'items' => [
                     'ITEM' => 'ANALISIS DE CLORO RESIDUAL',
                     'NORMA' => 'ENTRADA',
-                    'FRECUENCIA' => '1 VEZ POR DIA'
+                    'FRECUENCIA' => '1 VEZ POR DIA',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM' => 'ANALISIS DE CLORO RESIDUAL',
                     'NORMA' => 'SALIDA',
-                    'FRECUENCIA' => '1 VEZ POR DIA'
+                    'FRECUENCIA' => '1 VEZ POR DIA',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM' => 'RETROLAVADO',
                     'NORMA' => 'CON CLORO>1 PPM',
-                    'FRECUENCIA' => 'CADA SEMANA'
+                    'FRECUENCIA' => 'CADA SEMANA',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
                     'ITEM' => 'LIMPIEZA GENERAL',
                     'NORMA' => 'LIMPIEZA PROFUNDA',
-                    'FRECUENCIA' => 'CADA DIA'
+                    'FRECUENCIA' => 'CADA DIA',
                 ],
-                'categoria' => 'limpieza'
-            ]
+                'categoria' => 'limpieza',
+            ],
         ];
 
         foreach ($items as $item) {
-            $created =  Item::create([
+            $created = Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
-                'categoria' => $item['categoria']
+                'categoria' => $item['categoria'],
             ]);
 
             Alerta::create([
@@ -214,6 +215,7 @@ class EquiposSeeder extends Seeder
             ]);
         }
     }
+
     public function fze03(): void
     {
         $equipo = Equipo::create([
@@ -221,12 +223,12 @@ class EquiposSeeder extends Seeder
             'nombre' => 'FILTRO DE ZEOLITA',
             'numeroControl' => '001',
             'revision' => 'N',
-            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value,
         ]);
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
-            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value,
         ]);
 
         $items = [
@@ -234,48 +236,48 @@ class EquiposSeeder extends Seeder
                 'items' => [
                     'ITEM' => 'TURBIDEZ',
                     'NORMA' => '<5 NTU',
-                    'FRECUENCIA' => '1 VEZ POR DIA'
+                    'FRECUENCIA' => '1 VEZ POR DIA',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM' => 'COLOR DE AGUA EN EL ROTAMETRO',
                     'NORMA' => 'CLARA',
-                    'FRECUENCIA' => '1 VEZ POR DIA'
+                    'FRECUENCIA' => '1 VEZ POR DIA',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM' => 'RETROLAVADO',
                     'NORMA' => 'CON TURBIDEZ > 5 NTU',
-                    'FRECUENCIA' => 'CADA SEMANA'
+                    'FRECUENCIA' => 'CADA SEMANA',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
                     'ITEM' => 'LIMPIEZA GENERAL',
                     'NORMA' => 'LIMPIEZA PROFUNDA',
-                    'FRECUENCIA' => 'CADA DIA'
+                    'FRECUENCIA' => 'CADA DIA',
                 ],
-                'categoria' => 'limpieza'
-            ]
+                'categoria' => 'limpieza',
+            ],
         ];
 
         foreach ($items as $item) {
-            $created =  Item::create([
+            $created = Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
-                'categoria' => $item['categoria']
+                'categoria' => $item['categoria'],
             ]);
 
             if ($item['items']['ITEM'] === 'TURBIDEZ') {
                 Alerta::create([
                     'item_id' => $created->id,
                     'valor' => 5,
-                    'operador' => '>'
+                    'operador' => '>',
                 ]);
             }
 
@@ -293,12 +295,12 @@ class EquiposSeeder extends Seeder
             'nombre' => 'TANQUE DE CONDENSADOS',
             'numeroControl' => '001',
             'revision' => 'N',
-            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value,
         ]);
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
-            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value,
         ]);
 
         $items = [
@@ -309,9 +311,9 @@ class EquiposSeeder extends Seeder
                     'METODO DE CHEQUEO' => 'VISUAL',
                     'CRITERIO DE DETERMINACION' => 'REVISION DE NIVEL EN MANGUERA',
                     'QUIEN REALIZA' => 'OPERARIO',
-                    'OBSERVACIONES' => 'PREVENIR EL VACIADO DEL TANQUE'
+                    'OBSERVACIONES' => 'PREVENIR EL VACIADO DEL TANQUE',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -320,9 +322,9 @@ class EquiposSeeder extends Seeder
                     'METODO DE CHEQUEO' => 'VISUAL',
                     'CRITERIO DE DETERMINACION' => 'REVISAR EL CERRADO DE LA LLAVE AL LLENAR TANQUE DE CONDENSADOS',
                     'QUIEN REALIZA' => 'OPERARIO',
-                    'OBSERVACIONES' => 'PREVENIR DERRAME POR SOBRELLENADO'
+                    'OBSERVACIONES' => 'PREVENIR DERRAME POR SOBRELLENADO',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -331,9 +333,9 @@ class EquiposSeeder extends Seeder
                     'METODO DE CHEQUEO' => 'VISUAL',
                     'CRITERIO DE DETERMINACION' => 'REVISAR LA APERTURA DE LAS VALVULAS QUE SUMINISTRAN AGUA A LA CALDERA',
                     'QUIEN REALIZA' => 'OPERARIO',
-                    'OBSERVACIONES' => 'VERIFICAR QUE LA CALDERA NO SE QUEDE SIN SUMINISTRO DE AGUA'
+                    'OBSERVACIONES' => 'VERIFICAR QUE LA CALDERA NO SE QUEDE SIN SUMINISTRO DE AGUA',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -342,9 +344,9 @@ class EquiposSeeder extends Seeder
                     'METODO DE CHEQUEO' => 'MANUAL',
                     'CRITERIO DE DETERMINACION' => '70 °C a 95°C',
                     'QUIEN REALIZA' => 'OPERARIO',
-                    'OBSERVACIONES' => ''
+                    'OBSERVACIONES' => '',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -353,9 +355,9 @@ class EquiposSeeder extends Seeder
                     'METODO DE CHEQUEO' => 'MANUAL',
                     'CRITERIO DE DETERMINACION' => 'A/M',
                     'QUIEN REALIZA' => 'OPERARIO',
-                    'OBSERVACIONES' => ''
+                    'OBSERVACIONES' => '',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -364,9 +366,9 @@ class EquiposSeeder extends Seeder
                     'METODO DE CHEQUEO' => 'MANUAL',
                     'CRITERIO DE DETERMINACION' => '0 PPM',
                     'QUIEN REALIZA' => 'OPERARIO',
-                    'OBSERVACIONES' => ''
+                    'OBSERVACIONES' => '',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -375,9 +377,9 @@ class EquiposSeeder extends Seeder
                     'METODO DE CHEQUEO' => 'VISUAL',
                     'CRITERIO DE DETERMINACION' => '',
                     'QUIEN REALIZA' => 'OPERARIO',
-                    'OBSERVACIONES' => ''
+                    'OBSERVACIONES' => '',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -386,9 +388,9 @@ class EquiposSeeder extends Seeder
                     'METODO DE CHEQUEO' => '',
                     'CRITERIO DE DETERMINACION' => '',
                     'QUIEN REALIZA' => '',
-                    'OBSERVACIONES' => ''
+                    'OBSERVACIONES' => '',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -397,28 +399,29 @@ class EquiposSeeder extends Seeder
                     'METODO DE CHEQUEO' => '',
                     'CRITERIO DE DETERMINACION' => '',
                     'QUIEN REALIZA' => '',
-                    'OBSERVACIONES' => ''
+                    'OBSERVACIONES' => '',
                 ],
-                'categoria' => 'limpieza'
-            ]
+                'categoria' => 'limpieza',
+            ],
         ];
 
         foreach ($items as $item) {
-            $created =  Item::create([
+            $created = Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
-                'categoria' => $item['categoria']
+                'categoria' => $item['categoria'],
             ]);
 
             if ($item['items']['ITEM DE CHEQUEO'] === 'TEMPERATURA INTERIOR') {
                 Alerta::create([
                     'item_id' => $created->id,
                     'valor' => 95,
-                    'operador' => '>'
+                    'operador' => '>',
                 ]);
             }
         }
     }
+
     public function cmCom01(): void
     {
         $equipo = Equipo::create([
@@ -426,12 +429,12 @@ class EquiposSeeder extends Seeder
             'nombre' => 'COMPRESOR -01',
             'numeroControl' => 'AC-ES-248-RSP-012-2024',
             'revision' => 'NOM-020-STPS-2011',
-            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value,
         ]);
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
-            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value,
         ]);
 
         $items = [
@@ -440,107 +443,107 @@ class EquiposSeeder extends Seeder
                     'ITEM DE CHEQUEO' => 'PURGA DE FONDO',
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
                     'CRITERIO DE DETERMINACION' => 'APERTURA DE VALVULA',
-                    'OBSERVACIONES' => ''
+                    'OBSERVACIONES' => '',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
                     'ITEM DE CHEQUEO' => 'DISPARO VALVULA DE SEGURIDAD',
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
                     'CRITERIO DE DETERMINACION' => 'ACCIONAMIENTO DE VALVULA MODO MANUAL',
-                    'OBSERVACIONES' => ''
+                    'OBSERVACIONES' => '',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
                     'ITEM DE CHEQUEO' => 'ENCENDIDO DE INTERRUPTOR PRINCIPAL',
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'CRITERIO DE DETERMINACION' => 'REVISAR QUE ESTE ENCENDIDO EL INTERRUPTOR DEL COMPRESOR AL INICIAR TURNO',
-                    'OBSERVACIONES' => 'PASTILLA TERMOMAGNETICA EN BUEN ESTADO DEL TABLERO' // Changes here
+                    'OBSERVACIONES' => 'PASTILLA TERMOMAGNETICA EN BUEN ESTADO DEL TABLERO', // Changes here
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
                     'ITEM DE CHEQUEO' => 'ENCENDIDO DE INTERRUPTOR SECUNDARIO',
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'CRITERIO DE DETERMINACION' => 'REVISAR QUE ESTE ENCENDIDO EL INTERRUPTOR DEL COMPRESOR AL INICIAR TURNO',
-                    'OBSERVACIONES' => 'COLA DE RATA EN BUEN ESTADO' // Changes here
+                    'OBSERVACIONES' => 'COLA DE RATA EN BUEN ESTADO', // Changes here
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
                     'ITEM DE CHEQUEO' => 'TEMPERATURA DE PARTES A PRESIÓN',
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
                     'CRITERIO DE DETERMINACION' => '70°C A 140°C',
-                    'OBSERVACIONES' => ''
+                    'OBSERVACIONES' => '',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM DE CHEQUEO' => 'PRESIÓN MANOMETRICA',
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
                     'CRITERIO DE DETERMINACION' => '7 KG A 9 KG',  // Changes here
-                    'OBSERVACIONES' => ''
+                    'OBSERVACIONES' => '',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM DE CHEQUEO' => 'FUNCIONAMIENTO DE VALVULA DE ALIVIO',
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'CRITERIO DE DETERMINACION' => 'LIBERACION DE PRESION AL LLEGAR A LA PRESION DE TRABAJO',
-                    'OBSERVACIONES' => 'REVISAR CALIBRACION ADECUADA' // Changes here
+                    'OBSERVACIONES' => 'REVISAR CALIBRACION ADECUADA', // Changes here
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM DE CHEQUEO' => 'REVISION DE BANDAS',
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'CRITERIO DE DETERMINACION' => 'VERIFICAR EL DESGASTE Y POSICION',
-                    'OBSERVACIONES' => 'TENSION DE LA BANDA' // Changes here
+                    'OBSERVACIONES' => 'TENSION DE LA BANDA', // Changes here
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM DE CHEQUEO' => 'REVISION FILTRO DE AIRE',
                     'FRECUENCIA' => '1 VEZ POR SEMANA',
                     'CRITERIO DE DETERMINACION' => 'VERIFICAR LA SUCIEDAD DEL FILTRO',
-                    'OBSERVACIONES' => 'LIMPIAR EN CONTRA DEL SENTIDO'  // Changes here
+                    'OBSERVACIONES' => 'LIMPIAR EN CONTRA DEL SENTIDO',  // Changes here
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM DE CHEQUEO' => 'REVISIÓN NIVEL DE ACEITE',
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'CRITERIO DE DETERMINACION' => 'REVISAR QUE EL NIVEL DEL ACEITE ESTE A 3/4 DE SU CAPACIDAD',
-                    'OBSERVACIONES' => 'LUBRICACION DE LOS MECANISMOS' // Changes here
+                    'OBSERVACIONES' => 'LUBRICACION DE LOS MECANISMOS', // Changes here
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM DE CHEQUEO' => 'LIMPIEZA EXTERIOR DE EQUIPO',
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'CRITERIO DE DETERMINACION' => 'LIBERACION DE PRESION AL LLEGAR A LA PRESION DE TRABAJO',
-                    'OBSERVACIONES' => 'EXCESO DE PELUSA Y GRASA'  // Changes here
+                    'OBSERVACIONES' => 'EXCESO DE PELUSA Y GRASA',  // Changes here
                 ],
-                'categoria' => 'limpieza'
-            ]
+                'categoria' => 'limpieza',
+            ],
         ];
 
         foreach ($items as $item) {
-            $created =  Item::create([
+            $created = Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
-                'categoria' => $item['categoria']
+                'categoria' => $item['categoria'],
             ]);
 
             Alerta::create([
@@ -553,19 +556,19 @@ class EquiposSeeder extends Seeder
     public function cmCal($tag)
     {
         $equipo = Equipo::create([
-            'tag' => 'CM-CAL-0' . $tag,
-            'nombre' => 'CALDERA ' . $tag,
+            'tag' => 'CM-CAL-0'.$tag,
+            'nombre' => 'CALDERA '.$tag,
             'area' => 'CUARTO DE MAQUINAS',
             'foto' => null,
             'numeroControl' => 'AC-ES-248-GV-391-2024',
-            'revision' => 'NOM-020-STPS-2011'
+            'revision' => 'NOM-020-STPS-2011',
         ]);
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
             'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value,
             'version' => 1,
-            'observaciones' => null
+            'observaciones' => null,
         ]);
 
         $items = [
@@ -573,178 +576,178 @@ class EquiposSeeder extends Seeder
                 'items' => [
                     'ITEM' => 'LIMPIEZA EXTERIOR DE EQUIPO',
                     'CRITERIO' => 'REALIZARLO LOS LUNES DESPUES DEL APAGADO DE LA CALDERA',
-                    'FRECUENCIA' => '1 VEZ POR QUINCENA'
+                    'FRECUENCIA' => '1 VEZ POR QUINCENA',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
                     'ITEM' => 'LIMPIEZA DEL CRISTAL DEL NIVEL DEL AGUA',
                     'CRITERIO' => 'REALIZAR DURANTE LAS PURGAS',
-                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
                     'ITEM' => 'COLOR DE HUMOS A LA SALIDA DE LA CHIMENEA',
                     'CRITERIO' => 'TRANSPARENTE',
-                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
                     'ITEM' => 'PURGAS DE COLUMNA DE CRISTAL DE NIVEL Y GRIFOS DE LA COLUMNA',
                     'CRITERIO' => 'SI O NO',  // Changes here
-                    'FRECUENCIA' => '2 VECES POR TURNO'
+                    'FRECUENCIA' => '2 VECES POR TURNO',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
                     'ITEM' => 'PURGA DE VALVULA DE PRUEBA',
                     'CRITERIO' => 'SI O NO',  // Changes here
-                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
                     'ITEM' => 'PURGA DE FONDO',
                     'CRITERIO' => 'HORA',
-                    'FRECUENCIA' => '2 VECES POR TURNO'
+                    'FRECUENCIA' => '2 VECES POR TURNO',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
                     'ITEM' => 'CONTROL DE PRESIÓN',
                     'CRITERIO' => '5,2 KG',
-                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
                     'ITEM' => 'DISPARO DE VALVULA DE SEGURIDAD',
                     'CRITERIO' => 'ACCIONAMIENTO DE VALVULA MODO MANUAL',  // Changes here
-                    'FRECUENCIA' => '1 VEZ AL MES'
+                    'FRECUENCIA' => '1 VEZ AL MES',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
                     'ITEM' => 'ALARMA DE NIVEL',
                     'CRITERIO' => 'ENCENDIDO Y APAGADO DEL QUEMADOR',
-                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
                     'ITEM' => 'DESINCRUSTANTE',
                     'CRITERIO' => 'DESPUES DE LA PURGA 5 LT HORA',
-                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
                     'ITEM' => 'TEMPERATURA TERMOMETRO CHIMENEA',
                     'CRITERIO' => '200°C A 270°C',
-                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM' => 'TEMPERATURAS DE LAS PARTES A PRESIÓN',
                     'CRITERIO' => '140°C A 160°C',
-                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM' => 'PRESIÓN DE VAPOR',
                     'CRITERIO' => '4.2 A 5.2 KG/CM2',
-                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM' => 'PRESION DEL COMBUSTIBLE',
                     'CRITERIO' => null,
-                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM' => 'TEMPERATURA ENTRADA DE AGUA',
                     'CRITERIO' => '80°C A 90°C',
-                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM' => 'FUNCIONAMIENTO DE LA BOMBA',
                     'CRITERIO' => 'QUE ENCIENDA Y APAGUE AUTOMATICAMENTE',  // Changes here
-                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM' => 'FUNCIONAMIENTO DEL QUEMADOR',
                     'CRITERIO' => 'ENCENDIDO Y APAGADO EN MIRILLA',
-                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM' => 'SUMINISTRO DE AGUA',
                     'CRITERIO' => 'REVISAR NIVEL EN MANGUERA',
-                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO'
+                    'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
                 ],
-                'categoria' => 'revision'
-            ]
+                'categoria' => 'revision',
+            ],
         ];
 
         foreach ($items as $item) {
             $created = Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
-                'categoria' => $item['categoria']
+                'categoria' => $item['categoria'],
             ]);
 
             if ($item['items']['ITEM'] === 'TEMPERATURA TERMOMETRO CHIMENEA') {
                 Alerta::create([
                     'item_id' => $created->id,
                     'valor' => 270,
-                    'operador' => '>'
+                    'operador' => '>',
                 ]);
             } elseif ($item['items']['ITEM'] === 'TEMPERATURAS DE LAS PARTES A PRESIÓN') {
                 Alerta::create([
                     'item_id' => $created->id,
                     'valor' => 160,
-                    'operador' => '>'
+                    'operador' => '>',
                 ]);
             } elseif ($item['items']['ITEM'] === 'PRESIÓN DE VAPOR') {
                 Alerta::create([
                     'item_id' => $created->id,
                     'valor' => 5.2,
-                    'operador' => '>'
+                    'operador' => '>',
                 ]);
             } elseif ($item['items']['ITEM'] === 'TEMPERATURA ENTRADA DE AGUA') {
                 Alerta::create([
                     'item_id' => $created->id,
                     'valor' => 90,
-                    'operador' => '>'
+                    'operador' => '>',
                 ]);
             }
 
@@ -762,9 +765,8 @@ class EquiposSeeder extends Seeder
 
         $area = HOJACHEQUEOAREA::LAVANDERIA_INSTITUCIONAL->value;
 
-
         $this->tombolas($area);
-        $this->crearLavadoraLavanderia("LA-UNI-01", "UNIMAC 01");
+        $this->crearLavadoraLavanderia('LA-UNI-01', 'UNIMAC 01');
         $this->crearLavadoraLavanderia('LA02-UNI-01', 'UNIMAC 01 2');
         $this->crearLavadoraLavanderia('LA-PRI-01', 'PRIMUS 1');
         $this->crearLavadoraLavanderia('LA02-PRI-01', 'PRIMUS 1 2');
@@ -817,21 +819,22 @@ class EquiposSeeder extends Seeder
     public function crearLavadoraTintoreria($tag, $nombre)
     {
         $equipo = Equipo::where('tag', $tag)->first();
-        if (!$equipo)
+        if (! $equipo) {
             $equipo = Equipo::create([
                 'tag' => strtoupper($tag),  // Changes here
                 'nombre' => strtoupper($nombre),  // Changes here
                 'area' => 'LAVADO EN AGUA',
                 'foto' => null,
                 'numeroControl' => '001',
-                'revision' => 'N'
+                'revision' => 'N',
             ]);
+        }
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
             'area' => HOJACHEQUEOAREA::TINTORERIA->value,
             'version' => 1,
-            'observaciones' => "<ul><li>DESCARGUE LA MAQUINA RAPIDAMENTE DESPUES DE CADA CICLO COMPLETADO PARA EVITAR LA ACUMULACION DE HUMEDAD.</li><li>DEJE LA PUERTA DE CARGA ABIERTA DESPUES DE CADA CICLO PARA PERMITIR QUE LA HUMEDAD SE EVAPORE.</li><li>CERRAR LAS VALVULAS PRINCIPALES DE AGUA, VAPOR  AL FINAL DE LA JORNADA ASI COMO TAMBIEN DESENERGIZAR EL EQUIPO.</li><li>EN LA OPCION DEL BLOQUEO DE PUERTA SE REALIZARA LOS SIGUIENTES PASOS:</li><ol><li>Intentar correr un programa  con la puerta abierta  (no debe funcionar).</li><li>Cierre la puerta y arranque la maquina después intente abrir la puerta mientras el ciclo esta en proceso (no debe de abrir).</li></ol></ul>"
+            'observaciones' => '<ul><li>DESCARGUE LA MAQUINA RAPIDAMENTE DESPUES DE CADA CICLO COMPLETADO PARA EVITAR LA ACUMULACION DE HUMEDAD.</li><li>DEJE LA PUERTA DE CARGA ABIERTA DESPUES DE CADA CICLO PARA PERMITIR QUE LA HUMEDAD SE EVAPORE.</li><li>CERRAR LAS VALVULAS PRINCIPALES DE AGUA, VAPOR  AL FINAL DE LA JORNADA ASI COMO TAMBIEN DESENERGIZAR EL EQUIPO.</li><li>EN LA OPCION DEL BLOQUEO DE PUERTA SE REALIZARA LOS SIGUIENTES PASOS:</li><ol><li>Intentar correr un programa  con la puerta abierta  (no debe funcionar).</li><li>Cierre la puerta y arranque la maquina después intente abrir la puerta mientras el ciclo esta en proceso (no debe de abrir).</li></ol></ul>',
         ]);
 
         $items = [
@@ -841,9 +844,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL INICIO DEL TURNO',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'EXCESO DE POLVO Y RESPECTIVO AISLANTE',
-                    'OBSERVACIONES' => 'LIMPIEZA DE TUBERIA PARA EVITAR POLVO Y/O PELUSA'
+                    'OBSERVACIONES' => 'LIMPIEZA DE TUBERIA PARA EVITAR POLVO Y/O PELUSA',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -851,9 +854,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL INICIO DEL TURNO',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'EXCESO DE POLVO Y RESPECTIVO AISLANTE',
-                    'OBSERVACIONES' => 'QUE NO TENGA SUCIEDAD EL GABINETE, LA JUNTA DE LA PUERTA Y RETIRAR LOS RESIDUOS DE DETERGENTE DEL DEPOSITO DE JABON'
+                    'OBSERVACIONES' => 'QUE NO TENGA SUCIEDAD EL GABINETE, LA JUNTA DE LA PUERTA Y RETIRAR LOS RESIDUOS DE DETERGENTE DEL DEPOSITO DE JABON',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -861,9 +864,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL INICIO DEL TURNO',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'SIN POLVO Y SIN GRASA',
-                    'OBSERVACIONES' => 'REVISAR QUE EL CABLE ELECTRICO QUE ESTE BIEN SUJETADO Y QUITAR POLVO O PELUSA DE LA TAPA.'
+                    'OBSERVACIONES' => 'REVISAR QUE EL CABLE ELECTRICO QUE ESTE BIEN SUJETADO Y QUITAR POLVO O PELUSA DE LA TAPA.',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -871,9 +874,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL INICIO DEL TURNO',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'QUE NO TENGA POLVO O GRASA Y OBJETOS AJENOS AL LUGAR.',
-                    'OBSERVACIONES' => 'NO DEBE HABER GRASA EN PISO Y/O OBJETOS EXTRAÑOS AL LUGAR'
+                    'OBSERVACIONES' => 'NO DEBE HABER GRASA EN PISO Y/O OBJETOS EXTRAÑOS AL LUGAR',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -881,9 +884,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL INICIO DEL TURNO',
                     'METODO' => 'VISUAL',
                     'CRITERIO' => 'VERIFICAR QUE SE CUENTE  CON LOS SERVICIOS',
-                    'OBSERVACIONES' => 'AL INICIO DE LA JORNADA ABRIR VALVULAS HACIA EL EQUIPO ASI COMO ENERGIZARLO. CERRAR VALVULAS Y DESENERGIZAR EL EQUIPO AL FINALIZAR LA JORNADA LABORAL'
+                    'OBSERVACIONES' => 'AL INICIO DE LA JORNADA ABRIR VALVULAS HACIA EL EQUIPO ASI COMO ENERGIZARLO. CERRAR VALVULAS Y DESENERGIZAR EL EQUIPO AL FINALIZAR LA JORNADA LABORAL',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -891,9 +894,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL INICIO DEL TURNO',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'AL INICIAR LA JORNADA VERIFICAR QUE ESTE ENERGIZADO',
-                    'OBSERVACIONES' => 'QUE ESTE EN MODO ENCENDIDO Y QUE EL DISPLAY ESTE ENCENDIDO'
+                    'OBSERVACIONES' => 'QUE ESTE EN MODO ENCENDIDO Y QUE EL DISPLAY ESTE ENCENDIDO',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -901,9 +904,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL INICIO Y DURANTE EL TURNO',
                     'METODO' => 'REVISAR FISICAMENTE',
                     'CRITERIO' => 'QUE NO GOTEEN LAS TUBERIAS',
-                    'OBSERVACIONES' => 'GENERA ENCHARCAMIENTO DE AGUA Y DAÑA TUBERIAS'
+                    'OBSERVACIONES' => 'GENERA ENCHARCAMIENTO DE AGUA Y DAÑA TUBERIAS',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -911,9 +914,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL INICIO Y DURANTE EL TURNO',
                     'METODO' => 'REVISAR FISICAMENTE',
                     'CRITERIO' => 'FUGAS DE VAPOR EN CONEXIONES',
-                    'OBSERVACIONES' => 'NO DEBEN EXISTIR FUGAS EN LAS CONEXIONES'
+                    'OBSERVACIONES' => 'NO DEBEN EXISTIR FUGAS EN LAS CONEXIONES',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -921,9 +924,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL INICIO DEL TURNO',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'AL INICIAR LA JORNADA ABRIR LENTAMENTE LA VALVULA HASTA QUE SALGA VAPOR Y DESPUES CERRARLA.',
-                    'OBSERVACIONES' => 'EVITAR CONDENSADOS DENTRO DEL EQUIPO Y TUBERIAS.'
+                    'OBSERVACIONES' => 'EVITAR CONDENSADOS DENTRO DEL EQUIPO Y TUBERIAS.',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -931,9 +934,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'REVISAR FISICAMENTE',
                     'CRITERIO' => 'FUNCIONAMIENTO OPTIMO',
-                    'OBSERVACIONES' => 'QUE GIRE LA CANASTA ADECUADAMENTE Y QUE NO EXISTA RUIDOS EXTRAÑOS'
+                    'OBSERVACIONES' => 'QUE GIRE LA CANASTA ADECUADAMENTE Y QUE NO EXISTA RUIDOS EXTRAÑOS',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -941,9 +944,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'REVISAR FISICAMENTE',
                     'CRITERIO' => 'CERRADURA Y ENCLAVAMIENTO DE LA PUERTA',
-                    'OBSERVACIONES' => 'QUE CIERRE ADECUADAMENTE EN CUALQUIERA DE SUS ACTIVIDADES (VER NOTAS)'
+                    'OBSERVACIONES' => 'QUE CIERRE ADECUADAMENTE EN CUALQUIERA DE SUS ACTIVIDADES (VER NOTAS)',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -951,9 +954,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL FINAL DEL TURNO',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'ANOTAR LAS HORAS TRABAJADAS',
-                    'OBSERVACIONES' => 'AL FINAL DE LA JORNADA ANOTAR SUS HORAS'
+                    'OBSERVACIONES' => 'AL FINAL DE LA JORNADA ANOTAR SUS HORAS',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -961,17 +964,17 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'REVISAR VISUALMENTE',
                     'CRITERIO' => 'QUE GIRE LA CANASTA',
-                    'OBSERVACIONES' => 'CUANDO COLOQUE LA CARGA SE CERCIORE QUE LA CANASTA GIRE'
+                    'OBSERVACIONES' => 'CUANDO COLOQUE LA CARGA SE CERCIORE QUE LA CANASTA GIRE',
                 ],
-                'categoria' => 'operacion'
-            ]
+                'categoria' => 'operacion',
+            ],
         ];
 
         foreach ($items as $item) {
-            $created =  Item::create([
+            $created = Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
-                'categoria' => $item['categoria']
+                'categoria' => $item['categoria'],
             ]);
 
             Alerta::create([
@@ -981,27 +984,26 @@ class EquiposSeeder extends Seeder
         }
     }
 
-
     public function crearLavadoraLavanderia($tag, $nombre)
     {
         $equipo = Equipo::where('tag', $tag)->first();
-        if (!$equipo)
+        if (! $equipo) {
             $equipo = Equipo::create([
                 'tag' => strtoupper($tag),  // Changes here
                 'nombre' => strtoupper($nombre),  // Changes here
                 'area' => 'LAVANDERIA',
                 'foto' => null,
                 'numeroControl' => '001',
-                'revision' => 'N'
+                'revision' => 'N',
             ]);
+        }
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
             'area' => HOJACHEQUEOAREA::LAVANDERIA_INSTITUCIONAL->value,
             'version' => 1,
-            'observaciones' => "<ul><li>DESCARGUE LA MAQUINA RAPIDAMENTE DESPUES DE CADA CICLO COMPLETADO PARA EVITAR LA ACUMULACION DE HUMEDAD.</li><li>DEJE LA PUERTA DE CARGA ABIERTA DESPUES DE CADA CICLO PARA PERMITIR QUE LA HUMEDAD SE EVAPORE.</li><li>CERRAR LAS VALVULAS PRINCIPALES DE AGUA, VAPOR  AL FINAL DE LA JORNADA ASI COMO TAMBIEN DESENERGIZAR EL EQUIPO.</li><li>EN LA OPCION DEL BLOQUEO DE PUERTA SE REALIZARA LOS SIGUIENTES PASOS:</li><ol><li>Intentar correr un programa  con la puerta abierta  (no debe funcionar).</li><li>Cierre la puerta y arranque la maquina después intente abrir la puerta mientras el ciclo esta en proceso (no debe de abrir).</li></ol></ul>"
+            'observaciones' => '<ul><li>DESCARGUE LA MAQUINA RAPIDAMENTE DESPUES DE CADA CICLO COMPLETADO PARA EVITAR LA ACUMULACION DE HUMEDAD.</li><li>DEJE LA PUERTA DE CARGA ABIERTA DESPUES DE CADA CICLO PARA PERMITIR QUE LA HUMEDAD SE EVAPORE.</li><li>CERRAR LAS VALVULAS PRINCIPALES DE AGUA, VAPOR  AL FINAL DE LA JORNADA ASI COMO TAMBIEN DESENERGIZAR EL EQUIPO.</li><li>EN LA OPCION DEL BLOQUEO DE PUERTA SE REALIZARA LOS SIGUIENTES PASOS:</li><ol><li>Intentar correr un programa  con la puerta abierta  (no debe funcionar).</li><li>Cierre la puerta y arranque la maquina después intente abrir la puerta mientras el ciclo esta en proceso (no debe de abrir).</li></ol></ul>',
         ]);
-
 
         $items = [
             [
@@ -1010,9 +1012,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL INICIO DEL TURNO',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'EXCESO DE POLVO Y RESPECTIVO AISLANTE',
-                    'OBSERVACIONES' => 'LIMPIEZA DE TUBERIA PARA EVITAR POLVO Y/O PELUSA'
+                    'OBSERVACIONES' => 'LIMPIEZA DE TUBERIA PARA EVITAR POLVO Y/O PELUSA',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -1020,9 +1022,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL INICIO DEL TURNO',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'EXCESO DE POLVO Y RESPECTIVO AISLANTE',
-                    'OBSERVACIONES' => 'QUE NO TENGA SUCIEDAD EL GABINETE, LA JUNTA DE LA PUERTA Y RETIRAR LOS RESIDUOS DE DETERGENTE DEL DEPOSITO DE JABON'
+                    'OBSERVACIONES' => 'QUE NO TENGA SUCIEDAD EL GABINETE, LA JUNTA DE LA PUERTA Y RETIRAR LOS RESIDUOS DE DETERGENTE DEL DEPOSITO DE JABON',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -1030,9 +1032,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL INICIO DEL TURNO',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'SIN POLVO Y SIN GRASA',
-                    'OBSERVACIONES' => 'REVISAR QUE EL CABLE ELECTRICO QUE ESTE BIEN SUJETADO Y QUITAR POLVO O PELUSA DE LA TAPA.'
+                    'OBSERVACIONES' => 'REVISAR QUE EL CABLE ELECTRICO QUE ESTE BIEN SUJETADO Y QUITAR POLVO O PELUSA DE LA TAPA.',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -1040,9 +1042,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL INICIO DEL TURNO',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'QUE NO TENGA POLVO O GRASA Y OBJETOS AJENOS AL LUGAR.',
-                    'OBSERVACIONES' => 'NO DEBE HABER GRASA EN PISO Y/O OBJETOS EXTRAÑOS AL LUGAR'
+                    'OBSERVACIONES' => 'NO DEBE HABER GRASA EN PISO Y/O OBJETOS EXTRAÑOS AL LUGAR',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -1050,9 +1052,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL INICIO DEL TURNO',
                     'METODO' => 'VISUAL',
                     'CRITERIO' => 'VERIFICAR QUE SE CUENTE  CON LOS SERVICIOS',
-                    'OBSERVACIONES' => 'AL INICIO DE LA JORNADA ABRIR VALVULAS HACIA EL EQUIPO ASI COMO ENERGIZARLO. CERRAR VALVULAS Y DESENERGIZAR EL EQUIPO AL FINALIZAR LA JORNADA LABORAL'
+                    'OBSERVACIONES' => 'AL INICIO DE LA JORNADA ABRIR VALVULAS HACIA EL EQUIPO ASI COMO ENERGIZARLO. CERRAR VALVULAS Y DESENERGIZAR EL EQUIPO AL FINALIZAR LA JORNADA LABORAL',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -1060,9 +1062,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL INICIO DEL TURNO',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'AL INICIAR LA JORNADA VERIFICAR QUE ESTE ENERGIZADO',
-                    'OBSERVACIONES' => 'QUE ESTE EN MODO ENCENDIDO Y QUE EL DISPLAY ESTE ENCENDIDO'
+                    'OBSERVACIONES' => 'QUE ESTE EN MODO ENCENDIDO Y QUE EL DISPLAY ESTE ENCENDIDO',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -1070,9 +1072,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL INICIO Y DURANTE EL TURNO',
                     'METODO' => 'REVISAR FISICAMENTE',
                     'CRITERIO' => 'QUE NO GOTEEN LAS TUBERIAS',
-                    'OBSERVACIONES' => 'GENERA ENCHARCAMIENTO DE AGUA Y DAÑA TUBERIAS'
+                    'OBSERVACIONES' => 'GENERA ENCHARCAMIENTO DE AGUA Y DAÑA TUBERIAS',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -1080,9 +1082,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL INICIO Y DURANTE EL TURNO',
                     'METODO' => 'REVISAR FISICAMENTE',
                     'CRITERIO' => 'FUGAS DE VAPOR EN CONEXIONES',
-                    'OBSERVACIONES' => 'NO DEBEN EXISTIR FUGAS EN LAS CONEXIONES'
+                    'OBSERVACIONES' => 'NO DEBEN EXISTIR FUGAS EN LAS CONEXIONES',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -1090,9 +1092,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL INICIO DEL TURNO',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'AL INICIAR LA JORNADA ABRIR LENTAMENTE LA VALVULA HASTA QUE SALGA VAPOR Y DESPUES CERRARLA.',
-                    'OBSERVACIONES' => 'EVITAR CONDENSADOS DENTRO DEL EQUIPO Y TUBERIAS.'
+                    'OBSERVACIONES' => 'EVITAR CONDENSADOS DENTRO DEL EQUIPO Y TUBERIAS.',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -1100,9 +1102,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'REVISAR FISICAMENTE',
                     'CRITERIO' => 'FUNCIONAMIENTO OPTIMO',
-                    'OBSERVACIONES' => 'QUE GIRE LA CANASTA ADECUADAMENTE Y QUE NO EXISTA RUIDOS EXTRAÑOS'
+                    'OBSERVACIONES' => 'QUE GIRE LA CANASTA ADECUADAMENTE Y QUE NO EXISTA RUIDOS EXTRAÑOS',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -1110,9 +1112,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'REVISAR FISICAMENTE',
                     'CRITERIO' => 'CERRADURA Y ENCLAVAMIENTO DE LA PUERTA',
-                    'OBSERVACIONES' => 'QUE CIERRE ADECUADAMENTE EN CUALQUIERA DE SUS ACTIVIDADES (VER NOTAS)'
+                    'OBSERVACIONES' => 'QUE CIERRE ADECUADAMENTE EN CUALQUIERA DE SUS ACTIVIDADES (VER NOTAS)',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -1120,9 +1122,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL INICIO Y FINAL DE TURNO',
                     'METODO' => 'REVISAR FISICAMENTE',
                     'CRITERIO' => 'AL INICIO: ENCENDER DOSIFICADOR Y ABRIR LA VALVULA DE PASO DE AGUA AL FINAL: CERRAR VALVULA Y APAGAR DOSIFICADOR',
-                    'OBSERVACIONES' => 'EVITAR FUGAS DE AGUA'
+                    'OBSERVACIONES' => 'EVITAR FUGAS DE AGUA',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -1130,9 +1132,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'REVISAR FISICAMENTE',
                     'CRITERIO' => 'REVISAR QUE LOS BIDONES TENGAN PRODUCTO',
-                    'OBSERVACIONES' => 'EVITAR PAROS DE PRODUCCIÒN'
+                    'OBSERVACIONES' => 'EVITAR PAROS DE PRODUCCIÒN',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -1140,9 +1142,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL FINAL DEL TURNO',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'ANOTAR LAS HORAS TRABAJADAS',
-                    'OBSERVACIONES' => 'AL FINAL DE LA JORNADA ANOTAR SUS HORAS'
+                    'OBSERVACIONES' => 'AL FINAL DE LA JORNADA ANOTAR SUS HORAS',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -1150,17 +1152,17 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'REVISAR VISUALMENTE',
                     'CRITERIO' => 'QUE GIRE LA CANASTA',
-                    'OBSERVACIONES' => 'CUANDO COLOQUE LA CARGA SE CERCIORE QUE LA CANASTA GIRE'
+                    'OBSERVACIONES' => 'CUANDO COLOQUE LA CARGA SE CERCIORE QUE LA CANASTA GIRE',
                 ],
-                'categoria' => 'operacion'
-            ]
+                'categoria' => 'operacion',
+            ],
         ];
 
         foreach ($items as $item) {
-            $created =  Item::create([
+            $created = Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
-                'categoria' => $item['categoria']
+                'categoria' => $item['categoria'],
             ]);
 
             Alerta::create([
@@ -1173,21 +1175,22 @@ class EquiposSeeder extends Seeder
     public function crearSecadora($tag, $nombre, $hojaArea)
     {
         $equipo = Equipo::where('tag', $tag)->first();
-        if (!$equipo)
+        if (! $equipo) {
             $equipo = Equipo::create([
                 'tag' => strtoupper($tag),  // Changes here
                 'nombre' => strtoupper($nombre),  // Changes here
                 'area' => 'LAVADO EN AGUA',
                 'foto' => null,
                 'numeroControl' => '009',
-                'revision' => 'N'
+                'revision' => 'N',
             ]);
+        }
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
             'area' => $hojaArea,
             'version' => 1,
-            'observaciones' => null
+            'observaciones' => null,
         ]);
 
         $items = [
@@ -1197,9 +1200,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ AL INICIO DEL TURNO (CUANDO SE REQUIERA)',
                     'METODO' => null,
                     'CRITERIO' => 'FUNCIONAMIENTO OPTIMO',
-                    'OBSERVACIONES' => null
+                    'OBSERVACIONES' => null,
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -1207,9 +1210,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ AL INICIO DE TURNO',
                     'METODO' => null,
                     'CRITERIO' => 'RUIDO EXTRAÑO',
-                    'OBSERVACIONES' => null
+                    'OBSERVACIONES' => null,
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -1217,9 +1220,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => null,
                     'CRITERIO' => 'SIN DAÑO',
-                    'OBSERVACIONES' => null
+                    'OBSERVACIONES' => null,
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -1227,9 +1230,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL FINAL DEL DIA',
                     'METODO' => null,
                     'CRITERIO' => 'TOTALES',
-                    'OBSERVACIONES' => null
+                    'OBSERVACIONES' => null,
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -1237,9 +1240,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL INICIO DEL TURNO',
                     'METODO' => 'REVISAR FISICAMENTE',
                     'CRITERIO' => 'QUE NO GOTEEN LAS TUBERIAS',
-                    'OBSERVACIONES' => 'GENERA ENCHARCAMIENTO DE AGUA Y DAÑA TUBERIAS'
+                    'OBSERVACIONES' => 'GENERA ENCHARCAMIENTO DE AGUA Y DAÑA TUBERIAS',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -1247,9 +1250,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'QUE NO TENGA POLVO O GRASA',
-                    'OBSERVACIONES' => 'NO DEBE HABER GRASA EN PISO'
+                    'OBSERVACIONES' => 'NO DEBE HABER GRASA EN PISO',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -1257,9 +1260,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'QUE NO TENGA POLVO',
-                    'OBSERVACIONES' => 'QUITAR EL EXCESO DE PELUSA PARA EL MEJOR FUNCIONAMIENTO DEL EQUIPO'
+                    'OBSERVACIONES' => 'QUITAR EL EXCESO DE PELUSA PARA EL MEJOR FUNCIONAMIENTO DEL EQUIPO',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -1267,9 +1270,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'VISUAL',
                     'CRITERIO' => 'EXCESO DE POLVO',
-                    'OBSERVACIONES' => 'NO DEBE EXISTIR FUGAS'
+                    'OBSERVACIONES' => 'NO DEBE EXISTIR FUGAS',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -1277,9 +1280,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR SEMANA',
                     'METODO' => 'LIMPIEZA MANUAL',
                     'CRITERIO' => 'SIN POLVO Y SIN GRASA',
-                    'OBSERVACIONES' => 'QUITAR EXCESO DE POLVO, GRASA U OTRO MATERIAL QUE AFECTE AL FUNCIONAMIENTO DEL EQUIPO.'
+                    'OBSERVACIONES' => 'QUITAR EXCESO DE POLVO, GRASA U OTRO MATERIAL QUE AFECTE AL FUNCIONAMIENTO DEL EQUIPO.',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -1287,9 +1290,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR SEMANA',
                     'METODO' => 'LIMPIEZA MANUAL',
                     'CRITERIO' => 'SIN POLVO',
-                    'OBSERVACIONES' => 'QUITAR EL EXCESO DE PELUSA PARA EL MEJOR FUNCIONAMIENTO DEL EQUIPO'
+                    'OBSERVACIONES' => 'QUITAR EL EXCESO DE PELUSA PARA EL MEJOR FUNCIONAMIENTO DEL EQUIPO',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -1297,17 +1300,17 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL INICIO DEL TURNO Y DESPUES DE COMIDA',
                     'METODO' => 'LIMPIEZA MANUAL',
                     'CRITERIO' => 'EXCESO DE PELUSA',
-                    'OBSERVACIONES' => 'QUITAR EL EXCESO DE PELUSA PARA EL MEJOR FUNCIONAMIENTO DEL EQUIPO'
+                    'OBSERVACIONES' => 'QUITAR EL EXCESO DE PELUSA PARA EL MEJOR FUNCIONAMIENTO DEL EQUIPO',
                 ],
-                'categoria' => 'limpieza'
-            ]
+                'categoria' => 'limpieza',
+            ],
         ];
 
         foreach ($items as $item) {
-            $created =  Item::create([
+            $created = Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
-                'categoria' => $item['categoria']
+                'categoria' => $item['categoria'],
             ]);
 
             Alerta::create([
@@ -1320,19 +1323,19 @@ class EquiposSeeder extends Seeder
     public function lvMgl01($n)
     {
         $equipo = Equipo::create([
-            'tag' => 'LV-MGL-0' . $n,
-            'nombre' => 'MANGLE 0' . $n,
+            'tag' => 'LV-MGL-0'.$n,
+            'nombre' => 'MANGLE 0'.$n,
             'area' => 'LAVANDERIA INSTITUCIONAL',
             'foto' => null,
             'numeroControl' => '001',
-            'revision' => 'N'
+            'revision' => 'N',
         ]);
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
             'area' => HOJACHEQUEOAREA::LAVANDERIA_INSTITUCIONAL->value,
             'version' => 1,
-            'observaciones' => null
+            'observaciones' => null,
         ]);
 
         $items = [
@@ -1342,9 +1345,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ AL INICIO DEL TURNO (CUANDO SE REQUIERA)',
                     'METODO' => null,
                     'CRITERIO' => 'FUNCIONAMIENTO OPTIMO',
-                    'OBSERVACIONES' => null
+                    'OBSERVACIONES' => null,
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -1352,9 +1355,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ AL INICIO DEL TURNO (CUANDO SE REQUIERA)',
                     'METODO' => null,
                     'CRITERIO' => 'FUNCIONAMIENTO OPTIMO',
-                    'OBSERVACIONES' => null
+                    'OBSERVACIONES' => null,
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -1362,9 +1365,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ AL INICIO DEL TURNO (CUANDO SE REQUIERA)',
                     'METODO' => null,
                     'CRITERIO' => 'FUNCIONAMIENTO OPTIMO',
-                    'OBSERVACIONES' => null
+                    'OBSERVACIONES' => null,
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -1372,9 +1375,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ AL INICIO DEL TURNO (CUANDO SE REQUIERA)',
                     'METODO' => null,
                     'CRITERIO' => 'FUNCIONAMIENTO OPTIMO',
-                    'OBSERVACIONES' => null
+                    'OBSERVACIONES' => null,
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -1382,9 +1385,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => null,
                     'CRITERIO' => 'SIN DAÑO',
-                    'OBSERVACIONES' => null
+                    'OBSERVACIONES' => null,
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -1392,9 +1395,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'AL INICIO DEL TURNO',
                     'METODO' => 'REVISAR FISICAMENTE',
                     'CRITERIO' => 'FUGAS DE GAS EN CONEXIONES',
-                    'OBSERVACIONES' => 'NO DEBEN EXISTIR FUGAS EN LAS CONEXIONES'
+                    'OBSERVACIONES' => 'NO DEBEN EXISTIR FUGAS EN LAS CONEXIONES',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -1402,9 +1405,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'ELIMINAR EL EXCESO DE POLVO Y RESPECTIVO AISLANTE',
-                    'OBSERVACIONES' => 'CUANDO ESTE APAGADA Y FRIA'
+                    'OBSERVACIONES' => 'CUANDO ESTE APAGADA Y FRIA',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -1412,9 +1415,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'VISUAL',
                     'CRITERIO' => 'QUE NO ESTEN ROTAS, DESGASTADAS, FUERA DE SU LUGAR Y ENGRAPADAS',
-                    'OBSERVACIONES' => 'CUANDO ESTE APAGADA Y FRIA'
+                    'OBSERVACIONES' => 'CUANDO ESTE APAGADA Y FRIA',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -1422,9 +1425,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'ELIMINAR POLVO, PELUSA Y MATERIALES EXTRAÑOS.',
-                    'OBSERVACIONES' => 'CUANDO ESTE APAGADA Y FRIA'
+                    'OBSERVACIONES' => 'CUANDO ESTE APAGADA Y FRIA',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -1432,9 +1435,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'ELIMINAR POLVO, PELUSA Y MATERIALES EXTRAÑOS.',
-                    'OBSERVACIONES' => 'CUANDO ESTE APAGADA Y FRIA'
+                    'OBSERVACIONES' => 'CUANDO ESTE APAGADA Y FRIA',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -1442,9 +1445,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '2 VEZ POR TURNO',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'QUE NO TENGA POLVO O GRASA Y OBJETOS AJENOS AL LUGAR.',
-                    'OBSERVACIONES' => 'NO DEBE HABER GRASA EN PISO'
+                    'OBSERVACIONES' => 'NO DEBE HABER GRASA EN PISO',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -1452,9 +1455,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'AL INICIO DE LA JORNADA',
-                    'OBSERVACIONES' => 'LUBRICA LOS RODILLOS'
+                    'OBSERVACIONES' => 'LUBRICA LOS RODILLOS',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -1462,17 +1465,17 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'CADA 4 DÍAS',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'AL INICIO DE LA JORNADA',
-                    'OBSERVACIONES' => 'PARA MANTENER LA SABANA CON CERA'
+                    'OBSERVACIONES' => 'PARA MANTENER LA SABANA CON CERA',
                 ],
-                'categoria' => 'operacion'
-            ]
+                'categoria' => 'operacion',
+            ],
         ];
 
         foreach ($items as $item) {
-            $created =  Item::create([
+            $created = Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
-                'categoria' => $item['categoria']
+                'categoria' => $item['categoria'],
             ]);
 
             Alerta::create([
@@ -1490,14 +1493,14 @@ class EquiposSeeder extends Seeder
             'area' => 'LAVADO EN SECO',
             'foto' => null,
             'numeroControl' => '001',
-            'revision' => 'N'
+            'revision' => 'N',
         ]);
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
             'area' => HOJACHEQUEOAREA::TINTORERIA->value,
             'version' => 1,
-            'observaciones' => null
+            'observaciones' => null,
         ]);
 
         $items = [
@@ -1507,9 +1510,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'CADA 2 DÍAS',
                     'METODO' => null,
                     'CRITERIO' => 'CADA 8 - 10 CICLOS',
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -1517,9 +1520,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ AL DIA',
                     'METODO' => null,
                     'CRITERIO' => 'DE 110º A 127º C',
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -1527,9 +1530,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ AL DIA',
                     'METODO' => 'DURANTE EL SECADO',
                     'CRITERIO' => 'PRESIÓN EN ALTA DE 3 A 5 BAR',
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -1537,9 +1540,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ AL DIA',
                     'METODO' => 'DURANTE EL SECADO',
                     'CRITERIO' => 'PRESIÓN EN BAJA DE 19 A 21 BAR',
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -1547,9 +1550,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ AL DIA',
                     'METODO' => 'DURANTE EL ENFRIAMIENTO',
                     'CRITERIO' => 'PRESIÓN EN ALTA DE 3 A 5 BAR',
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -1557,9 +1560,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ AL DIA',
                     'METODO' => 'DURANTE EL ENFRIAMIENTO',
                     'CRITERIO' => 'PRESIÓN EN BAJA DE 18 A 21 BAR',
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -1567,9 +1570,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ AL DÍA',
                     'METODO' => null,
                     'CRITERIO' => 'CADA 8-10 CICLOS',
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -1577,9 +1580,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ AL DÍA',
                     'METODO' => null,
                     'CRITERIO' => 'LIMPIEZA PROFUNDA',
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -1587,9 +1590,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'CADA 35 CICLOS O UNA VEZ A LA SEMANA',
                     'METODO' => null,
                     'CRITERIO' => 'MANTENIMIENTO',
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -1597,9 +1600,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ AL DÍA',
                     'METODO' => null,
                     'CRITERIO' => 'PURGA',
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -1607,9 +1610,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => null,
                     'METODO' => null,
                     'CRITERIO' => 'TOTALES',
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -1617,9 +1620,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => 'SEMANAL',
                     'METODO' => null,
                     'CRITERIO' => 'RELLENAR NIVELES',
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -1627,9 +1630,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ AL DÍA',
                     'METODO' => null,
                     'CRITERIO' => 'LIMPIEZA DE LA CANASTA',
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -1637,9 +1640,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ CADA 15 DIAS',
                     'METODO' => null,
                     'CRITERIO' => 'LIMPIEZA DE LA CANASTA MANUAL',  // Changes here
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -1647,17 +1650,17 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => null,
                     'CRITERIO' => 'LIMPIEZA PROFUNDA',
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'limpieza'
-            ]
+                'categoria' => 'limpieza',
+            ],
         ];
 
         foreach ($items as $item) {
-            $created =  Item::create([
+            $created = Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
-                'categoria' => $item['categoria']
+                'categoria' => $item['categoria'],
             ]);
 
             if ($item['items']['ITEM'] == 'TEMPERATURA DEL DESTILADOR') {
@@ -1668,7 +1671,7 @@ class EquiposSeeder extends Seeder
                 ]);
             }
 
-            if(strpos($item['items']['CRITERIO'], "PRESIÓN EN BAJA") !== false){
+            if (strpos($item['items']['CRITERIO'], 'PRESIÓN EN BAJA') !== false) {
                 Alerta::create([
                     'item_id' => $created->id,
                     'valor' => 21,
@@ -1676,7 +1679,7 @@ class EquiposSeeder extends Seeder
                 ]);
             }
 
-            if($item['items']['CRITERIO'] == "PRESIÓN EN ALTA DE 3 A 5 BAR"){
+            if ($item['items']['CRITERIO'] == 'PRESIÓN EN ALTA DE 3 A 5 BAR') {
                 Alerta::create([
                     'item_id' => $created->id,
                     'valor' => 5,
@@ -1699,12 +1702,12 @@ class EquiposSeeder extends Seeder
             'nombre' => 'SUAVIZADOR 05',
             'numeroControl' => '005',
             'revision' => 'N',
-            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value,
         ]);
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
-            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value
+            'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value,
         ]);
 
         $items = [
@@ -1713,68 +1716,68 @@ class EquiposSeeder extends Seeder
                     'ITEM' => 'RETROLAVADO',
                     'FRECUENCIA' => 'CADA 36 HRS',
                     'METODO' => 'MANUAL',
-                    'CRITERIO' => 'CUANDO SE PRESENTE DUREZA 0 A 80 PPM'
+                    'CRITERIO' => 'CUANDO SE PRESENTE DUREZA 0 A 80 PPM',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
                     'ITEM' => 'LIMPIEZA DEL INYECTOR',
                     'FRECUENCIA' => '1 VEZ POR 15 DIAS',
                     'METODO' => '',
-                    'CRITERIO' => ''
+                    'CRITERIO' => '',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
                     'ITEM' => 'NIVEL DE SALMUERA',
                     'FRECUENCIA' => 'CADA 36 HRS',
                     'METODO' => '',
-                    'CRITERIO' => '3/4 DE LLENADO'
+                    'CRITERIO' => '3/4 DE LLENADO',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM' => 'COLOR DE AGUA EN LA PRUEBA',
                     'FRECUENCIA' => '1 VEZ POR DIA',
                     'METODO' => '',
-                    'CRITERIO' => 'A/M'
+                    'CRITERIO' => 'A/M',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM' => '% DUREZA DEL AGUA (EDTA)',
                     'FRECUENCIA' => '1 VEZ POR DIA',
                     'METODO' => '',
-                    'CRITERIO' => '0 PPM'
+                    'CRITERIO' => '0 PPM',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM' => 'LIMPIEZA GENERAL',
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => '',
-                    'CRITERIO' => 'LIMPIEZA PROFUNDA'
+                    'CRITERIO' => 'LIMPIEZA PROFUNDA',
                 ],
-                'categoria' => 'limpieza'
-            ]
+                'categoria' => 'limpieza',
+            ],
         ];
 
         foreach ($items as $item) {
             $created = Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
-                'categoria' => $item['categoria']
+                'categoria' => $item['categoria'],
             ]);
 
             Alerta::create([
                 'item_id' => $created->id,
-                'simbologia_id' => 2
-            ]); 
+                'simbologia_id' => 2,
+            ]);
         }
     }
 
@@ -1786,14 +1789,14 @@ class EquiposSeeder extends Seeder
             'area' => 'LAVADO EN SECO',  // Changes here
             'foto' => null,
             'numeroControl' => '002',
-            'revision' => 'N'
+            'revision' => 'N',
         ]);
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
             'version' => 1,
             'observaciones' => null,
-            'area' => HOJACHEQUEOAREA::TINTORERIA->value
+            'area' => HOJACHEQUEOAREA::TINTORERIA->value,
         ]);
 
         $items = [
@@ -1801,153 +1804,153 @@ class EquiposSeeder extends Seeder
                 'items' => [
                     'ITEM' => 'LIMPIAR EL DESTILADOR',
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO' => 'CUANDO EL DESTILADOR ESTA FRIO'
+                    'CRITERIO' => 'CUANDO EL DESTILADOR ESTA FRIO',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
                     'ITEM' => 'LIMPIAR EL FILTRO DE TRAMPA BOTÓN',
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO' => 'CADA 3-4 CICLOS'
+                    'CRITERIO' => 'CADA 3-4 CICLOS',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
                     'ITEM' => 'LIMPIAR EL FILTRO DE AIRE PRIMARIO Y SECUNDARIO',
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO' => 'MAQUINA EN PUNTO MUERTO'
+                    'CRITERIO' => 'MAQUINA EN PUNTO MUERTO',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
                     'ITEM' => 'LIMPIAR LOS FILTROS SPIN (1 Y 2)',  // Changes here
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO' => 'CADA 8-10 CICLOS'
+                    'CRITERIO' => 'CADA 8-10 CICLOS',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
                     'ITEM' => 'CORRER EL PROGRAMA DE “GOOD MORNING”',
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO' => 'DESPUES DE LA LIMPIEZA DEL DESTILADOR'
+                    'CRITERIO' => 'DESPUES DE LA LIMPIEZA DEL DESTILADOR',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
                     'ITEM' => 'LIMPIAR EL FILTRO DE LA BOMBA DE VACÍO',  // Changes here
                     'FRECUENCIA' => '2 VECES POR SEMANA',
-                    'CRITERIO' => 'MAQUINA EN PUNTO MUERTO'
+                    'CRITERIO' => 'MAQUINA EN PUNTO MUERTO',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
                     'ITEM' => 'LIMPIAR EL FILTRO DE AIRE PRIMARIO Y SECUNDARIO',
                     'FRECUENCIA' => '1 VEZ POR SEMANA',
-                    'CRITERIO' => 'LIMPIEZA PROFUNDA'
+                    'CRITERIO' => 'LIMPIEZA PROFUNDA',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
                     'ITEM' => 'LIMPIAR EL FLOTADOR DE LA TRAMPA DE BOTONES',
                     'FRECUENCIA' => 'CADA 2 MESES',
-                    'CRITERIO' => 'LIMPIEZA PROFUNDA'
+                    'CRITERIO' => 'LIMPIEZA PROFUNDA',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
                     'ITEM' => 'COMPRESOR',
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO' => 'PURGA'
+                    'CRITERIO' => 'PURGA',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
                     'ITEM' => 'HORAS',
                     'FRECUENCIA' => 'AL FINAL DEL DÍA',
-                    'CRITERIO' => 'TOTALES'
+                    'CRITERIO' => 'TOTALES',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM' => 'SOLVENTE',
                     'FRECUENCIA' => 'SEMANAL',
-                    'CRITERIO' => 'RELLENAR NIVELES'
+                    'CRITERIO' => 'RELLENAR NIVELES',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM' => 'LIMPIEZA DE SEPARADOR DE AGUA',
                     'FRECUENCIA' => '1 VEZ AL MES',
-                    'CRITERIO' => 'LIMPIEZA PROFUNDA'
+                    'CRITERIO' => 'LIMPIEZA PROFUNDA',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
                     'ITEM' => 'LECTURA DEL MANOMETRO ST1',
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO' => 'ESTADO OPTIMO DE CONDENSADOR Y DESTILADOR'  // Changes here
+                    'CRITERIO' => 'ESTADO OPTIMO DE CONDENSADOR Y DESTILADOR',  // Changes here
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
                     'ITEM' => 'LECTURA DEL MANOMETRO ST3',
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO' => 'ESTADO OPTIMO DE CONDENSADOR Y DESTILADOR'  // Changes here
+                    'CRITERIO' => 'ESTADO OPTIMO DE CONDENSADOR Y DESTILADOR',  // Changes here
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
                     'ITEM' => 'LECTURA DEL MANOMETRO ST6',
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO' => 'ESTADO OPTIMO DE CONDENSADOR Y DESTILADOR'  // Changes here
+                    'CRITERIO' => 'ESTADO OPTIMO DE CONDENSADOR Y DESTILADOR',  // Changes here
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
                     'ITEM' => 'CICLOS DEL FILTRO ROTATIVO F1',
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO' => 'ESTADO OPTIMO DEL FILTRO SPIN 1'  // Changes here
+                    'CRITERIO' => 'ESTADO OPTIMO DEL FILTRO SPIN 1',  // Changes here
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM' => 'CICLOS DEL FILTRO ROTATIVO F2',
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO' => 'ESTADO OPTIMO DEL FILTRO SPIN 2'  // Changes here
+                    'CRITERIO' => 'ESTADO OPTIMO DEL FILTRO SPIN 2',  // Changes here
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
                     'ITEM' => 'LIMPIEZA GENERAL DEL EQUIPO',  // Changes here
                     'FRECUENCIA' => '1 VEZ AL DÍA',
-                    'CRITERIO' => 'LIMPIEZA PROFUNDA'
+                    'CRITERIO' => 'LIMPIEZA PROFUNDA',
                 ],
-                'categoria' => 'limpieza'
-            ]
+                'categoria' => 'limpieza',
+            ],
         ];
 
         foreach ($items as $item) {
-            $created =  Item::create([
+            $created = Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
-                'categoria' => $item['categoria']
+                'categoria' => $item['categoria'],
             ]);
 
             Alerta::create([
@@ -1965,14 +1968,14 @@ class EquiposSeeder extends Seeder
             'area' => 'LAVADO EN AGUA',  // Changes here
             'foto' => null,
             'numeroControl' => '002',
-            'revision' => 'NOM-020-STPS-2011'
+            'revision' => 'NOM-020-STPS-2011',
         ]);
 
         $hoja = HojaChequeo::create([
             'equipo_id' => $equipo->id,
             'version' => 1,
             'area' => HOJACHEQUEOAREA::CUARTO_DE_MAQUINAS->value,
-            'observaciones' => null
+            'observaciones' => null,
         ]);
 
         $items = [
@@ -1982,9 +1985,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'VISUAL',
                     'CRITERIO' => 'REVISAR QUE ESTE ENCENDIDO EL INTERRUPTOR DEL COMPRESOR DEL HIDRONEUMATICO',
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -1992,9 +1995,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'VISUAL Y AUDITIVO',
                     'CRITERIO' => 'REVISAR QUE ESTE ENCENDIDO EL INTERRUPTOR DEL COMPRESOR DEL HIDRONEUMATICO',
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'operacion'
+                'categoria' => 'operacion',
             ],
             [
                 'items' => [
@@ -2002,9 +2005,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'VISUAL',
                     'CRITERIO' => 'REALIZAR AL INICIO DEL TURNO',
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -2012,9 +2015,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ CADA SEMANA',
                     'METODO' => 'VISUAL',
                     'CRITERIO' => 'CHECAR SI HAY FUGAS EN UNIONES',
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -2022,9 +2025,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ POR TURNO',
                     'METODO' => 'VISUAL',
                     'CRITERIO' => 'VERIFICAR EL LLENADO DE LA CISTERNA',  // Typo here. Should this be "LLENADO"?
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -2032,9 +2035,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 AL DIA',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => 'LIMPIEZA PROFUNDA',
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'limpieza'
+                'categoria' => 'limpieza',
             ],
             [
                 'items' => [
@@ -2042,9 +2045,9 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
                     'METODO' => 'MANUAL',
                     'CRITERIO' => '40 PSI A 60 PSI',
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'revision'
+                'categoria' => 'revision',
             ],
             [
                 'items' => [
@@ -2052,17 +2055,17 @@ class EquiposSeeder extends Seeder
                     'FRECUENCIA' => '1 VEZ DURANTE EL TURNO',
                     'METODO' => 'VISUAL',
                     'CRITERIO' => '38 PSI',
-                    'RESPONSABLE' => 'OPERARIO'
+                    'RESPONSABLE' => 'OPERARIO',
                 ],
-                'categoria' => 'revision'
-            ]
+                'categoria' => 'revision',
+            ],
         ];
 
         foreach ($items as $item) {
-            $created =  Item::create([
+            $created = Item::create([
                 'hoja_chequeo_id' => $hoja->id,
                 'valores' => $item['items'],
-                'categoria' => $item['categoria']
+                'categoria' => $item['categoria'],
             ]);
 
             Alerta::create([

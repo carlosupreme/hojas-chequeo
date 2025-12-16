@@ -39,10 +39,10 @@
                         <div class="flex-shrink-0">
                             @if ($hoja->equipo->foto)
                                 <img class="h-16 w-16 rounded-full object-cover ring-2 ring-gray-300 dark:ring-gray-600"
-                                    src="/storage/{{ $hoja->equipo->foto }}" alt="{{ $hoja->equipo->nombre }}">
+                                    src="{{ asset('storage/' . $hoja->equipo->foto) }}" alt="{{ $hoja->equipo->nombre }}">
                             @else
                                 <img class="h-16 w-16 rounded-full object-cover ring-2 ring-gray-300 dark:ring-gray-600"
-                                    src="{{asset('placeholder.jpg')}}" alt="Sin foto" />
+                                    src="{{ asset('placeholder.jpg') }}" alt="Sin foto" />
                             @endif
                         </div>
                         <div class="flex-1 min-w-0 overflow-hidden  ">
@@ -75,7 +75,7 @@
                                 </path>
                             </svg>
                             Ultimo chequeo:
-                            {{ $hoja->chequeosDiarios->sortByDesc('created_at')->first()?->created_at->diffForHumans() ?? 'Nunca' }}
+                            {{ $hoja->latestChequeoDiario?->created_at->diffForHumans() ?? 'Nunca' }}
                         </p>
                     </div>
                 </div>
