@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Exception;
 use Database\Factories\UserFactory;
 use Filament\Panel;
 use Devaslanphp\FilamentAvatar\Core\HasAvatarUrl;
@@ -18,11 +19,6 @@ class User extends Authenticatable implements FilamentUser
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasRoles, HasAvatarUrl;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
@@ -30,21 +26,11 @@ class User extends Authenticatable implements FilamentUser
         'perfil_id'
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array {
         return [
             'email_verified_at' => 'datetime',
@@ -56,8 +42,24 @@ class User extends Authenticatable implements FilamentUser
         return $this->belongsTo(Perfil::class);
     }
 
-    public function canAccessPanel(Panel $panel): bool
-    {
+    /**
+     * @throws Exception
+     */
+    public function canAccessPanel(Panel $panel): bool {
+        $isPanelAdmin = $panel->getId() === 'admin';
+
+        if ($isPanelAdmin) {
+            return $this->hasRole('Administrador');
+        }
+
         return true;
+    }
+
+    public function isAdmin(): bool {
+        return $this->hasRole('Administrador');
+    }
+
+    public function isSupervisor(): bool {
+        return $this->hasRole('Supervisor');
     }
 }

@@ -1,15 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LoginSelectionController;
 
-Route::get('/', function () {
-    if (!Auth::check() || (Auth::check() && Auth::user()->hasRole('Administrador'))) {
-        return redirect('admin');
-    }
-
-    return redirect('operador');
-});
-
+Route::get('/', [LoginSelectionController::class, 'index'])->name('login.selection');
+Route::post('/login/operador', [LoginSelectionController::class, 'login'])->name('login.operador');
 
 Route::get('/documentacion', function () {
     return view('docs');
