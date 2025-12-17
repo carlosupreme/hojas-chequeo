@@ -72,7 +72,7 @@
                             <div class="overflow-x-auto pb-2">
                                 <div class="min-w-[600px]">
                                     <table
-                                        class="w-full border-collapse bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                                        class="w-full border-collapse bg-white dark:bg-gray-800 shadow-xs rounded-lg overflow-hidden">
                                         <thead>
                                         <tr>
                                             <th class="border-b border-gray-200 dark:border-gray-700 px-6 py-3 bg-gray-50 dark:bg-gray-900 text-left left-0 sticky">
@@ -99,7 +99,7 @@
                                                     <td class="px-6 py-4 group relative">
                                                         <div class="flex items-center min-w-max">
                                                         <span
-                                                            class="text-gray-700 dark:text-gray-300 break-words max-w-full text-sm">
+                                                            class="text-gray-700 dark:text-gray-300 wrap-break-word max-w-full text-sm">
                                                             @if($loop->last)
                                                                 @if(!str_contains($cell, 'Cuando tenga el valor') && !str_contains($cell, 'No tiene'))
                                                                     <div class="flex items-center gap-3">
@@ -107,7 +107,7 @@
                                                                         <x-filament::badge
                                                                             size="sm"
                                                                             color="warning"
-                                                                            class="whitespace-normal max-w-full break-words font-medium">
+                                                                            class="whitespace-normal max-w-full wrap-break-word font-medium">
                                                                             {{ explode('`', $cell)[1] }}
                                                                         </x-filament::badge>
                                                                     </div>
@@ -115,14 +115,14 @@
                                                                     <span class="flex items-center gap-3">
                                                                         <x-filament::badge
                                                                             size="sm"
-                                                                            class="whitespace-normal max-w-full break-words font-medium">
+                                                                            class="whitespace-normal max-w-full wrap-break-word font-medium">
                                                                             {{ explode('`', $cell)[0] }}
                                                                         </x-filament::badge>
                                                                         @if(!empty(explode('`', $cell)[1]))
                                                                             <x-filament::badge
                                                                                 size="sm"
                                                                                 color="warning"
-                                                                                class="whitespace-normal max-w-full break-words font-medium">
+                                                                                class="whitespace-normal max-w-full wrap-break-word font-medium">
                                                                                 {{ explode('`', $cell)[1] }}
                                                                             </x-filament::badge>
                                                                         @endif

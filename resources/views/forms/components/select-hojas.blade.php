@@ -17,7 +17,7 @@
                         type="checkbox"
                         value="{{ $hoja->id }}"
                         wire:model="{{ $getStatePath() }}"
-                        class="absolute top-2 right-2 h-4 w-4 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:checked:bg-primary-500"
+                        class="absolute top-2 right-2 h-4 w-4 rounded-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:checked:bg-primary-500"
                     />
 
                     @if($hoja->equipo->foto)

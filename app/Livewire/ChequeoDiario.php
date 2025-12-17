@@ -2,17 +2,20 @@
 
 namespace App\Livewire;
 
+use Filament\Actions\Contracts\HasActions;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Grid;
+use Filament\Actions\Action;
 use App\Models\HojaChequeo;
 use App\Models\Reporte;
 use App\Models\User;
 use Carbon\Carbon;
 use Coolsam\SignaturePad\Forms\Components\Fields\SignaturePad;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Notifications\Actions;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Cache;
@@ -20,8 +23,9 @@ use Illuminate\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-class ChequeoDiario extends Component implements HasForms
+class ChequeoDiario extends Component implements HasForms, HasActions
 {
+    use InteractsWithActions;
     use InteractsWithForms;
 
     public bool $reported = false;
@@ -51,10 +55,10 @@ class ChequeoDiario extends Component implements HasForms
         }
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Grid::make()->schema([
                     SignaturePad::make('firma_operador')
                         ->label('Firma')
@@ -158,7 +162,7 @@ class ChequeoDiario extends Component implements HasForms
             ->iconColor('success')
             ->body(auth()->user()->name.' ha completado un chequeo diario para la hoja '.$this->checkSheet->name)
             ->actions([
-                Actions\Action::make('Ver')
+                Action::make('Ver')
                     ->button()
                     ->url("/admin/hoja-chequeos/{$this->checkSheet->id}/historial?startDate=".now()->format('Y-m-d').'&endDate='.now()->format('Y-m-d')),
             ])

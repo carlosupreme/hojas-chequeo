@@ -5,7 +5,7 @@ if (!function_exists('render_icon')) {
         try {
             return svg($name, ['w-5', 'h-5'], ['style' => "color: {$color}"])
                 ->toHtml();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return "<span style='color: {$color}; font-size: {$size}px'>[?]</span>";
         }
     }

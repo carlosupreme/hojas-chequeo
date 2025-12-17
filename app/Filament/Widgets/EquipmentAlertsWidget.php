@@ -2,6 +2,9 @@
 
 namespace App\Filament\Widgets;
 
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Enums\FiltersLayout;
 use App\Models\Equipo;
 use Filament\Forms;
 use Filament\Tables;
@@ -23,14 +26,14 @@ class EquipmentAlertsWidget extends BaseWidget
             ->heading("Alertas de equipos")
             ->query($this->getQuery())
             ->columns([
-                Tables\Columns\TextColumn::make('tag')
+                TextColumn::make('tag')
                                          ->label('Tag de Equipo')
                                          ->searchable()
                                          ->sortable()
                                          ->description(fn($record) => $record->last_checked)
                                          ->weight('semibold'),
 
-                Tables\Columns\TextColumn::make('total_alerts')
+                TextColumn::make('total_alerts')
                                          ->label('Alertas Activas')
                                          ->badge()
                                          ->color(fn($state) => $state > 0 ? 'danger' : 'success')
@@ -41,10 +44,10 @@ class EquipmentAlertsWidget extends BaseWidget
             ->filters([
                 Filter::make('rango_fechas')
                       ->label('Rango de Fechas')
-                      ->form([
-                          Forms\Components\DatePicker::make('fecha_inicio')
+                      ->schema([
+                          DatePicker::make('fecha_inicio')
                                                      ->label('Fecha Inicio'),
-                          Forms\Components\DatePicker::make('fecha_fin')
+                          DatePicker::make('fecha_fin')
                                                      ->label('Fecha Fin'),
                       ])
                       ->query(function (Builder $query, array $data): Builder {
@@ -84,10 +87,10 @@ class EquipmentAlertsWidget extends BaseWidget
                                     $query->where('equipos.id', $data['value']);
                                 }
                             }),
-            ], layout: Tables\Enums\FiltersLayout::Modal)
+            ], layout: FiltersLayout::Modal)
             ->persistSortInSession()
             ->persistFiltersInSession()
-            ->actions([
+            ->recordActions([
                 // Acciones adicionales si son necesarias
             ])
             ->defaultPaginationPageOption(5)

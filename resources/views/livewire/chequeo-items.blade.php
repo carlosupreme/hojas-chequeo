@@ -43,7 +43,7 @@
                         <div class="grid grid-cols-2 gap-2 items-center">
                             <button
                                 @click="open = !open"
-                                class="text-left focus:outline-none"
+                                class="text-left focus:outline-hidden"
                             >
                                 <h3 class="font-medium text-xs text-gray-900 dark:text-gray-100">
                                     {{ $item[$headers[0]] ?? 'N/A' }}

@@ -2,13 +2,14 @@
 
 namespace App\Providers\Filament;
 
+use Filament\Widgets\AccountWidget;
 use App\Filament\Pages\ChequeoDaily;
 use App\Filament\Pages\ChequeoHistorico;
 use App\Filament\Pages\Reportar;
 use App\Filament\Pages\ReporteHistorico;
-use App\Filament\Resources\ChequeoDiarioResource;
-use App\Filament\Resources\ReporteResource;
-use App\Filament\Resources\TarjetonResource;
+use App\Filament\Resources\ChequeoDiarios\ChequeoDiarioResource;
+use App\Filament\Resources\Reportes\ReporteResource;
+use App\Filament\Resources\Tarjetons\TarjetonResource;
 use App\Http\Middleware\EnsureIsOperador;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -46,7 +47,7 @@ class OperadorPanelProvider extends PanelProvider
             ])
             ->resources([ReporteResource::class, ChequeoDiarioResource::class, TarjetonResource::class])
             ->pages([ChequeoDaily::class, Reportar::class, ReporteHistorico::class])
-            ->widgets([Widgets\AccountWidget::class])
+            ->widgets([AccountWidget::class])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

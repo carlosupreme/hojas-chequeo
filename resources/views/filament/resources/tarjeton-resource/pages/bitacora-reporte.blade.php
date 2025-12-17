@@ -104,7 +104,7 @@
                                         <tr>
                                             <td colspan="5" class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-sm text-gray-600 dark:text-gray-400 italic bg-gray-50 dark:bg-gray-800">
                                                 <div class="flex items-start gap-2">
-                                                    <x-heroicon-o-chat-bubble-left-ellipsis class="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                                    <x-heroicon-o-chat-bubble-left-ellipsis class="w-4 h-4 mt-0.5 shrink-0" />
                                                     <div>
                                                         <strong>Observaciones:</strong> {{ $registro->observaciones }}
                                                     </div>

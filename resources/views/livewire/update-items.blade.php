@@ -13,7 +13,7 @@
                     <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-left">
                         <div class="flex items-center justify-between">
                             <input type="text" wire:model.live="columns.{{ $index }}"
-                                   class="bg-transparent border-none font-bold text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 rounded transition-colors duration-200"
+                                   class="bg-transparent border-none font-bold text-gray-800 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 rounded-sm transition-colors duration-200"
                                    aria-label="Column name"
                             />
                             <x-filament::icon-button
@@ -47,7 +47,7 @@
                     <td class="border border-gray-300 dark:border-gray-600 px-4 py-2">
                         <select
                             wire:model.live="categories.{{ $rowIndex }}"
-                            class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-xs px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="limpieza">Limpieza</option>
                             <option value="operacion">Operación</option>
@@ -61,7 +61,7 @@
                                 @if($editingCell && $editingCell['rowIndex'] === $rowIndex && $editingCell['colIndex'] === $colIndex)
                                     <input type="text"
                                            wire:model.live="rows.{{$rowIndex}}.{{$colIndex}}"
-                                           class="flex-grow bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
+                                           class="grow bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-sm px-2 py-1 text-gray-800 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                                            aria-label="Edit cell content"
                                     />
                                 @else
@@ -177,7 +177,7 @@
                                     <button
                                         @click="open = !open"
                                         type="button"
-                                        class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-4 py-2 inline-flex justify-between items-center text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                        class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-xs px-4 py-2 inline-flex justify-between items-center text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                     >
                                         <span x-text="selectedName"></span>
                                         @svg('heroicon-c-chevron-down', 'w-6 h-6')
@@ -192,7 +192,7 @@
                                         x-transition:leave="transition ease-in duration-75"
                                         x-transition:leave-start="transform opacity-100 scale-100"
                                         x-transition:leave-end="transform opacity-0 scale-95"
-                                        class="absolute z-10 mt-1 w-full flex flex-col gap-2 bg-white dark:bg-gray-700 shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
+                                        class="absolute z-10 mt-1 w-full flex flex-col gap-2 bg-white dark:bg-gray-700 shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-hidden sm:text-sm"
                                     >
                                         @foreach ($statuses as $status)
                                             <button @click="choose({{ $status->id }}, '{{ $status->nombre }}')"

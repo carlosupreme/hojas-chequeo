@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use Exception;
 use App\Models\Alerta;
 use App\Models\ItemChequeoDiario;
 use Illuminate\Support\Collection;
@@ -91,7 +92,7 @@ class ChequeoItems extends Component
             ItemChequeoDiario::insert($itemsToInsert);
 
             $this->dispatch('dailyCheckItemsSaved');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dispatch('dailyCheckItemsFailed', $id);
         }
     }

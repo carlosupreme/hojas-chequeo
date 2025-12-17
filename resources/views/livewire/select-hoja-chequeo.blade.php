@@ -3,7 +3,7 @@
         {{-- Search Bar --}}
         <div class="relative w-full">
             <input wire:model.live="search" type="search" placeholder="Buscar por nombre, tag, o area"
-                class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -36,7 +36,7 @@
                 x-data="{}">
                 <div class="p-6 space-y-4">
                     <div class="flex items-start space-x-4">
-                        <div class="flex-shrink-0">
+                        <div class="shrink-0">
                             @if ($hoja->equipo->foto)
                                 <img class="h-16 w-16 rounded-full object-cover ring-2 ring-gray-300 dark:ring-gray-600"
                                     src="{{ asset('storage/' . $hoja->equipo->foto) }}" alt="{{ $hoja->equipo->nombre }}">
@@ -46,7 +46,7 @@
                             @endif
                         </div>
                         <div class="flex-1 min-w-0 overflow-hidden  ">
-                            <h3 class="text-lg font-semibold break-words text-gray-900 dark:text-white leading-tight">
+                            <h3 class="text-lg font-semibold wrap-break-word text-gray-900 dark:text-white leading-tight">
                                 {{ $hoja->equipo->nombre }}
                             </h3>
                             <p class="text-sm font-medium text-blue-600 dark:text-blue-400">

@@ -33,7 +33,7 @@
                 <div class="overflow-x-auto pb-2">
                     <div class="min-w-[600px]">
                         <table
-                            class="w-full border-collapse bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                            class="w-full border-collapse bg-white dark:bg-gray-800 shadow-xs rounded-lg overflow-hidden">
                             <thead>
                             <tr>
                                 <th class="border-b border-gray-200 dark:border-gray-700 px-6 py-3 bg-gray-50 dark:bg-gray-900 text-left left-0 sticky">
@@ -60,7 +60,7 @@
                                         <td class="px-6 py-4">
                                             <div class="flex items-center min-w-max">
                                                 <span
-                                                    class="text-gray-700 dark:text-gray-300 break-words max-w-full text-sm">{{ $item['valores'][$column] }}</span>
+                                                    class="text-gray-700 dark:text-gray-300 wrap-break-word max-w-full text-sm">{{ $item['valores'][$column] }}</span>
                                             </div>
                                         </td>
                                     @endforeach
@@ -77,7 +77,7 @@
                                                 />
                                             @else
                                                 <span
-                                                    class="text-gray-700 dark:text-gray-300 break-words max-w-full text-sm">{{$item['valor']}}</span>
+                                                    class="text-gray-700 dark:text-gray-300 wrap-break-word max-w-full text-sm">{{$item['valor']}}</span>
                                             @endif
                                         </div>
                                     </td>

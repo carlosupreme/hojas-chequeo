@@ -2,12 +2,15 @@
 
 namespace App\Filament\Pages;
 
+use Auth;
+use Filament\Actions\ViewAction;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
 use App\HojaChequeoArea;
 use App\Models\Reporte;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Pages\Page;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -19,9 +22,9 @@ class ReporteHistorico extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-text';
 
-    protected static string $view = 'filament.pages.reporte-historico';
+    protected string $view = 'filament.pages.reporte-historico';
 
     protected static ?string $title = "Mis reportes";
 
@@ -30,7 +33,7 @@ class ReporteHistorico extends Page implements HasTable
     }
 
     public static function canAccess(): bool {
-        return \Auth::user()->hasRole('Operador');
+        return Auth::user()->hasRole('Operador');
     }
 
     public function table(Table $table): Table {
@@ -88,12 +91,12 @@ class ReporteHistorico extends Page implements HasTable
                                 array_map(fn(HojaChequeoArea $area) => $area->value, HojaChequeoArea::cases())
                             ))
             ])
-            ->actions([
-                ViewAction::make()->infolist([
-                    \Filament\Infolists\Components\Section::make('Estado del Reporte')
+            ->recordActions([
+                ViewAction::make()->schema([
+                    Section::make('Estado del Reporte')
                                                           ->schema([
 
-                                                              \Filament\Infolists\Components\Grid::make(3)
+                                                              Grid::make(3)
                                                                                                  ->schema([
                                                                                                      TextEntry::make('created_at')
                                                                                                               ->label('Fecha de Reporte')
@@ -126,9 +129,9 @@ class ReporteHistorico extends Page implements HasTable
                                                           ])
                                                           ->collapsible(),
 
-                    \Filament\Infolists\Components\Section::make('Información del Equipo')
+                    Section::make('Información del Equipo')
                                                           ->schema([
-                                                              \Filament\Infolists\Components\Grid::make(2)
+                                                              Grid::make(2)
                                                                                                  ->schema([
                                                                                                      TextEntry::make('equipo.tag')
                                                                                                               ->label('Tag del Equipo')
@@ -139,7 +142,7 @@ class ReporteHistorico extends Page implements HasTable
                                                                                                               ->icon('heroicon-o-building-office'),
                                                                                                  ]),
 
-                                                              \Filament\Infolists\Components\Grid::make(2)
+                                                              Grid::make(2)
                                                                                                  ->schema([
                                                                                                      TextEntry::make('equipo.nombre')
                                                                                                               ->label('Nombre del Equipo')
@@ -152,9 +155,9 @@ class ReporteHistorico extends Page implements HasTable
                                                           ])
                                                           ->collapsible(),
 
-                    \Filament\Infolists\Components\Section::make('Detalles de la Falla')
+                    Section::make('Detalles de la Falla')
                                                           ->schema([
-                                                              \Filament\Infolists\Components\Grid::make(1)
+                                                              Grid::make(1)
                                                                                                  ->schema([
                                                                                                      TextEntry::make('failure')
                                                                                                               ->label('Descripción de la Falla')
@@ -168,7 +171,7 @@ class ReporteHistorico extends Page implements HasTable
                                                                                                  ]),
                                                           ]),
 
-                    \Filament\Infolists\Components\Section::make('Evidencia Fotográfica')
+                    Section::make('Evidencia Fotográfica')
                                                           ->schema([
                                                               ImageEntry::make('photo')
                                                                         ->hiddenLabel()
@@ -179,9 +182,9 @@ class ReporteHistorico extends Page implements HasTable
                                                           ])
                                                           ->collapsible(),
 
-                    \Filament\Infolists\Components\Section::make('Información de Seguimiento')
+                    Section::make('Información de Seguimiento')
                                                           ->schema([
-                                                              \Filament\Infolists\Components\Grid::make(2)
+                                                              Grid::make(2)
                                                                                                  ->schema([
                                                                                                      TextEntry::make('created_at')
                                                                                                               ->label('Creado el')
@@ -202,7 +205,7 @@ class ReporteHistorico extends Page implements HasTable
                                                           ->collapsible(),
                 ])
             ])
-            ->bulkActions([
+            ->toolbarActions([
 
             ]);
     }

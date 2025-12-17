@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
@@ -56,7 +57,7 @@ class Tarjeton extends Model
                 } else {
                     $this->tiempo_operacion_minutos = $inicio->diffInMinutes($fin);
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->tiempo_operacion_minutos = null;
             }
         }
@@ -87,7 +88,7 @@ class Tarjeton extends Model
             
             return "{$horas}h {$minutos}m";
             
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 'Error formato';
         }
     }

@@ -2,18 +2,20 @@
 
 namespace App\Filament\Pages;
 
+use Auth;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Actions\Action;
 use App\HojaChequeoArea;
 use App\Models\Reporte;
 use App\Models\User;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Notifications\Actions;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -23,13 +25,13 @@ class Reportar extends Page
 {
     use WithFileUploads;
 
-    protected static ?string $navigationIcon = 'heroicon-o-paper-airplane';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-paper-airplane';
 
-    protected static string $view = 'filament.pages.reportar';
+    protected string $view = 'filament.pages.reportar';
 
     public static function canAccess(): bool
     {
-        return \Auth::user()->hasRole(['Operador', 'Supervisor']);
+        return Auth::user()->hasRole(['Operador', 'Supervisor']);
     }
 
     public static function getNavigationGroup(): ?string
@@ -44,10 +46,10 @@ class Reportar extends Page
         $this->form->fill();
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make('Datos del reporte')
                     ->collapsible()
                     ->schema([
@@ -56,7 +58,7 @@ class Reportar extends Page
                                 TextInput::make('name')
                                     ->label('Nombre')
                                     ->required()
-                                    ->default(fn () => \Auth::user()->name),
+                                    ->default(fn () => Auth::user()->name),
                                 DatePicker::make('fecha')
                                     ->label('Fecha')
                                     ->default(Carbon::now())
@@ -147,7 +149,7 @@ class Reportar extends Page
             ->iconColor('danger')
             ->body(auth()->user()->name.' ha reportado una falla de '.$reporte->equipo->tag)
             ->actions([
-                Actions\Action::make('Ver')
+                Action::make('Ver')
                     ->button()
                     ->url('/admin/reportes/'),
             ])

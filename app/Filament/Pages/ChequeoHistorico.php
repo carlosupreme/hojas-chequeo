@@ -2,13 +2,15 @@
 
 namespace App\Filament\Pages;
 
+use Auth;
+use Filament\Actions\ViewAction;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use App\Infolists\Components\ViewChequeoDiarioItems;
 use App\Models\ChequeoDiario;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
-use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\ImageEntry;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Pages\Page;
 use Filament\Tables\Columns\TextColumn;
@@ -23,9 +25,9 @@ class ChequeoHistorico extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-clipboard-document-check';
 
-    protected static string $view = 'filament.pages.chequeo-historico';
+    protected string $view = 'filament.pages.chequeo-historico';
 
     protected static ?string $title = 'Mis chequeos';
 
@@ -34,7 +36,7 @@ class ChequeoHistorico extends Page implements HasTable
     }
 
     public static function canAccess(): bool {
-        return \Auth::user()->hasRole('Operador');
+        return Auth::user()->hasRole('Operador');
     }
 
     public function table(Table $table): Table {
@@ -64,7 +66,7 @@ class ChequeoHistorico extends Page implements HasTable
             ->filters([
                 Filter::make('rango_fechas')
                       ->label('Rango de Fechas')
-                      ->form([
+                      ->schema([
                           DatePicker::make('fecha_inicio')
                                                      ->label('Fecha Inicio'),
                           DatePicker::make('fecha_fin')
@@ -99,8 +101,8 @@ class ChequeoHistorico extends Page implements HasTable
                           return $indicators;
                       }),
             ])
-            ->actions([
-                \Filament\Tables\Actions\ViewAction::make()->infolist([Grid::make()->schema([
+            ->recordActions([
+                ViewAction::make()->schema([Grid::make()->schema([
                     Section::make('Datos de la hoja de chequeo')
                            ->icon('heroicon-o-document')
                            ->schema([
@@ -147,7 +149,7 @@ class ChequeoHistorico extends Page implements HasTable
                            ])
                 ])]),
             ])
-            ->bulkActions([
+            ->toolbarActions([
 
             ]);
     }

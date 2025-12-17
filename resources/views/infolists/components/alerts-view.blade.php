@@ -57,7 +57,7 @@
                                 <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 group relative">
                                     <div class="flex items-center min-w-max">
                                         <!-- Contenedor para contenido de celda -->
-                                        <span class="text-gray-800 dark:text-gray-200 break-words max-w-full">
+                                        <span class="text-gray-800 dark:text-gray-200 wrap-break-word max-w-full">
                                                 @if($loop->last)
                                                 @if(!str_contains($cell,'Cuando tenga el valor') && !str_contains($cell,'No tiene'))
                                                     <div class="flex items-center gap-1">
@@ -66,7 +66,7 @@
                                                 @else
                                                     <x-filament::badge
                                                         size="sm"
-                                                        class="whitespace-normal max-w-full break-words">
+                                                        class="whitespace-normal max-w-full wrap-break-word">
                                                             {{ $cell }}
                                                         </x-filament::badge>
                                                 @endif

@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\DB;
 
 class EquipmentAlertsChart extends ChartWidget
 {
-    protected static ?string   $heading    = 'Top 5 Equipos con Más Alertas';
-    protected static ?string   $maxHeight  = '400px';
+    protected ?string   $heading    = 'Top 5 Equipos con Más Alertas';
+    protected ?string   $maxHeight  = '400px';
 
     protected function getData(): array {
         $activeFilter = $this->filter;
