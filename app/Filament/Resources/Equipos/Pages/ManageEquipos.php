@@ -13,7 +13,7 @@ class ManageEquipos extends ManageRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()->closeModalByClickingAway(false),
         ];
     }
 }

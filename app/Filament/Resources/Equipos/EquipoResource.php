@@ -12,6 +12,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
@@ -55,6 +56,27 @@ class EquipoResource extends Resource
                     ->label('Revision')
                     ->maxLength(255),
                 FileUpload::make('foto')->image(),
+                Repeater::make('Especificaciones')->columnSpanFull()
+                    ->relationship('specs')
+                    ->schema([
+                        TextInput::make('tipo')
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('unidad')
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('min')
+                            ->required()
+                            ->numeric(),
+                        TextInput::make('optimo')
+                            ->required()
+                            ->numeric(),
+                        TextInput::make('max')
+                            ->required()
+                            ->numeric(),
+                    ])
+                    ->columns(3)
+                    ->collapsible(),
             ]);
     }
 

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Equipo extends Model
 {
@@ -14,4 +15,9 @@ class Equipo extends Model
         'numeroControl',
         'revision',
     ];
+
+    public function specs(): HasMany
+    {
+        return $this->hasMany(EquipoSpec::class);
+    }
 }
