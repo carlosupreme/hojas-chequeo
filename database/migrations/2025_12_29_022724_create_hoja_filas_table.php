@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignIdFor(HojaChequeo::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(AnswerType::class)->constrained();
             $table->unsignedSmallInteger('order');
+            $table->enum('categoria', ['limpieza', 'operacion', 'revision'])->default('limpieza');
             $table->timestamps();
 
             $table->index(['hoja_chequeo_id', 'order']);
