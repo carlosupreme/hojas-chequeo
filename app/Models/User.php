@@ -35,7 +35,8 @@ class User extends Authenticatable implements FilamentUser
         ];
     }
 
-    public function perfil(): BelongsTo {
+    public function perfil(): BelongsTo
+    {
         return $this->belongsTo(Perfil::class);
     }
 
@@ -59,6 +60,4 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasRole('Supervisor');
     }
-
-
 }
