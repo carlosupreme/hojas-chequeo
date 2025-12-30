@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
     {
 
         $this->call(UserSeeder::class);
+        $this->call(RecorridoTintoreriaSeeder::class);
 
         $iconType = AnswerType::create([
             'key' => 'icon_set',

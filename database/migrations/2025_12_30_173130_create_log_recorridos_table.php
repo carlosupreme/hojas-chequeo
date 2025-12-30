@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\FormularioRecorrido;
 use App\Models\Turno;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
@@ -13,10 +14,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('recorridos', function (Blueprint $table) {
+        Schema::create('log_recorridos', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Turno::class)->constrained()->nullOnDelete();
-            $table->foreignIdFor(User::class)->constrained()->nullOnDelete();
+            $table->foreignIdFor(FormularioRecorrido::class)->constrained();
+            $table->foreignIdFor(User::class)->constrained();
+            $table->foreignIdFor(Turno::class)->constrained();
+            $table->date('fecha');
             $table->timestamps();
         });
     }
@@ -26,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('recorridos');
+        Schema::dropIfExists('log_recorridos');
     }
 };
