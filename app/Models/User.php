@@ -20,6 +20,8 @@ class User extends Authenticatable implements FilamentUser
         'name',
         'email',
         'password',
+        'perfil_id',
+        'turno_id',
     ];
 
     protected $hidden = [
@@ -33,6 +35,11 @@ class User extends Authenticatable implements FilamentUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function turno(): BelongsTo
+    {
+        return $this->belongsTo(Turno::class);
     }
 
     public function perfil(): BelongsTo
@@ -59,5 +66,10 @@ class User extends Authenticatable implements FilamentUser
     public function isSupervisor(): bool
     {
         return $this->hasRole('Supervisor');
+    }
+
+    public function tieneAccesoAHoja($hojaId): bool
+    {
+        return $this->perfil->tieneAccesoAHoja($hojaId);
     }
 }

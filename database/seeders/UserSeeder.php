@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Perfil;
+use App\Models\Turno;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
@@ -11,9 +12,16 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        Perfil::create([
+        $turnoTintoreria = Turno::create([
+            'nombre' => 'Tintoreria',
+            'dias' => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+            'hora_inicio' => '08:00:00',
+            'hora_final' => '17:00:00',
+        ]);
+
+        $perfil = Perfil::create([
             'nombre' => 'Administrador',
-            'hoja_ids' => [1, 2, 3],
+            'hoja_ids' => ['*'],
         ]);
 
         $adminRole = Role::create(['name' => 'Administrador']);
@@ -24,7 +32,8 @@ class UserSeeder extends Seeder
             'name' => 'Administrador',
             'password' => bcrypt('password'),
             'email' => 'admin@admin.com',
-            'perfil_id' => 1,
+            'perfil_id' => $perfil->id,
+            'turno_id' => $turnoTintoreria->id,
         ]);
 
         $user->assignRole($adminRole);
@@ -33,10 +42,14 @@ class UserSeeder extends Seeder
             'name' => 'Operador',
             'password' => bcrypt('password'),
             'email' => 'operador@admin.com',
-            'perfil_id' => 1,
+            'perfil_id' => $perfil->id,
+            'turno_id' => $turnoTintoreria->id,
         ]);
 
-        User::factory(20)->create()->each(function ($user) use ($operadorRole) {
+        User::factory(20)->create([
+            'perfil_id' => $perfil->id,
+            'turno_id' => $turnoTintoreria->id,
+        ])->each(function ($user) use ($operadorRole) {
             $user->assignRole($operadorRole);
         });
 
@@ -46,7 +59,8 @@ class UserSeeder extends Seeder
             'name' => 'supervisor',
             'password' => bcrypt('password'),
             'email' => 'supervisor@admin.com',
-            'perfil_id' => 1,
+            'perfil_id' => $perfil->id,
+            'turno_id' => $turnoTintoreria->id,
         ]);
 
         $supervisor->assignRole($supervisorRole);

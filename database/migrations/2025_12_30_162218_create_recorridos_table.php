@@ -1,6 +1,7 @@
 <?php
 
-use App\Models\Perfil;
+use App\Models\Turno;
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,15 +13,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('perfils', function (Blueprint $table) {
+        Schema::create('recorridos', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre')->unique();
-            $table->json('hoja_ids');
+            $table->foreignIdFor(Turno::class)->constrained()->nullOnDelete();
+            $table->foreignIdFor(User::class)->constrained()->nullOnDelete();
             $table->timestamps();
-        });
-
-        Schema::table('users', function (Blueprint $table) {
-            $table->foreignIdFor(Perfil::class)->constrained()->restrictOnDelete();
         });
     }
 
@@ -29,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('perfils');
+        Schema::dropIfExists('recorridos');
     }
 };
