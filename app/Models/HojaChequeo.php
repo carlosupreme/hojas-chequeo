@@ -12,6 +12,7 @@ class HojaChequeo extends Model
         'equipo_id',
         'observaciones',
         'encendido',
+        'version',
     ];
 
     public function equipo(): BelongsTo

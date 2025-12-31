@@ -16,8 +16,10 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Equipo::class)->constrained()->cascadeOnDelete();
             $table->string('observaciones')->nullable();
+            $table->integer('version')->default(1);
             $table->boolean('encendido')->default(true);
             $table->timestamps();
+            $table->unique(['equipo_id', 'version']);
         });
     }
 
