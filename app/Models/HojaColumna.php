@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class HojaColumna extends Model
 {
@@ -19,5 +21,15 @@ class HojaColumna extends Model
         return [
             'is_fixed' => 'boolean',
         ];
+    }
+
+    public function hojaChequeo(): BelongsTo
+    {
+        return $this->belongsTo(HojaChequeo::class);
+    }
+
+    public function valores(): HasMany
+    {
+        return $this->hasMany(HojaFilaValor::class);
     }
 }

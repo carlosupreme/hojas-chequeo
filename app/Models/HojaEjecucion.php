@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class HojaEjecucion extends Model
 {
@@ -15,4 +17,26 @@ class HojaEjecucion extends Model
         'observaciones',
         'finalizado_en',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'finalizado_en' => 'datetime',
+        ];
+    }
+
+    public function hojaChequeo(): BelongsTo
+    {
+        return $this->belongsTo(HojaChequeo::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function respuestas(): HasMany
+    {
+        return $this->hasMany(HojaFilaRespuesta::class);
+    }
 }

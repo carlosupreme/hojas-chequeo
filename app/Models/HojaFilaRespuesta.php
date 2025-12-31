@@ -2,8 +2,12 @@
 
 namespace App\Models;
 
+use App\Observers\HojaFilaRespuestaObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[ObservedBy([HojaFilaRespuestaObserver::class])]
 class HojaFilaRespuesta extends Model
 {
     protected $fillable = [
@@ -14,4 +18,27 @@ class HojaFilaRespuesta extends Model
         'text_value',
         'boolean_value',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'numeric_value' => 'decimal:2',
+            'boolean_value' => 'boolean',
+        ];
+    }
+
+    public function hojaEjecucion(): BelongsTo
+    {
+        return $this->belongsTo(HojaEjecucion::class);
+    }
+
+    public function hojaFila(): BelongsTo
+    {
+        return $this->belongsTo(HojaFila::class);
+    }
+
+    public function answerOption(): BelongsTo
+    {
+        return $this->belongsTo(AnswerOption::class);
+    }
 }

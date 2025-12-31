@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AnswerOption extends Model
 {
@@ -14,8 +16,13 @@ class AnswerOption extends Model
         'color',
     ];
 
-    public function answerType()
+    public function answerType(): BelongsTo
     {
         return $this->belongsTo(AnswerType::class);
+    }
+
+    public function hojaFilaRespuestas(): HasMany
+    {
+        return $this->hasMany(HojaFilaRespuesta::class);
     }
 }
