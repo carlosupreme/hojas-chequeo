@@ -105,7 +105,12 @@
             <tr>
                 <td class="header">AREA</td>
                 <td class="header">TAG</td>
-                <td class="header text-center" rowspan="2">HOJA DE CHEQUEO EQUIPO {{$record->equipo->nombre}}</td>
+                <td class="header text-center" rowspan="2">
+                    HOJA DE CHEQUEO EQUIPO {{$record->equipo->nombre}}
+                    @if(isset($chunk['turno']))
+                        ({{ $chunk['turno']->nombre }})
+                    @endif
+                </td>
                 <td class="header">No DE CONTROL DE EQUIPO</td>
                 <td class="header">REVISION</td>
                 <td class="header">RAZON</td>

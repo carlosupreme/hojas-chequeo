@@ -55,7 +55,7 @@
                 >
                     <span class="flex items-center gap-2">
                         @svg('heroicon-o-chart-bar', 'w-4 h-4')
-                        Comparar Turnos
+                        Todos
                     </span>
                 </button>
             </nav>

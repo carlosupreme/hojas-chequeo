@@ -6,6 +6,7 @@ use App\Filament\Resources\HojaChequeos\HojaChequeoResource;
 use App\Models\HojaChequeo;
 use App\Models\Turno;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
@@ -50,9 +51,10 @@ class HistoryHojaChequeo extends Page
 
     public function getEjecuciones(): Collection
     {
+        $endDate = Carbon::parse($this->endDate)->addDay()->format('Y-m-d');
         return $this->record->chequeos()
             ->with(['turno', 'user', 'respuestas.hojaFila', 'respuestas.answerOption'])
-            ->whereBetween('finalizado_en', [$this->startDate, $this->endDate])
+            ->whereBetween('finalizado_en', [$this->startDate, $endDate])
             ->whereNotNull('finalizado_en')
             ->orderBy('finalizado_en')
             ->get();
@@ -160,7 +162,26 @@ class HistoryHojaChequeo extends Page
             Action::make('exportPdf')
                 ->label('Exportar a PDF')
                 ->icon('heroicon-o-document-arrow-down')
-                ->action(fn () => $this->exportPdf()),
+                ->form([
+                    \Filament\Forms\Components\Select::make('turno_id')
+                        ->label('Seleccionar Turno')
+                        ->options(function () {
+                            $turnos = $this->getTurnos();
+                            $options = ['all' => 'Todos los Turnos'];
+
+                            foreach ($turnos as $turno) {
+                                $options[$turno->id] = $turno->nombre;
+                            }
+
+                            return $options;
+                        })
+                        ->default('all')
+                        ->required()
+                        ->native(false),
+                ])
+                ->action(function (array $data) {
+                    return $this->exportPdf($data['turno_id']);
+                }),
             Action::make('exportExcel')
                 ->label('Exportar a Excel')
                 ->icon('heroicon-o-document-arrow-down')
@@ -168,7 +189,7 @@ class HistoryHojaChequeo extends Page
         ];
     }
 
-    public function exportPdf()
+    public function exportPdf($turnoId = 'all')
     {
         $dates = $this->getDateRange();
         $filas = $this->record->filas()->with('answerType', 'valores')->get();
@@ -178,24 +199,59 @@ class HistoryHojaChequeo extends Page
         $chunks = [];
         $dateChunks = array_chunk($dates, 15);
 
-        foreach ($dateChunks as $chunkDates) {
-            $chunkEjecuciones = [];
+        if ($turnoId === 'all') {
+            // For "all" mode, create separate chunks for each turno
+            $turnos = $this->getTurnos();
 
-            foreach ($chunkDates as $date) {
-                $ejecucion = $ejecuciones->first(function ($ej) use ($date) {
-                    return $ej->finalizado_en->format('Y-m-d') === $date;
-                });
+            foreach ($turnos as $turno) {
+                foreach ($dateChunks as $chunkDates) {
+                    $chunkEjecuciones = [];
 
-                if ($ejecucion) {
-                    $chunkEjecuciones[$date] = $ejecucion;
+                    foreach ($chunkDates as $date) {
+                        $ejecucion = $ejecuciones->first(function ($ej) use ($date, $turno) {
+                            return $ej->finalizado_en->format('Y-m-d') === $date && $ej->turno_id === $turno->id;
+                        });
+
+                        if ($ejecucion) {
+                            $chunkEjecuciones[$date] = $ejecucion;
+                        }
+                    }
+
+                    $chunks[] = [
+                        'dates' => $chunkDates,
+                        'ejecuciones' => $chunkEjecuciones,
+                        'turno' => $turno,
+                    ];
                 }
             }
+        } else {
+            // For single turno mode
+            $turno = Turno::find($turnoId);
+            $filteredEjecuciones = $ejecuciones->where('turno_id', $turnoId);
 
-            $chunks[] = [
-                'dates' => $chunkDates,
-                'ejecuciones' => $chunkEjecuciones,
-            ];
+            foreach ($dateChunks as $chunkDates) {
+                $chunkEjecuciones = [];
+
+                foreach ($chunkDates as $date) {
+                    $ejecucion = $filteredEjecuciones->first(function ($ej) use ($date) {
+                        return $ej->finalizado_en->format('Y-m-d') === $date;
+                    });
+
+                    if ($ejecucion) {
+                        $chunkEjecuciones[$date] = $ejecucion;
+                    }
+                }
+
+                $chunks[] = [
+                    'dates' => $chunkDates,
+                    'ejecuciones' => $chunkEjecuciones,
+                    'turno' => $turno,
+                ];
+            }
         }
+
+        // Get turno info for filename
+        $turnoName = $turnoId === 'all' ? 'todos' : (Turno::find($turnoId)?->nombre ?? 'turno');
 
         $pdf = Pdf::loadView('filament.resources.hoja-chequeos.pages.history-hoja-chequeo-pdf', [
             'record' => $this->record,
@@ -207,7 +263,7 @@ class HistoryHojaChequeo extends Page
             ->setOption('isHtml5ParserEnabled', true)
             ->setOption('isPhpEnabled', true);
 
-        $filename = 'historial_'.$this->record->equipo->tag.'_'.now()->format('Y-m-d').'.pdf';
+        $filename = 'historial_'.$this->record->equipo->tag.'_'.$turnoName.'_'.now()->format('Y-m-d').'.pdf';
 
         return response()->streamDownload(
             fn () => print ($pdf->output()),
