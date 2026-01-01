@@ -5,6 +5,7 @@ namespace App\Filament\Resources\HojaChequeos\Pages;
 use App\Filament\Resources\HojaChequeos\HojaChequeoResource;
 use App\Models\HojaChequeo;
 use App\Models\Turno;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\CarbonPeriod;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
@@ -167,7 +168,52 @@ class HistoryHojaChequeo extends Page
         ];
     }
 
-    public function exportPdf() {}
+    public function exportPdf()
+    {
+        $dates = $this->getDateRange();
+        $filas = $this->record->filas()->with('answerType', 'valores')->get();
+        $columnas = $this->record->columnas()->get();
+        $ejecuciones = $this->getEjecuciones();
+
+        $chunks = [];
+        $dateChunks = array_chunk($dates, 15);
+
+        foreach ($dateChunks as $chunkDates) {
+            $chunkEjecuciones = [];
+
+            foreach ($chunkDates as $date) {
+                $ejecucion = $ejecuciones->first(function ($ej) use ($date) {
+                    return $ej->finalizado_en->format('Y-m-d') === $date;
+                });
+
+                if ($ejecucion) {
+                    $chunkEjecuciones[$date] = $ejecucion;
+                }
+            }
+
+            $chunks[] = [
+                'dates' => $chunkDates,
+                'ejecuciones' => $chunkEjecuciones,
+            ];
+        }
+
+        $pdf = Pdf::loadView('filament.resources.hoja-chequeos.pages.history-hoja-chequeo-pdf', [
+            'record' => $this->record,
+            'chunks' => $chunks,
+            'filas' => $filas,
+            'columnas' => $columnas,
+        ])
+            ->setPaper('a4', 'landscape')
+            ->setOption('isHtml5ParserEnabled', true)
+            ->setOption('isPhpEnabled', true);
+
+        $filename = 'historial_'.$this->record->equipo->tag.'_'.now()->format('Y-m-d').'.pdf';
+
+        return response()->streamDownload(
+            fn () => print ($pdf->output()),
+            $filename
+        );
+    }
 
     public function exportExcel() {}
 }

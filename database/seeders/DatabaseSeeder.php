@@ -141,7 +141,7 @@ class DatabaseSeeder extends Seeder
                     'user_id' => $user->id,
                     'turno_id' => $turnoId,
                     'nombre_operador' => $user->name,
-                    'firma_operador' => 'Firma de '.$user->name,
+                    'firma_operador' => '/firmas/firma.svg',
                     'firma_supervisor' => 'Firma de supervisor',
                     'observaciones' => 'Ejecución del día '.$day.' - Turno '.$turnoId,
                     'finalizado_en' => $date,
