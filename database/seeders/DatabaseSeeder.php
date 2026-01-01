@@ -125,7 +125,7 @@ class DatabaseSeeder extends Seeder
 
         // Create executions (simulate a month) for each shift
         foreach (range(1, 30) as $day) {
-            $date = Carbon::now()->startOfMonth()->addDays($day - 1);
+            $date = Carbon::now()->subMonth()->addDays($day);
 
             // Create execution for each turno
             foreach ($usersByTurno as $turnoId => $users) {

@@ -5,6 +5,7 @@
     $turnos = $this->getTurnos();
     $ejecucionesByDateAndTurno = $this->getEjecucionesByDateAndTurno();
     $shiftColors = $this->getShiftColors();
+    $filaAggregates = $this->getFilaAggregates(); // SQL aggregation instead of runtime calculation
 
     $filas = $record->filas()->with('answerType')->get();
     $columnas = $record->columnas()->get();
@@ -152,9 +153,6 @@
                             @endforeach
 
                             {{-- Date Columns with Respuestas --}}
-                            @php
-                                $numericValues = [];
-                            @endphp
                             @if($activeTab == 'compare')
                                 {{-- Compare Mode --}}
                                 @foreach($dates as $date)
@@ -163,11 +161,6 @@
                                             $ejecucion = $ejecucionesByDateAndTurno[$date][$turno->id] ?? null;
                                             $respuesta = $ejecucion?->respuestas->where('hoja_fila_id', $fila->id)->first();
                                             $turnoColor = $shiftColors[$turno->id];
-
-                                            // Collect numeric values for aggregation
-                                            if ($respuesta && $respuesta->numeric_value !== null) {
-                                                $numericValues[] = $respuesta->numeric_value;
-                                            }
                                         @endphp
                                         <td class="px-3 py-2 text-center text-xs border-l border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
                                             @if($respuesta)
@@ -199,11 +192,6 @@
                                         $ejecucion = $ejecucionesByDateAndTurno[$date][$activeTab] ?? null;
                                         $respuesta = $ejecucion?->respuestas->where('hoja_fila_id', $fila->id)->first();
                                         $turnoColor = $shiftColors[$activeTab] ?? 'gray';
-
-                                        // Collect numeric values for aggregation
-                                        if ($respuesta && $respuesta->numeric_value !== null) {
-                                            $numericValues[] = $respuesta->numeric_value;
-                                        }
                                     @endphp
                                     <td class="px-3 py-2 text-center text-xs border-l border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
                                         @if($respuesta)
@@ -229,19 +217,18 @@
                                 @endforeach
                             @endif
 
-                            {{-- Aggregate Columns --}}
+                            {{-- Aggregate Columns (from SQL aggregation) --}}
                             @php
-                                $sum = count($numericValues) > 0 ? array_sum($numericValues) : null;
-                                $average = count($numericValues) > 0 ? array_sum($numericValues) / count($numericValues) : null;
+                                $aggregate = $filaAggregates[$fila->id] ?? null;
                             @endphp
                             <td class="px-3 py-2 text-center text-xs border-l border-r border-gray-200 dark:border-gray-700 bg-amber-50 dark:bg-amber-900/20 font-semibold ">
-                                @if($sum !== null)
-                                    {{ number_format($sum, 2) }}
+                                @if($aggregate && isset($aggregate['suma']))
+                                    {{ number_format($aggregate['suma'], 2) }}
                                 @endif
                             </td>
                             <td class="px-3 py-2 text-center text-xs border-r border-gray-200 dark:border-gray-700 bg-amber-50 dark:bg-amber-900/20 font-semibold ">
-                                @if($average !== null)
-                                    {{ number_format($average, 2) }}
+                                @if($aggregate && isset($aggregate['promedio']))
+                                    {{ number_format($aggregate['promedio'], 2) }}
                                 @endif
                             </td>
                         </tr>

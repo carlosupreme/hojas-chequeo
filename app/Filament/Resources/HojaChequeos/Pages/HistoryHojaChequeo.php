@@ -89,6 +89,46 @@ class HistoryHojaChequeo extends Page
         })->toArray();
     }
 
+    /**
+     * Calculate sum and average of numeric values per fila using SQL aggregation
+     * Returns array indexed by fila_id with ['suma' => float, 'promedio' => float]
+     */
+    public function getFilaAggregates(): array
+    {
+        // Build query based on active tab
+        $query = \DB::table('hoja_ejecucions as he')
+            ->join('hoja_fila_respuestas as hfr', 'he.id', '=', 'hfr.hoja_ejecucion_id')
+            ->where('he.hoja_chequeo_id', $this->record->id)
+            ->whereBetween('he.finalizado_en', [$this->startDate, $this->endDate])
+            ->whereNotNull('he.finalizado_en')
+            ->whereNotNull('hfr.numeric_value');
+
+        // Filter by turno if not in compare mode
+        if ($this->activeTab !== 'compare') {
+            $query->where('he.turno_id', $this->activeTab);
+        }
+
+        // Aggregate by fila_id
+        $results = $query
+            ->select('hfr.hoja_fila_id')
+            ->selectRaw('SUM(hfr.numeric_value) as suma')
+            ->selectRaw('AVG(hfr.numeric_value) as promedio')
+            ->selectRaw('COUNT(hfr.numeric_value) as count')
+            ->groupBy('hfr.hoja_fila_id')
+            ->get();
+
+        // Convert to array indexed by fila_id
+        return $results->mapWithKeys(function ($result) {
+            return [
+                $result->hoja_fila_id => [
+                    'suma' => (float) $result->suma,
+                    'promedio' => (float) $result->promedio,
+                    'count' => (int) $result->count,
+                ],
+            ];
+        })->toArray();
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema

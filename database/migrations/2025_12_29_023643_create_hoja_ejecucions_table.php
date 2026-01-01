@@ -23,6 +23,8 @@ return new class extends Migration
             $table->string('observaciones')->nullable();
             $table->timestamp('finalizado_en')->nullable()->index();
             $table->timestamps();
+
+            $table->index(['hoja_chequeo_id', 'finalizado_en']);
         });
     }
 
