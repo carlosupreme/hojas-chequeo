@@ -6,49 +6,48 @@ use App\Filament\Resources\HojaChequeos\HojaChequeoResource;
 use App\Filament\Resources\HojaChequeos\Schemas\HojaChequeoForm;
 use App\Models\HojaChequeo;
 use Filament\Notifications\Notification;
+use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
 use Filament\Schemas\Schema;
 use Livewire\Attributes\On;
 
-class CreateHojaChequeo extends Page
+class EditHojaChequeo extends Page
 {
+    use InteractsWithRecord;
+
     protected static string $resource = HojaChequeoResource::class;
 
-    protected string $view = 'filament.resources.hoja-chequeos.pages.create-hoja-chequeo';
+    protected string $view = 'filament.resources.hoja-chequeos.pages.edit-hoja-chequeo';
 
     public ?array $data = [];
 
-    public ?int $recordCreatedId = null;
+    public int $hojaChequeoId;
 
-    public function mount(): void
+    public function mount(int|string $record): void
     {
-        $this->form->fill();
+        $this->record = HojaChequeo::findOrFail($record);
+        $this->hojaChequeoId = $this->record->id;
+        $this->form->fill([
+            ...$this->record->attributesToArray(),
+            'version' => HojaChequeo::getCurrentVersion($this->record->equipo_id),
+        ]);
     }
 
-    public function create(): void
+    public function update(): void
     {
         $data = $this->form->getState();
         $record = HojaChequeo::create($data);
-        $this->recordCreatedId = $record->id;
         $this->dispatch('hoja-chequeo-created', $record->id);
+        $this->record->update([
+            'encendido' => false,
+        ]);
     }
 
     #[On('create-hoja-chequeo-items-created')]
     public function success(): void
     {
-        Notification::make()->success()->title('Creado')->send();
+        Notification::make()->success()->title('Nueva version creada')->send();
         $this->redirect($this->getResource()::getUrl('index'));
-    }
-
-    #[On('create-hoja-chequeo-items-failed')]
-    public function error(): void
-    {
-        if (! $this->recordCreatedId) {
-            return;
-        }
-
-        HojaChequeo::find($this->recordCreatedId)->deleteQuietly();
-        Notification::make()->danger()->title('Corrige los errores')->send();
     }
 
     public function form(Schema $schema): Schema
@@ -58,6 +57,6 @@ class CreateHojaChequeo extends Page
 
     public function getTitle(): string
     {
-        return 'Crear hoja de chequeo';
+        return 'Editar hoja de chequeo';
     }
 }

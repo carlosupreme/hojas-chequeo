@@ -36,11 +36,11 @@ class HojaChequeo extends Model
 
     public function columnas(): HasMany
     {
-        return $this->hasMany(HojaColumna::class);
+        return $this->hasMany(HojaColumna::class)->orderBy('order');
     }
 
     public function filas(): HasMany
     {
-        return $this->hasMany(HojaFila::class);
+        return $this->hasMany(HojaFila::class)->orderBy('order');
     }
 }

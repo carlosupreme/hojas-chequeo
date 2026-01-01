@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('hoja_chequeos', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Equipo::class)->constrained()->cascadeOnDelete();
-            $table->string('observaciones')->nullable();
+            $table->longText('observaciones')->nullable();
             $table->integer('version')->default(1);
             $table->boolean('encendido')->default(true);
             $table->timestamps();
