@@ -25,7 +25,7 @@ class HistoryHojaChequeo extends Page
 
     public ?string $endDate = null;
 
-    public string $activeTab = 'all';
+    public string $activeTab = 'compare';
 
     protected array $queryString = ['startDate', 'endDate', 'activeTab'];
 
@@ -36,7 +36,7 @@ class HistoryHojaChequeo extends Page
 
     public function mount(): void
     {
-        $this->startDate = $this->startDate ?? now()->subWeek()->format('Y-m-d');
+        $this->startDate = $this->startDate ?? now()->subWeeks(2)->format('Y-m-d');
         $this->endDate = $this->endDate ?? now()->format('Y-m-d');
     }
 
@@ -82,7 +82,7 @@ class HistoryHojaChequeo extends Page
     public function getShiftColors(): array
     {
         $turnos = $this->getTurnos();
-        $colors = ['blue', 'orange', 'green', 'purple', 'pink', 'indigo', 'red', 'yellow'];
+        $colors = ['blue', 'green', 'red', 'yellow'];
 
         return $turnos->mapWithKeys(function ($turno, $index) use ($colors) {
             return [$turno->id => $colors[$index % count($colors)]];
