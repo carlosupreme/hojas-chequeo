@@ -3,9 +3,7 @@
 namespace App\Filament\Resources\HojaChequeos;
 
 use App\Filament\Resources\HojaChequeos\Pages\CreateHojaChequeo;
-use App\Filament\Resources\HojaChequeos\Pages\EditHojaChequeo;
 use App\Filament\Resources\HojaChequeos\Pages\ListHojaChequeos;
-use App\Filament\Resources\HojaChequeos\Pages\ViewHojaChequeo;
 use App\Filament\Resources\HojaChequeos\Schemas\HojaChequeoForm;
 use App\Filament\Resources\HojaChequeos\Schemas\HojaChequeoInfolist;
 use App\Filament\Resources\HojaChequeos\Tables\HojaChequeosTable;
@@ -53,9 +51,9 @@ class HojaChequeoResource extends Resource
     {
         return [
             'index' => ListHojaChequeos::route('/'),
-            'create' => CreateHojaChequeo::route('/create'),
-            'view' => ViewHojaChequeo::route('/{record}'),
-            'edit' => EditHojaChequeo::route('/{record}/edit'),
+            'create' => CreateHojaChequeo::route('/crear'),
+            //            'view' => ViewHojaChequeo::route('/{record}'),
+            //            'edit' => EditHojaChequeo::route('/{record}/edit'),
         ];
     }
 }

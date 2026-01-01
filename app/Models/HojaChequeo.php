@@ -15,6 +15,15 @@ class HojaChequeo extends Model
         'version',
     ];
 
+    public static function getCurrentVersion(int $equipo_id): int
+    {
+        $latestVersion = HojaChequeo::where('equipo_id', $equipo_id)
+            ->orderBy('version', 'desc')
+            ->value('version');
+
+        return $latestVersion ? (int) $latestVersion + 1 : 1;
+    }
+
     public function equipo(): BelongsTo
     {
         return $this->belongsTo(Equipo::class);

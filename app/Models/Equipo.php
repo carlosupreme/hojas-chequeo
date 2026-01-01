@@ -21,7 +21,7 @@ class Equipo extends Model
         return $this->hasMany(EquipoSpec::class);
     }
 
-    public function hojasChequeo(): HasMany
+    public function hojaChequeos(): HasMany
     {
         return $this->hasMany(HojaChequeo::class);
     }
