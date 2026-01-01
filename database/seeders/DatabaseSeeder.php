@@ -41,8 +41,16 @@ class DatabaseSeeder extends Seeder
             'answer_type_id' => $iconType->id,
             'key' => 'realizado',
             'label' => 'REALIZADO',
-            'icon' => 'check',
+            'icon' => 'heroicon-o-check',
             'color' => 'green',
+        ]);
+
+        $noRealizado = AnswerOption::create([
+            'answer_type_id' => $iconType->id,
+            'key' => 'no_realizado',
+            'label' => 'NO REALIZADO',
+            'icon' => 'heroicon-o-x-mark',
+            'color' => 'red',
         ]);
 
         $equipo = Equipo::create([
@@ -108,30 +116,51 @@ class DatabaseSeeder extends Seeder
         $setValor($filaHoras, 'metodo', 'Tiempo');
         $setValor($filaHoras, 'observaciones', 'Tomar el tiempo');
 
-        $user = User::find(1);
-        // Create executions (simulate a month)
+        // Get users from different shifts
+        $allUsers = User::whereHas('roles', function ($query) {
+            $query->where('name', 'Operador');
+        })->get();
+
+        $usersByTurno = $allUsers->groupBy('turno_id');
+
+        // Create executions (simulate a month) for each shift
         foreach (range(1, 30) as $day) {
-            $exec = HojaEjecucion::create([
-                'hoja_chequeo_id' => $hoja->id,
-                'user_id' => $user->id,
-                'nombre_operador' => $user->name,
-                'firma_operador' => 'Firma de '.$user->name,
-                'firma_supervisor' => 'Firma de supervisor',
-                'observaciones' => 'Ejecución del día '.$day,
-                'finalizado_en' => Carbon::now()->startOfMonth()->addDays($day - 1),
-            ]);
+            $date = Carbon::now()->startOfMonth()->addDays($day - 1);
 
-            HojaFilaRespuesta::create([
-                'hoja_ejecucion_id' => $exec->id,
-                'hoja_fila_id' => $filaLimpieza->id,
-                'answer_option_id' => $realizado->id,
-            ]);
+            // Create execution for each turno
+            foreach ($usersByTurno as $turnoId => $users) {
+                if ($users->isEmpty()) {
+                    continue;
+                }
 
-            HojaFilaRespuesta::create([
-                'hoja_ejecucion_id' => $exec->id,
-                'hoja_fila_id' => $filaHoras->id,
-                'numeric_value' => rand(1, 10) * 10,
-            ]);
+                $user = $users->random();
+                $answerOptions = [$realizado->id, $noRealizado->id];
+
+                $exec = HojaEjecucion::create([
+                    'hoja_chequeo_id' => $hoja->id,
+                    'user_id' => $user->id,
+                    'turno_id' => $turnoId,
+                    'nombre_operador' => $user->name,
+                    'firma_operador' => 'Firma de '.$user->name,
+                    'firma_supervisor' => 'Firma de supervisor',
+                    'observaciones' => 'Ejecución del día '.$day.' - Turno '.$turnoId,
+                    'finalizado_en' => $date,
+                ]);
+
+                // Randomize icon answer (check or x-mark)
+                HojaFilaRespuesta::create([
+                    'hoja_ejecucion_id' => $exec->id,
+                    'hoja_fila_id' => $filaLimpieza->id,
+                    'answer_option_id' => $answerOptions[array_rand($answerOptions)],
+                ]);
+
+                // Randomize numeric answer
+                HojaFilaRespuesta::create([
+                    'hoja_ejecucion_id' => $exec->id,
+                    'hoja_fila_id' => $filaHoras->id,
+                    'numeric_value' => rand(1, 15) * 10,
+                ]);
+            }
         }
     }
 }

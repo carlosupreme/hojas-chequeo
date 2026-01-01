@@ -2,8 +2,11 @@
 
 namespace App\Filament\Resources\HojaChequeos\Tables;
 
+use App\Filament\Resources\HojaChequeos\HojaChequeoResource;
 use App\Models\HojaChequeo;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -78,9 +81,15 @@ class HojaChequeosTable
                     ->preload(),
             ])
             ->recordActions([
+                Action::make('Historial')
+                    ->url(fn (HojaChequeo $record): string => HojaChequeoResource::getUrl('history', ['record' => $record]))
+                    ->icon('heroicon-o-calendar'),
                 ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(),
             ])
+            ->persistSortInSession()
+            ->persistFiltersInSession()
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

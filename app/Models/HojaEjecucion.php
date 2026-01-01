@@ -11,6 +11,7 @@ class HojaEjecucion extends Model
     protected $fillable = [
         'hoja_chequeo_id',
         'user_id',
+        'turno_id',
         'nombre_operador',
         'firma_operador',
         'firma_supervisor',
@@ -33,6 +34,11 @@ class HojaEjecucion extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function turno(): BelongsTo
+    {
+        return $this->belongsTo(Turno::class);
     }
 
     public function respuestas(): HasMany
