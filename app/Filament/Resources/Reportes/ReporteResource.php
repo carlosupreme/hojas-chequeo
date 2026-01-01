@@ -1,0 +1,57 @@
+<?php
+
+namespace App\Filament\Resources\Reportes;
+
+use App\Filament\Resources\Reportes\Pages\CreateReporte;
+use App\Filament\Resources\Reportes\Pages\EditReporte;
+use App\Filament\Resources\Reportes\Pages\ListReportes;
+use App\Filament\Resources\Reportes\Pages\ViewReporte;
+use App\Filament\Resources\Reportes\Schemas\ReporteForm;
+use App\Filament\Resources\Reportes\Schemas\ReporteInfolist;
+use App\Filament\Resources\Reportes\Tables\ReportesTable;
+use App\Models\Reporte;
+use BackedEnum;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Table;
+
+class ReporteResource extends Resource
+{
+    protected static ?string $model = Reporte::class;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::PaperAirplane;
+    protected static ?string $recordTitleAttribute = 'Reporte';
+
+
+    public static function form(Schema $schema): Schema
+    {
+        return ReporteForm::configure($schema);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return ReporteInfolist::configure($schema);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return ReportesTable::configure($table);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'create' => CreateReporte::route('/create'),
+            'index' => ListReportes::route('/'),
+            'view' => ViewReporte::route('/{record}'),
+            'edit' => EditReporte::route('/{record}/edit'),
+        ];
+    }
+}
