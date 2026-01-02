@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\HojaChequeos\Pages;
 
 use App\Filament\Resources\HojaChequeos\HojaChequeoResource;
+use App\Models\AnswerOption;
 use App\Models\HojaChequeo;
 use App\Models\Turno;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -14,8 +15,8 @@ use Filament\Resources\Pages\Page;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Collection;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class HistoryHojaChequeo extends Page
 {
@@ -318,19 +319,21 @@ class HistoryHojaChequeo extends Page
                 $turnos = Turno::where('id', $turnoId)->get();
             }
 
-            // Helper mapping for icons to numeric scale (1-5)
-            $iconMap = [
-                'heroicon-o-check' => 1,
-                'heroicon-o-x-mark' => 2,
-                'heroicon-o-no-symbol' => 2,
-                'heroicon-o-minus-circle' => 3,
-                'heroicon-o-question-mark-circle' => 3,
-                'heroicon-o-clock' => 3,
-                'heroicon-o-eye' => 3,
-                'heroicon-o-exclamation-triangle' => 4,
-                'heroicon-o-shield-exclamation' => 4,
-                'heroicon-o-wrench' => 5,
-            ];
+            // Build dynamic mapping from existing AnswerOption records
+            // 1) get all options
+            $answerOptions = AnswerOption::orderBy('id')->get();
+            // 2) extract unique icons in deterministic order
+            $icons = $answerOptions->pluck('icon')->filter()->unique()->values();
+            // 3) map icons -> numeric values (1..N)
+            $iconMap = [];
+            foreach ($icons as $idx => $icon) {
+                $iconMap[$icon] = $idx + 1;
+            }
+            // 4) build label -> value map using the icon mapping (if option has no icon, leave empty)
+            $labelMap = [];
+            foreach ($answerOptions as $opt) {
+                $labelMap[$opt->label] = $opt->icon ? ($iconMap[$opt->icon] ?? '') : '';
+            }
 
             // Friendly turno name for filename
             $turnoName = $turnoId === 'all' ? 'todos' : (Turno::find($turnoId)?->nombre ?? 'turno');
@@ -388,14 +391,14 @@ class HistoryHojaChequeo extends Page
 
                 // Write columna headers
                 foreach ($columnas as $columna) {
-                    $cell = Coordinate::stringFromColumnIndex($colIndex) . $headerRow;
+                    $cell = Coordinate::stringFromColumnIndex($colIndex).$headerRow;
                     $sheet->setCellValue($cell, strtoupper($columna->label));
                     $colIndex++;
                 }
 
                 // Write date headers
                 foreach ($dates as $day) {
-                    $cell = Coordinate::stringFromColumnIndex($colIndex) . $headerRow;
+                    $cell = Coordinate::stringFromColumnIndex($colIndex).$headerRow;
                     $sheet->setCellValue($cell, Carbon::parse($day)->format('d/m'));
                     $colIndex++;
                 }
@@ -404,7 +407,7 @@ class HistoryHojaChequeo extends Page
                 $lastColumnIndex = $colIndex - 1;
 
                 // Apply header style to header row
-                $sheet->getStyle(Coordinate::stringFromColumnIndex(1) . $headerRow . ':' . Coordinate::stringFromColumnIndex($lastColumnIndex) . $headerRow)
+                $sheet->getStyle(Coordinate::stringFromColumnIndex(1).$headerRow.':'.Coordinate::stringFromColumnIndex($lastColumnIndex).$headerRow)
                     ->applyFromArray($headerStyle);
 
                 // Fill filas
@@ -414,14 +417,14 @@ class HistoryHojaChequeo extends Page
                     // columna valores
                     foreach ($columnas as $columna) {
                         $valor = $fila->valores->where('hoja_columna_id', $columna->id)->first();
-                        $cell = Coordinate::stringFromColumnIndex($colIndex) . $currentRow;
+                        $cell = Coordinate::stringFromColumnIndex($colIndex).$currentRow;
                         $sheet->setCellValue($cell, $valor?->valor ?? '');
                         $colIndex++;
                     }
 
                     // date cells: find ejecucion for this turno and date
                     foreach ($dates as $day) {
-                        $cell = Coordinate::stringFromColumnIndex($colIndex) . $currentRow;
+                        $cell = Coordinate::stringFromColumnIndex($colIndex).$currentRow;
                         $ejec = $ejecMap[$turno->id][$day] ?? null;
                         $respuesta = $ejec?->respuestas->where('hoja_fila_id', $fila->id)->first();
 
@@ -448,12 +451,12 @@ class HistoryHojaChequeo extends Page
 
                 // Operator name row
                 $labelColEnd = count($columnas);
-                $labelCell = Coordinate::stringFromColumnIndex(1) . $currentRow;
+                $labelCell = Coordinate::stringFromColumnIndex(1).$currentRow;
                 $sheet->setCellValue($labelCell, 'NOMBRE DE OPERADOR:');
                 // Fill operator names into date columns
                 $colIndex = count($columnas) + 1;
                 foreach ($dates as $day) {
-                    $cell = Coordinate::stringFromColumnIndex($colIndex) . $currentRow;
+                    $cell = Coordinate::stringFromColumnIndex($colIndex).$currentRow;
                     $ejec = $ejecMap[$turno->id][$day] ?? null;
                     $sheet->setCellValue($cell, $ejec?->nombre_operador ?? '');
                     $colIndex++;
@@ -461,11 +464,11 @@ class HistoryHojaChequeo extends Page
                 $currentRow++;
 
                 // Operator signature row -> replace image with [FIRMADO]
-                $labelCell = Coordinate::stringFromColumnIndex(1) . $currentRow;
+                $labelCell = Coordinate::stringFromColumnIndex(1).$currentRow;
                 $sheet->setCellValue($labelCell, 'FIRMA DEL OPERADOR');
                 $colIndex = count($columnas) + 1;
                 foreach ($dates as $day) {
-                    $cell = Coordinate::stringFromColumnIndex($colIndex) . $currentRow;
+                    $cell = Coordinate::stringFromColumnIndex($colIndex).$currentRow;
                     $ejec = $ejecMap[$turno->id][$day] ?? null;
                     if ($ejec?->firma_operador) {
                         $sheet->setCellValue($cell, '[FIRMADO]');
@@ -475,11 +478,11 @@ class HistoryHojaChequeo extends Page
                 $currentRow++;
 
                 // Supervisor signature row -> replace image with [FIRMADO]
-                $labelCell = Coordinate::stringFromColumnIndex(1) . $currentRow;
+                $labelCell = Coordinate::stringFromColumnIndex(1).$currentRow;
                 $sheet->setCellValue($labelCell, 'FIRMA DEL SUPERVISOR');
                 $colIndex = count($columnas) + 1;
                 foreach ($dates as $day) {
-                    $cell = Coordinate::stringFromColumnIndex($colIndex) . $currentRow;
+                    $cell = Coordinate::stringFromColumnIndex($colIndex).$currentRow;
                     $ejec = $ejecMap[$turno->id][$day] ?? null;
                     if ($ejec?->firma_supervisor) {
                         $sheet->setCellValue($cell, '[FIRMADO]');
@@ -488,10 +491,24 @@ class HistoryHojaChequeo extends Page
                 }
                 $currentRow++;
 
+                // Add mapping legend under the table: option label -> numeric value
+                // Leave one empty row for spacing
+                $currentRow++;
+                $sheet->setCellValue(Coordinate::stringFromColumnIndex(1).$currentRow, 'MAPA DE OPCIONES (Etiqueta -> Valor)');
+                $sheet->getStyle(Coordinate::stringFromColumnIndex(1).$currentRow)->getFont()->setBold(true);
+                $currentRow++;
+
+                // Write label -> value mappings
+                foreach ($labelMap as $label => $value) {
+                    $text = $label.' -> '.($value === '' ? '-' : $value);
+                    $sheet->setCellValue(Coordinate::stringFromColumnIndex(1).$currentRow, $text);
+                    $currentRow++;
+                }
+
                 // Apply border style to used area
-                $firstCell = Coordinate::stringFromColumnIndex(1) . $headerRow;
-                $lastCell = Coordinate::stringFromColumnIndex($lastColumnIndex) . ($currentRow - 1);
-                $sheet->getStyle($firstCell . ':' . $lastCell)->applyFromArray($borderStyle);
+                $firstCell = Coordinate::stringFromColumnIndex(1).$headerRow;
+                $lastCell = Coordinate::stringFromColumnIndex($lastColumnIndex).($currentRow - 1);
+                $sheet->getStyle($firstCell.':'.$lastCell)->applyFromArray($borderStyle);
 
                 // Auto size columns for readability (limited to first 50 columns to avoid huge loops)
                 $maxAuto = min($lastColumnIndex, 50);
