@@ -24,6 +24,11 @@ class ReporteResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'Reporte';
 
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Reportes';
+    }
+
     public static function form(Schema $schema): Schema
     {
         return ReporteForm::configure($schema);

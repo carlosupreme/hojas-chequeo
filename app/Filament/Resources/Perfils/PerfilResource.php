@@ -20,10 +20,14 @@ class PerfilResource extends Resource
 {
     protected static ?string $model = Perfil::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::UserCircle;
 
     protected static ?string $recordTitleAttribute = 'nombre';
 
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Administración';
+    }
     public static function form(Schema $schema): Schema
     {
         return PerfilForm::configure($schema);
