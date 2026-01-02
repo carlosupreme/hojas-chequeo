@@ -19,7 +19,6 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-
         $this->call(UserSeeder::class);
         $this->call(RecorridoTintoreriaSeeder::class);
 
@@ -40,17 +39,33 @@ class DatabaseSeeder extends Seeder
         $realizado = AnswerOption::create([
             'answer_type_id' => $iconType->id,
             'key' => 'realizado',
-            'label' => 'REALIZADO',
+            'label' => 'REALIZADO Y ESTA BIEN',
             'icon' => 'heroicon-o-check',
             'color' => 'green',
+        ]);
+
+        $realizadoMal = AnswerOption::create([
+            'answer_type_id' => $iconType->id,
+            'key' => 'realizado_mal',
+            'label' => 'REALIZADO Y ESTA MAL',
+            'icon' => 'heroicon-o-x-mark',
+            'color' => 'red',
         ]);
 
         $noRealizado = AnswerOption::create([
             'answer_type_id' => $iconType->id,
             'key' => 'no_realizado',
             'label' => 'NO REALIZADO',
-            'icon' => 'heroicon-o-x-mark',
-            'color' => 'red',
+            'icon' => 'heroicon-o-no-symbol',
+            'color' => 'yellow',
+        ]);
+
+        $noAplica = AnswerOption::create([
+            'answer_type_id' => $iconType->id,
+            'key' => 'no_aplica',
+            'label' => 'NO APLICA',
+            'icon' => 'heroicon-o-minus-circle',
+            'color' => 'gray',
         ]);
 
         $equipo = Equipo::create([
@@ -134,7 +149,7 @@ class DatabaseSeeder extends Seeder
                 }
 
                 $user = $users->random();
-                $answerOptions = [$realizado->id, $noRealizado->id];
+                $answerOptions = [$realizado->id, $noRealizado->id, $noAplica->id, $realizadoMal->id];
 
                 $exec = HojaEjecucion::create([
                     'hoja_chequeo_id' => $hoja->id,
