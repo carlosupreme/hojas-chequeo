@@ -14,6 +14,8 @@ use Filament\Resources\Pages\Page;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Collection;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class HistoryHojaChequeo extends Page
 {
@@ -52,6 +54,7 @@ class HistoryHojaChequeo extends Page
     public function getEjecuciones(): Collection
     {
         $endDate = Carbon::parse($this->endDate)->addDay()->format('Y-m-d');
+
         return $this->record->chequeos()
             ->with(['turno', 'user', 'respuestas.hojaFila', 'respuestas.answerOption'])
             ->whereBetween('finalizado_en', [$this->startDate, $endDate])
@@ -183,9 +186,29 @@ class HistoryHojaChequeo extends Page
                     return $this->exportPdf($data['turno_id']);
                 }),
             Action::make('exportExcel')
+                ->extraAttributes(['class' => 'text-white bg-green-600'])
                 ->label('Exportar a Excel')
                 ->icon('heroicon-o-document-arrow-down')
-                ->action(fn () => $this->exportExcel()),
+                ->form([
+                    \Filament\Forms\Components\Select::make('turno_id')
+                        ->label('Seleccionar Turno')
+                        ->options(function () {
+                            $turnos = $this->getTurnos();
+                            $options = ['all' => 'Todos los Turnos'];
+
+                            foreach ($turnos as $turno) {
+                                $options[$turno->id] = $turno->nombre;
+                            }
+
+                            return $options;
+                        })
+                        ->default('all')
+                        ->required()
+                        ->native(false),
+                ])
+                ->action(function (array $data) {
+                    return $this->exportExcel($data['turno_id']);
+                }),
         ];
     }
 
@@ -271,5 +294,227 @@ class HistoryHojaChequeo extends Page
         );
     }
 
-    public function exportExcel() {}
+    public function exportExcel($turnoId = 'all')
+    {
+        try {
+            $spreadsheet = new Spreadsheet;
+
+            $dates = $this->getDateRange();
+            $filas = $this->record->filas()->with('answerType', 'valores')->get();
+            $columnas = $this->record->columnas()->get();
+            $ejecuciones = $this->getEjecuciones();
+
+            // Build map: turno_id => date (Y-m-d) => ejecucion
+            $ejecMap = [];
+            foreach ($ejecuciones as $ej) {
+                $date = $ej->finalizado_en->format('Y-m-d');
+                $ejecMap[$ej->turno_id][$date] = $ej;
+            }
+
+            // Determine which turnos to export based on user selection
+            if ($turnoId === 'all') {
+                $turnos = $this->getTurnos();
+            } else {
+                $turnos = Turno::where('id', $turnoId)->get();
+            }
+
+            // Helper mapping for icons to numeric scale (1-5)
+            $iconMap = [
+                'heroicon-o-check' => 1,
+                'heroicon-o-x-mark' => 2,
+                'heroicon-o-no-symbol' => 2,
+                'heroicon-o-minus-circle' => 3,
+                'heroicon-o-question-mark-circle' => 3,
+                'heroicon-o-clock' => 3,
+                'heroicon-o-eye' => 3,
+                'heroicon-o-exclamation-triangle' => 4,
+                'heroicon-o-shield-exclamation' => 4,
+                'heroicon-o-wrench' => 5,
+            ];
+
+            // Friendly turno name for filename
+            $turnoName = $turnoId === 'all' ? 'todos' : (Turno::find($turnoId)?->nombre ?? 'turno');
+
+            $sheetIndex = 0;
+            foreach ($turnos as $turno) {
+                if ($sheetIndex === 0) {
+                    $sheet = $spreadsheet->getActiveSheet();
+                    $sheet->setTitle(substr($turno->nombre ?? 'Turno', 0, 31));
+                } else {
+                    $sheet = $spreadsheet->createSheet();
+                    $sheet->setTitle(substr($turno->nombre ?? ('Turno-'.$sheetIndex), 0, 31));
+                }
+
+                // Styles
+                $borderStyle = [
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                        ],
+                    ],
+                ];
+
+                $headerStyle = [
+                    'font' => ['bold' => true],
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                        ],
+                    ],
+                ];
+
+                // Title (merge first 5 columns like original pdf)
+                $sheet->mergeCells('A1:E1');
+                $sheet->setCellValue('A1', 'TACUBA DRY CLEAN');
+                $sheet->getStyle('A1:E1')->applyFromArray($headerStyle);
+
+                // Equipo info
+                $sheet->setCellValue('A3', 'AREA');
+                $sheet->setCellValue('B3', 'TAG');
+                $sheet->setCellValue('C3', 'HOJA DE CHEQUEO EQUIPO '.$this->record->equipo->nombre);
+                $sheet->setCellValue('D3', 'No DE CONTROL');
+                $sheet->setCellValue('E3', 'REVISION');
+
+                $sheet->setCellValue('A4', $this->record->equipo->area);
+                $sheet->setCellValue('B4', $this->record->equipo->tag);
+                $sheet->setCellValue('D4', $this->record->equipo->numeroControl);
+                $sheet->setCellValue('E4', $this->record->equipo->revision);
+
+                $sheet->getStyle('A3:E4')->applyFromArray($borderStyle);
+
+                // Table header start at row 6
+                $headerRow = 6;
+                $colIndex = 1; // 1-based for Coordinate
+
+                // Write columna headers
+                foreach ($columnas as $columna) {
+                    $cell = Coordinate::stringFromColumnIndex($colIndex) . $headerRow;
+                    $sheet->setCellValue($cell, strtoupper($columna->label));
+                    $colIndex++;
+                }
+
+                // Write date headers
+                foreach ($dates as $day) {
+                    $cell = Coordinate::stringFromColumnIndex($colIndex) . $headerRow;
+                    $sheet->setCellValue($cell, Carbon::parse($day)->format('d/m'));
+                    $colIndex++;
+                }
+
+                // Keep track of last column for styling
+                $lastColumnIndex = $colIndex - 1;
+
+                // Apply header style to header row
+                $sheet->getStyle(Coordinate::stringFromColumnIndex(1) . $headerRow . ':' . Coordinate::stringFromColumnIndex($lastColumnIndex) . $headerRow)
+                    ->applyFromArray($headerStyle);
+
+                // Fill filas
+                $currentRow = $headerRow + 1;
+                foreach ($filas as $fila) {
+                    $colIndex = 1;
+                    // columna valores
+                    foreach ($columnas as $columna) {
+                        $valor = $fila->valores->where('hoja_columna_id', $columna->id)->first();
+                        $cell = Coordinate::stringFromColumnIndex($colIndex) . $currentRow;
+                        $sheet->setCellValue($cell, $valor?->valor ?? '');
+                        $colIndex++;
+                    }
+
+                    // date cells: find ejecucion for this turno and date
+                    foreach ($dates as $day) {
+                        $cell = Coordinate::stringFromColumnIndex($colIndex) . $currentRow;
+                        $ejec = $ejecMap[$turno->id][$day] ?? null;
+                        $respuesta = $ejec?->respuestas->where('hoja_fila_id', $fila->id)->first();
+
+                        if ($respuesta) {
+                            if ($respuesta->answer_option_id && $respuesta->answerOption) {
+                                $icon = $respuesta->answerOption->icon ?? null;
+                                $mapped = $icon ? ($iconMap[$icon] ?? 3) : 3;
+                                $sheet->setCellValueExplicit($cell, $mapped, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
+                            } elseif ($respuesta->numeric_value !== null) {
+                                $sheet->setCellValueExplicit($cell, $respuesta->numeric_value, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
+                            } elseif ($respuesta->text_value) {
+                                $sheet->setCellValue($cell, $respuesta->text_value);
+                            } elseif ($respuesta->boolean_value !== null) {
+                                // store as 1/0 for easier aggregation
+                                $sheet->setCellValueExplicit($cell, $respuesta->boolean_value ? 1 : 0, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
+                            }
+                        }
+
+                        $colIndex++;
+                    }
+
+                    $currentRow++;
+                }
+
+                // Operator name row
+                $labelColEnd = count($columnas);
+                $labelCell = Coordinate::stringFromColumnIndex(1) . $currentRow;
+                $sheet->setCellValue($labelCell, 'NOMBRE DE OPERADOR:');
+                // Fill operator names into date columns
+                $colIndex = count($columnas) + 1;
+                foreach ($dates as $day) {
+                    $cell = Coordinate::stringFromColumnIndex($colIndex) . $currentRow;
+                    $ejec = $ejecMap[$turno->id][$day] ?? null;
+                    $sheet->setCellValue($cell, $ejec?->nombre_operador ?? '');
+                    $colIndex++;
+                }
+                $currentRow++;
+
+                // Operator signature row -> replace image with [FIRMADO]
+                $labelCell = Coordinate::stringFromColumnIndex(1) . $currentRow;
+                $sheet->setCellValue($labelCell, 'FIRMA DEL OPERADOR');
+                $colIndex = count($columnas) + 1;
+                foreach ($dates as $day) {
+                    $cell = Coordinate::stringFromColumnIndex($colIndex) . $currentRow;
+                    $ejec = $ejecMap[$turno->id][$day] ?? null;
+                    if ($ejec?->firma_operador) {
+                        $sheet->setCellValue($cell, '[FIRMADO]');
+                    }
+                    $colIndex++;
+                }
+                $currentRow++;
+
+                // Supervisor signature row -> replace image with [FIRMADO]
+                $labelCell = Coordinate::stringFromColumnIndex(1) . $currentRow;
+                $sheet->setCellValue($labelCell, 'FIRMA DEL SUPERVISOR');
+                $colIndex = count($columnas) + 1;
+                foreach ($dates as $day) {
+                    $cell = Coordinate::stringFromColumnIndex($colIndex) . $currentRow;
+                    $ejec = $ejecMap[$turno->id][$day] ?? null;
+                    if ($ejec?->firma_supervisor) {
+                        $sheet->setCellValue($cell, '[FIRMADO]');
+                    }
+                    $colIndex++;
+                }
+                $currentRow++;
+
+                // Apply border style to used area
+                $firstCell = Coordinate::stringFromColumnIndex(1) . $headerRow;
+                $lastCell = Coordinate::stringFromColumnIndex($lastColumnIndex) . ($currentRow - 1);
+                $sheet->getStyle($firstCell . ':' . $lastCell)->applyFromArray($borderStyle);
+
+                // Auto size columns for readability (limited to first 50 columns to avoid huge loops)
+                $maxAuto = min($lastColumnIndex, 50);
+                for ($i = 1; $i <= $maxAuto; $i++) {
+                    $sheet->getColumnDimension(Coordinate::stringFromColumnIndex($i))->setAutoSize(true);
+                }
+
+                $sheetIndex++;
+            }
+
+            // Prepare filename
+            $fileName = 'historial-'.$this->record->equipo->tag.'_'.$turnoName.'-'.now()->format('Y-m-d').'.xlsx';
+
+            return response()->streamDownload(function () use ($spreadsheet) {
+                $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+                $writer->save('php://output');
+            }, $fileName, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error exportando Excel: '.$e->getMessage());
+            throw new \Exception('Error al generar el archivo Excel: '.$e->getMessage());
+        }
+    }
 }
