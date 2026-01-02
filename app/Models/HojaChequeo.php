@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class HojaChequeo extends Model
 {
@@ -22,6 +23,18 @@ class HojaChequeo extends Model
             ->value('version');
 
         return $latestVersion ? (int) $latestVersion + 1 : 1;
+    }
+
+    public function latestChequeoDiario(): HasOne
+    {
+        return $this->hasOne(HojaEjecucion::class)
+            ->orderByDesc('finalizado_en')
+            ->limit(1);
+    }
+
+    public function scopeEncendidas($query): void
+    {
+        $query->where('encendido', true);
     }
 
     public function equipo(): BelongsTo

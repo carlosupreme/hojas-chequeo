@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\Chequeos;
 
-use App\Filament\Resources\Chequeos\Pages\CreateChequeos;
-use App\Filament\Resources\Chequeos\Pages\EditChequeos;
 use App\Filament\Resources\Chequeos\Pages\ListChequeos;
 use App\Filament\Resources\Chequeos\Schemas\ChequeosForm;
 use App\Filament\Resources\Chequeos\Tables\ChequeosTable;
@@ -48,8 +46,6 @@ class ChequeosResource extends Resource
     {
         return [
             'index' => ListChequeos::route('/'),
-            'create' => CreateChequeos::route('/create'),
-            'edit' => EditChequeos::route('/{record}/edit'),
         ];
     }
 }
