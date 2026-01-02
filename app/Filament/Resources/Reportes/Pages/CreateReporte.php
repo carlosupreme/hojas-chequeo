@@ -24,6 +24,4 @@ class CreateReporte extends CreateRecord
     {
         return 'Complete los campos a continuación para registrar un nuevo reporte en el sistema.';
     }
-
-
 }

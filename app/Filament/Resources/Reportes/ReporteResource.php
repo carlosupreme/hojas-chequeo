@@ -19,9 +19,10 @@ use Filament\Tables\Table;
 class ReporteResource extends Resource
 {
     protected static ?string $model = Reporte::class;
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::PaperAirplane;
-    protected static ?string $recordTitleAttribute = 'Reporte';
 
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::PaperAirplane;
+
+    protected static ?string $recordTitleAttribute = 'Reporte';
 
     public static function form(Schema $schema): Schema
     {

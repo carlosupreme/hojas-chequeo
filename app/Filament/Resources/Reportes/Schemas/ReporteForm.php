@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Reportes\Schemas;
 
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -20,7 +21,7 @@ class ReporteForm
                     ->schema([
                         TextInput::make('name')
                             ->label('Nombre')
-                            ->default(fn() => auth()->user()->name)
+                            ->default(fn () => auth()->user()->name)
                             ->required(),
                         DatePicker::make('fecha')
                             ->label('Fecha de hoy')
@@ -36,10 +37,11 @@ class ReporteForm
                                 'Alta' => 'Alta',
                                 'Media' => 'Media',
                                 'Baja' => 'Baja',
-                            ]),
+                            ])
+                            ->default('Baja'),
                     ]),
-
-
+                Hidden::make('status')
+                    ->default('Pendiente'),
                 Section::make('Detalles del equipo')
                     ->description('Selecciona el equipo que presenta la falla')
                     ->schema([
@@ -61,8 +63,6 @@ class ReporteForm
                                 'Tintorería' => 'Tintorería',
                             ]),
                     ]),
-
-
                 Section::make('Detalles de la falla')
                     ->description('Describe el problema que presenta')
                     ->schema([
@@ -70,15 +70,14 @@ class ReporteForm
                             ->label('Falla')
                             ->required(),
                         Textarea::make('observations')
-                        ->label('Observaciones'),
-
+                            ->label('Observaciones'),
                     ]),
-
                 Section::make('Evidencia')
                     ->description('Adjunta evidencia del equipo que presenta la falla')
                     ->schema([
                         FileUpload::make('photo')
-                            ->label('Foto')
+                            ->image()
+                            ->label('Foto'),
 
                     ]),
             ]);

@@ -73,7 +73,7 @@ class ChequeosTable
             ->persistSortInSession()
             ->persistFiltersInSession()
             ->recordActions([
-                EditAction::make()->hidden(! Auth::user()->hasRole(['Administrador','Supervisor'])),
+                EditAction::make()->hidden(! Auth::user()->hasRole(['Administrador', 'Supervisor'])),
                 ViewAction::make(),
                 DeleteAction::make()->hidden(! Auth::user()->hasRole('Administrador')),
             ])
