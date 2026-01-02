@@ -10,6 +10,8 @@ class ListHojaChequeos extends ListRecords
 {
     protected static string $resource = HojaChequeoResource::class;
 
+    protected static ?string $title = 'Hojas de chequeo';
+
     protected function getHeaderActions(): array
     {
         return [

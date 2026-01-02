@@ -162,7 +162,6 @@ class DatabaseSeeder extends Seeder
                     'finalizado_en' => $date,
                 ]);
 
-                // Randomize icon answer (check or x-mark)
                 HojaFilaRespuesta::create([
                     'hoja_ejecucion_id' => $exec->id,
                     'hoja_fila_id' => $filaLimpieza->id,
@@ -173,7 +172,7 @@ class DatabaseSeeder extends Seeder
                 HojaFilaRespuesta::create([
                     'hoja_ejecucion_id' => $exec->id,
                     'hoja_fila_id' => $filaHoras->id,
-                    'numeric_value' => rand(1, 15) * 10,
+                    'numeric_value' => rand(1, 15),
                 ]);
             }
         }

@@ -20,6 +20,7 @@ class HojaChequeoResource extends Resource
 {
     protected static ?string $model = HojaChequeo::class;
 
+    protected static ?string $navigationLabel = 'Hojas de chequeo';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
 
     public static function getNavigationGroup(): ?string
