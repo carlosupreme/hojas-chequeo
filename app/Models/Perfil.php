@@ -11,12 +11,14 @@ class Perfil extends Model
 
     protected $fillable = [
         'nombre',
+        'acceso_total',
         'hoja_ids',
     ];
 
     protected function casts(): array
     {
         return [
+            'acceso_total' => 'boolean',
             'hoja_ids' => 'array',
         ];
     }
@@ -28,6 +30,10 @@ class Perfil extends Model
 
     public function tieneAccesoAHoja(int $hojaId): bool
     {
-        return in_array(self::TODAS_LAS_HOJAS, $this->hoja_ids) || in_array($hojaId, $this->hoja_ids);
+        if ($this->acceso_total) {
+            return true;
+        }
+
+        return in_array($hojaId, $this->hoja_ids ?? [], true);
     }
 }

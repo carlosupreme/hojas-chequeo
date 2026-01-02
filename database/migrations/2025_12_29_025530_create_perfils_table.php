@@ -16,6 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('nombre')->unique();
             $table->json('hoja_ids');
+            $table->boolean('acceso_total')->default(false);
             $table->timestamps();
         });
 

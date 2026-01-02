@@ -30,7 +30,8 @@ class UserSeeder extends Seeder
 
         $perfil = Perfil::create([
             'nombre' => 'Administrador',
-            'hoja_ids' => ['*'],
+            'hoja_ids' => [],
+            'acceso_total' => true,
         ]);
 
         $adminRole = Role::create(['name' => 'Administrador']);
