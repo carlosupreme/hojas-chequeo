@@ -127,6 +127,15 @@ class ChequeoItems extends Component
     #[On('dailyCheckCreated')]
     public function save(int $id): void {}
 
+    /**
+     * Whenever any nested key in `form` changes (e.g. form.123), dispatch a browser event
+     * so the Blade/JS side can show feedback + animations.
+     */
+    public function updatedForm($value, $key): void
+    {
+        $this->dispatch('chequeo-form-updated', key: $key, value: $value);
+    }
+
     public function render()
     {
         return view('livewire.chequeo-items');

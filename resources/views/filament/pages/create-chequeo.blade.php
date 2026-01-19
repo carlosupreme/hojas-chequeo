@@ -1,17 +1,18 @@
 <x-filament-panels::page>
     {{-- Top Header Section --}}
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+    <div data-page="create-chequeo" class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div class="space-y-1">
-            <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+            <h1 data-animate="header-title" class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
                 Hola, {{ $user->name }}
             </h1>
-            <p class="text-gray-500 dark:text-gray-400">
+            <p data-animate="header-subtitle" class="text-gray-500 dark:text-gray-400">
                 Selecciona un equipo para comenzar el chequeo.
             </p>
         </div>
 
         {{-- Creative Turno Widget --}}
         <div
+            data-animate="turno-card"
             class="relative group overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700 p-1 pr-6 transition-all hover:shadow-xl">
             <div class="flex items-center gap-4">
                 {{-- Dynamic Icon Background based on Turno --}}
