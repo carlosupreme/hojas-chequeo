@@ -12,8 +12,8 @@ class PerfilForm
     {
         return $schema
             ->components([
-                TextInput::make("nombre")->label("Nombre")->required(),
-                SelectHojas::make("hoja_ids")
+                TextInput::make('nombre')->label('Nombre')->required(),
+                SelectHojas::make('hoja_ids')
                     ->columnSpanFull()
                     ->label('Hojas de Chequeo')
                     ->required(),

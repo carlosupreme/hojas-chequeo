@@ -1,7 +1,50 @@
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
 
 @source '../../../../app/Filament/**/*';
-@source '../../../../resources/views/filament/**/*';
+@source '../../../../resources/views/**/*';
 @source '../../../../vendor/saade/filament-autograph/resources/views/**/*.blade.php';
 
-@source inline('{dark:,}{bg,border,text}-{red,yellow,blue,green}-{50,100,200,300,400,500,600,700,800,900}{/10,/20,/30,/40,/50,/60,/70,/80,/90,}')
+@source inline('{dark:,}{bg,border,text}-{red,yellow,blue,green}-{50,100,200,300,400,500,600,700,800,900}{/10,/20,/30,/40,/50,/60,/70,/80,/90,}');
+
+.fi-layout-sidebar-toggle-btn-ctn {
+    @apply bg-white dark:bg-zinc-800;
+}
+
+.fi-sidebar {
+    @apply border-r border-zinc-200! bg-zinc-50! dark:bg-zinc-900! dark:border-zinc-700!;
+}
+
+
+.fi-main, .fi-main-ctn {
+    @apply bg-white! dark:bg-zinc-800!;
+}
+
+
+.fi-ta-main {
+    @apply bg-white! dark:bg-zinc-800!;
+}
+
+
+.fi-sidebar-item.fi-active {
+    & .fi-sidebar-item-btn {
+        @apply bg-white border  dark:bg-white/7 border-transparent;
+
+        & .fi-icon, .fi-sidebar-item-label {
+            @apply dark:text-white text-zinc-900;
+        }
+    }
+}
+
+.fi-sidebar-item {
+    & .fi-sidebar-item-btn {
+        & .fi-icon, .fi-sidebar-item-label {
+            @apply dark:text-white/80 text-zinc-500;
+        }
+    }
+}
+
+.create-chequeo-page {
+    & .fi-header {
+        @apply hidden;
+    }
+}

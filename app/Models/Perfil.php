@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Perfil extends Model
 {
-    const TODAS_LAS_HOJAS = '*';
-
     protected $fillable = [
         'nombre',
         'acceso_total',

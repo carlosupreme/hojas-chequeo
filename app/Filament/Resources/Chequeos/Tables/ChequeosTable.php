@@ -67,7 +67,7 @@ class ChequeosTable
                 TextColumn::make('hojaChequeo.equipo.nombre')->label('Equipo')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('turno.nombre')->label('Area')
+                TextColumn::make('turno.nombre')->label('Turno')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('nombre_operador')->label('Operador')

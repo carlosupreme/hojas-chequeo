@@ -36,6 +36,20 @@ class DatabaseSeeder extends Seeder
             'aggregable' => true,
         ]);
 
+        $textType = AnswerType::create([
+            'key' => 'text',
+            'label' => 'Texto',
+            'behavior' => 'text',
+            'aggregable' => false,
+        ]);
+
+        $boolType = AnswerType::create([
+            'key' => 'boolean',
+            'label' => 'Si/No',
+            'behavior' => 'boolean',
+            'aggregable' => false,
+        ]);
+
         $realizado = AnswerOption::create([
             'answer_type_id' => $iconType->id,
             'key' => 'realizado',

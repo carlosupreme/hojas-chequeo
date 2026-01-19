@@ -16,13 +16,13 @@ class PerfilsTable
     {
         return $table
             ->columns([
-                TextColumn::make("nombre")->label("Nombre"),
+                TextColumn::make('nombre')->label('Nombre'),
                 TextColumn::make('Hojas')
                     ->badge()
-                    ->default(fn(Perfil $record) => count($record->hoja_ids)),
+                    ->default(fn (Perfil $record) => count($record->hoja_ids)),
                 TextColumn::make('users_count')
                     ->counts('users')
-                    ->label("Usuarios")
+                    ->label('Usuarios')
                     ->badge()
                     ->default(0),
             ])

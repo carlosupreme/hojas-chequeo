@@ -54,7 +54,7 @@ class PerfilResource extends Resource
     {
         return [
             'index' => ListPerfils::route('/'),
-           // 'create' => CreatePerfil::route('/create'),
+            // 'create' => CreatePerfil::route('/create'),
             'view' => ViewPerfil::route('/{record}'),
             'edit' => EditPerfil::route('/{record}/edit'),
         ];

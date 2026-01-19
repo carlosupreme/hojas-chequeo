@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -32,6 +33,32 @@ class HojaChequeo extends Model
             ->limit(1);
     }
 
+    public function scopeAvailableTo(Builder $query, ?array $ids): Builder
+    {
+        if (empty($ids)) {
+            return $query;
+        }
+
+        if (in_array('*', $ids)) {
+            return $query;
+        }
+
+        return $query->whereIn('id', $ids);
+    }
+
+    public function scopeInArea(Builder $query, ?string $area): Builder
+    {
+        return $query->when($area, fn (Builder $q) => $q->whereHas('equipo', fn (Builder $eq) => $eq->where('area', $area)));
+    }
+
+    public function scopeSearch(Builder $query, ?string $term): Builder
+    {
+        return $query->when($term, fn (Builder $q) => $q->whereHas('equipo', fn (Builder $eq) => $eq->where('nombre', 'ILIKE', "%{$term}%")
+            ->orWhere('tag', 'ILIKE', "%{$term}%")
+            ->orWhere('area', 'ILIKE', "%{$term}%")
+        ));
+    }
+
     public function scopeEncendidas($query): void
     {
         $query->where('encendido', true);
@@ -55,5 +82,11 @@ class HojaChequeo extends Model
     public function filas(): HasMany
     {
         return $this->hasMany(HojaFila::class)->orderBy('order');
+
+    }
+
+    public function hasItems(): bool
+    {
+        return $this->filas()->count() > 0;
     }
 }

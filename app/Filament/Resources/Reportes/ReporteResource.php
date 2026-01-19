@@ -20,7 +20,7 @@ class ReporteResource extends Resource
 {
     protected static ?string $model = Reporte::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::PaperAirplane;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPaperAirplane;
 
     protected static ?string $recordTitleAttribute = 'Reporte';
 

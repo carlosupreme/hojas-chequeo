@@ -2,95 +2,116 @@
 
 namespace App\Filament\Pages;
 
+use App\Events\HojaPresenceUpdated;
 use App\Filament\Resources\Chequeos\Schemas\ChequeosForm;
 use App\Models\HojaChequeo;
+use App\Models\HojaEjecucion;
 use BackedEnum;
 use Carbon\Carbon;
+use Filament\Forms\Components\DatePicker;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Width;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Livewire\Attributes\On;
 
 class CreateChequeo extends Page
 {
     protected string $view = 'filament.pages.create-chequeo';
 
-    protected static ?string $title = 'Chequeo diario';
+    public ?HojaEjecucion $ejecucion = null;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-pencil-square';
 
     public ?array $data = [];
 
-    public ?int $hojaId = null;
+    public null|string|int $hojaId = null;
 
     public ?HojaChequeo $checkSheet = null;
 
     public $dateSelected;
 
-    public $tempDateSelected;
+    public $user;
 
     protected $queryString = [
-        'hojaId' => ['except' => null, 'as' => 'hoja'],
+        'hojaId' => ['except' => '', 'as' => 'h'],
     ];
-
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Mantenimiento';
-    }
 
     public function mount(): void
     {
-        $user = Auth::user();
+        $this->user = Auth::user();
         $this->form->fill([
-            'nombre_operador' => $user->name,
+            'nombre_operador' => $this->user->name,
         ]);
         $this->dateSelected = Carbon::now();
-        $this->tempDateSelected = $this->dateSelected->format('Y-m-d');
 
         if ($this->hojaId) {
             $this->loadCheckSheet($this->hojaId);
         }
     }
 
+    #[On('checkSheetSelected')]
+    public function nextPage(int $checkSheet): void
+    {
+        $this->hojaId = $checkSheet;
+        $this->loadCheckSheet($checkSheet);
+    }
+
     protected function loadCheckSheet(int $checkSheetId): void
     {
-        $cacheKey = "hoja:detail:{$checkSheetId}";
-        $cacheTtl = now()->addHours(2);
+        $checkSheet = HojaChequeo::with([
+            'filas.valores.hojaColumna:id,key', 'columnas', 'equipo',
+        ])->find($checkSheetId);
 
-        $this->checkSheet = Cache::tags(['hojas', "hoja:{$checkSheetId}"])->remember(
-            $cacheKey,
-            $cacheTtl,
-            fn () => HojaChequeo::with([
-                'filas',
-                'columnas',
-                'equipo:id,nombre,tag,area,foto',
-            ])
-                ->select(['id', 'equipo_id', 'observaciones'])
-                ->find($checkSheetId)
-        );
+        if (! $checkSheet->encendido) {
+            $this->resetState();
+
+            return;
+        }
+
+        $this->checkSheet = $checkSheet;
     }
 
     public function resetState(): void
     {
+        if ($this->hojaId) {
+            $user = Auth::user();
+            $cacheKey = "hoja_presence_{$this->hojaId}";
+            $users = Cache::get($cacheKey, []);
+
+            if (isset($users[$user->id])) {
+                unset($users[$user->id]);
+                Cache::put($cacheKey, $users, now()->addMinutes(30));
+
+                broadcast(new HojaPresenceUpdated(
+                    userId: $user->id,
+                    userName: $user->name,
+                    userAvatar: $user->profile_photo_url ?? null,
+                    hojaId: (int) $this->hojaId,
+                    action: 'left'
+                ));
+            }
+        }
+
         $this->hojaId = null;
         $this->checkSheet = null;
         $this->form->fill();
     }
 
-    public function updateSelectedDate(): void
+    public function hasItems(): bool
     {
-        $this->dateSelected = Carbon::parse($this->tempDateSelected);
+        return $this->checkSheet?->hasItems();
     }
 
     public function create(): void
     {
-        $user = Auth::user();
-
         $data = [
             ...$this->form->getState(),
-            'user_id' => $user->id,
-            'turno_id' => $user->turno_id,
+            'user_id' => $this->user->id,
+            'turno_id' => $this->user->turno_id,
+            'created_at' => $this->dateSelected,
         ];
 
         debug($data);
@@ -103,8 +124,40 @@ class CreateChequeo extends Page
             ->send();
     }
 
+    public function dateForm(Schema $schema): Schema
+    {
+        return $schema->components([
+            DatePicker::make('dateSelected')
+                ->visible(fn ($component) => auth()->user()->isAdmin())
+                ->hiddenLabel()
+                ->displayFormat('D d/m/Y')
+                ->native(false)
+                ->locale('es')
+                ->closeOnDateSelection()
+                ->required()
+                ->maxDate(now()),
+        ]);
+    }
+
     public function form(Schema $schema): Schema
     {
         return ChequeosForm::configure($schema)->statePath('data');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Mantenimiento';
+    }
+
+    public function getMaxContentWidth(): Width
+    {
+        return Width::Full;
+    }
+
+    public function getExtraBodyAttributes(): array
+    {
+        return [
+            'class' => 'create-chequeo-page',
+        ];
     }
 }

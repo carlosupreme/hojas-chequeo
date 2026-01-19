@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet"/>
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/alpine.js'])
 
     <style>
         [x-cloak] {
@@ -35,11 +35,11 @@
             --border-color: rgba(0, 0, 0, 0.1);
             --border-hover: rgba(0, 0, 0, 0.2);
 
-            --color-accent: #E50914;
-            --color-accent-hover: #B20710;
-            --ring-accent: rgba(229, 9, 20, 0.5);
-            --shadow-glow: rgba(229, 9, 20, 0.3);
-            --shadow-glow-active: rgba(229, 9, 20, 0.5);
+            --color-accent: #1d4cc4;
+            --color-accent-hover: #2636ea;
+            --ring-accent: rgba(9, 13, 229, 0.5);
+            --shadow-glow: rgba(9, 152, 229, 0.3);
+            --shadow-glow-active: rgba(9, 46, 229, 0.5);
         }
 
         [data-theme="dark"] {
@@ -61,11 +61,11 @@
             --border-color: rgba(255, 255, 255, 0.1);
             --border-hover: rgba(255, 255, 255, 0.2);
 
-            --color-accent: #E50914;
-            --color-accent-hover: #B20710;
-            --ring-accent: rgba(229, 9, 20, 0.5);
-            --shadow-glow: rgba(229, 9, 20, 0.3);
-            --shadow-glow-active: rgba(229, 9, 20, 0.5);
+            --color-accent: #1d4cc4;
+            --color-accent-hover: #2636ea;
+            --ring-accent: rgba(9, 13, 229, 0.5);
+            --shadow-glow: rgba(9, 152, 229, 0.3);
+            --shadow-glow-active: rgba(9, 46, 229, 0.5);
         }
 
         @keyframes fade-in-up {
@@ -159,19 +159,19 @@
                                 <svg class="mr-3 h-5 w-5 text-[var(--text-muted)] group-hover:text-[var(--text-primary)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                                 </svg>
-                                Light
+                                Claro
                             </button>
                             <button @click="theme = 'dark'; themeMenuOpen = false" class="group flex w-full items-center px-4 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-hover-glass)] hover:text-[var(--text-primary)]">
                                 <svg class="mr-3 h-5 w-5 text-[var(--text-muted)] group-hover:text-[var(--text-primary)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                                 </svg>
-                                Dark
+                                Oscuro
                             </button>
                             <button @click="theme = 'system'; themeMenuOpen = false" class="group flex w-full items-center px-4 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-hover-glass)] hover:text-[var(--text-primary)]">
                                 <svg class="mr-3 h-5 w-5 text-[var(--text-muted)] group-hover:text-[var(--text-primary)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                 </svg>
-                                System
+                                Sistema
                             </button>
                         </div>
                     </div>
@@ -300,8 +300,8 @@
 
         <!-- Header -->
         <div class="text-center mb-10 animate-fade-in-up">
-            <h1 class="text-3xl sm:text-4xl font-bold text-[var(--text-primary)] mb-3">¿Quién está trabajando?</h1>
-            <p class="text-[var(--text-secondary)] text-lg">Selecciona tu usuario para comenzar</p>
+            <h1 class="text-3xl sm:text-4xl font-bold text-(--text-primary) mb-3">¿Quién está trabajando?</h1>
+            <p class="text-(--text-secondary) text-lg">Selecciona tu usuario para comenzar</p>
         </div>
 
         <!-- Search Bar -->
@@ -410,12 +410,12 @@
                 <!-- User Avatar & Name -->
                 <div class="flex flex-col items-center mb-8">
                     <div
-                        class="w-24 h-24 rounded-xl bg-gradient-to-br flex items-center justify-center text-white font-bold text-3xl shadow-lg mb-4 pulse-glow"
+                        class="w-24 h-24 rounded-xl bg-linear-to-br flex items-center justify-center text-white font-bold text-3xl shadow-lg mb-4 pulse-glow"
                         :class="selectedUser ? getAvatarColor(selectedUser.colorIndex) : ''">
                         <span x-text="selectedUser ? getInitials(selectedUser.name) : ''"></span>
                     </div>
-                    <h3 class="text-xl font-semibold text-[var(--text-primary)]" x-text="selectedUser?.name"></h3>
-                    <p class="text-[var(--text-secondary)] text-sm mt-1">Ingresa tu contraseña</p>
+                    <h3 class="text-xl font-semibold text-(--text-primary)" x-text="selectedUser?.name"></h3>
+                    <p class="text-(--text-secondary) text-sm mt-1">Ingresa tu contraseña</p>
                 </div>
 
                 <!-- Password Form -->
@@ -440,7 +440,7 @@
                                x-model="password"
                                @keydown.enter="login()"
                                placeholder="Contraseña"
-                               class="w-full px-4 py-4 bg-[var(--bg-surface)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] text-center text-lg tracking-widest placeholder-[var(--text-placeholder)] focus:outline-none focus:ring-2 focus:ring-[var(--ring-accent)] focus:border-[var(--color-accent)] transition-all"
+                               class="w-full px-4 py-4 bg-(--bg-surface) border border-(--border-color) rounded-xl text-[var(--text-primary)] text-center text-lg tracking-widest placeholder-(--text-placeholder) focus:outline-none focus:ring-2 focus:ring-(--ring-accent) focus:border-[var(--color-accent)] transition-all"
                                :class="{ 'border-red-500 focus:ring-red-500/50': error }">
                     </div>
 
