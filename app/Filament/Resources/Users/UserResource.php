@@ -19,6 +19,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Hash;
 
 class UserResource extends Resource
 {
@@ -45,14 +46,14 @@ class UserResource extends Resource
                     ->label('Email')
                     ->email()
                     ->unique(ignoreRecord: true)
-                    ->required()
                     ->maxLength(255)
                     ->live(),
                 TextInput::make('password')
                     ->label('Contraseña')
                     ->password()
+                    ->saved(fn (?string $state): bool => filled($state))
+                    ->required(fn (string $operation): bool => $operation === 'create')
                     ->revealable()
-                    ->required()
                     ->maxLength(255),
                 Select::make('roles')
                     ->relationship('roles', 'name')
