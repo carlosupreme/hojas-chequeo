@@ -2,11 +2,8 @@
 
 namespace App\Livewire;
 
-use App\Events\HojaPresenceUpdated;
 use App\Models\HojaChequeo;
 use App\Models\HojaEjecucion;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -28,27 +25,6 @@ class ChequeoItems extends Component
             'filas.answerType.answerOptions',
             'filas.valores.hojaColumna',
         ]);
-
-        // Presence Logic: Add user to this Hoja's active list
-        $user = Auth::user();
-        $cacheKey = "hoja_presence_{$hoja->id}";
-
-        $users = Cache::get($cacheKey, []);
-        $users[$user->id] = [
-            'id' => $user->id,
-            'name' => $user->name,
-            'avatar' => $user->profile_photo_url ?? null, // Assuming standard Laravel User
-            'joined_at' => now()->timestamp,
-        ];
-        Cache::put($cacheKey, $users, now()->addMinutes(30)); // Expire if no activity
-
-        broadcast(new HojaPresenceUpdated(
-            userId: $user->id,
-            userName: $user->name,
-            userAvatar: $user->profile_photo_url ?? null,
-            hojaId: $hoja->id,
-            action: 'joined'
-        ));
 
         $existingResponses = $ejecucion
             ? $ejecucion->respuestas()->get()->keyBy('hoja_fila_id')
@@ -81,14 +57,6 @@ class ChequeoItems extends Component
             // Initialize the form state
             $this->form[$fila->id] = $initialValue;
 
-            $initialValue = match ($type) {
-                'icon_seat' => $resp?->answer_option_id,
-                'number' => $resp?->numeric_value,
-                'text' => $resp?->text_value,
-                'icon_set' => (bool) $resp?->boolean_value,
-                default => null
-            };
-
             return [
                 'id' => $fila->id,
                 'type_key' => $fila->answerType?->key,
@@ -101,27 +69,6 @@ class ChequeoItems extends Component
                 'cells' => $cells,
             ];
         })->toArray();
-    }
-
-    #[On('markAsLeft')]
-    public function markAsLeft()
-    {
-        $user = Auth::user();
-        $cacheKey = "hoja_presence_{$this->hojaId}";
-        $users = Cache::get($cacheKey, []);
-
-        if (isset($users[$user->id])) {
-            unset($users[$user->id]);
-            Cache::put($cacheKey, $users, now()->addMinutes(30));
-
-            broadcast(new HojaPresenceUpdated(
-                userId: $user->id,
-                userName: $user->name,
-                userAvatar: $user->profile_photo_url ?? null,
-                hojaId: $this->hojaId,
-                action: 'left'
-            ));
-        }
     }
 
     #[On('dailyCheckCreated')]

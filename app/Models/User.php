@@ -7,6 +7,7 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -15,6 +16,10 @@ class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, HasRoles, Notifiable;
+
+    public static string $canEditDatesPermission = 'chequeos.edit.date';
+
+    protected $with = ['turno', 'perfil', 'roles'];
 
     protected $fillable = [
         'name',
@@ -35,6 +40,17 @@ class User extends Authenticatable implements FilamentUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function chequeos(): HasMany
+    {
+        return $this->hasMany(HojaEjecucion::class);
+    }
+
+    public function chequeosPendientes(): HasMany
+    {
+        return $this->hasMany(HojaEjecucion::class)
+            ->whereNull('finalizado_en');
     }
 
     public function turno(): BelongsTo

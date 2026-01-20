@@ -23,7 +23,7 @@ class ChequeosForm
                         ->required(),
                 ]),
                 Textarea::make('observaciones')
-                    ->translateLabel()
+                    ->label('Observaciones')
                     ->columnSpanFull(),
             ]);
     }

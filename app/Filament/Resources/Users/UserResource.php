@@ -16,10 +16,9 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Hash;
 
 class UserResource extends Resource
 {
@@ -97,9 +96,6 @@ class UserResource extends Resource
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                ImageColumn::make('avatarUrl')
-                    ->label('Foto')
-                    ->circular(),
                 TextColumn::make('name')
                     ->label('Nombre')
                     ->searchable()
@@ -113,6 +109,17 @@ class UserResource extends Resource
                 TextColumn::make('perfil.nombre')
                     ->searchable()
                     ->badge()->color('gray'),
+                ToggleColumn::make('Puede cambiar fecha')
+                    ->state(fn (User $record) => $record->can(User::$canEditDatesPermission))
+                    ->updateStateUsing(function ($state, User $record) {
+                        if ($state) {
+                            $record->givePermissionTo(User::$canEditDatesPermission);
+
+                            return;
+                        }
+
+                        $record->revokePermissionTo(User::$canEditDatesPermission);
+                    }),
                 TextColumn::make('created_at')
                     ->label('Creado el')
                     ->dateTime()

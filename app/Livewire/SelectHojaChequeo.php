@@ -4,11 +4,10 @@ namespace App\Livewire;
 
 use App\Area;
 use App\Models\HojaChequeo;
+use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
-use Livewire\Attributes\On;
 use Livewire\Component;
 
 class SelectHojaChequeo extends Component
@@ -21,56 +20,29 @@ class SelectHojaChequeo extends Component
 
     public int $page = 1;
 
-    public $activeUsers = [];
-
     protected $queryString = ['search' => ['except' => '']];
 
     public ?Area $activeFilter = null;
 
+    public User $user;
+
+    public iterable $areas;
+
     public function mount(): void
     {
-        // Initial load of active users for relevant sheets
-        $availableIds = auth()->user()->perfil->hoja_ids ?? [];
-
-        $idsToLoad = in_array('*', $availableIds)
-            ? HojaChequeo::encendidas()->pluck('id')->toArray()
-            : $availableIds;
-
-        foreach ($idsToLoad as $id) {
-            $users = Cache::get("hoja_presence_{$id}", []);
-            if (! empty($users)) {
-                $this->activeUsers[$id] = $users;
-            }
-        }
+        $this->user = Auth::user();
+        $this->areas = Area::cases();
     }
 
-    #[On('echo:hojas.global,HojaPresenceUpdated')]
-    public function updatePresence($event)
+    public function toggleFilter(?string $filter = null): void
     {
-        Log::info($event);
-        // $event is an array in Livewire listener
-        $hojaId = $event['hojaId'];
-        $userId = $event['userId'];
-        $action = $event['action'];
+        $area = null;
 
-        if (! isset($this->activeUsers[$hojaId])) {
-            $this->activeUsers[$hojaId] = [];
+        if (! is_null($filter) && $filter !== '') {
+            $area = Area::tryFrom($filter);
         }
 
-        if ($action === 'joined') {
-            $this->activeUsers[$hojaId][$userId] = [
-                'id' => $userId,
-                'name' => $event['userName'],
-                'avatar' => $event['userAvatar'],
-            ];
-        } elseif ($action === 'left') {
-            unset($this->activeUsers[$hojaId][$userId]);
-        }
-    }
-
-    public function toggleFilter(Area $filter): void
-    {
-        $this->activeFilter = ($this->activeFilter === $filter) ? null : $filter;
+        $this->activeFilter = ($this->activeFilter === $area) ? null : $area;
         $this->resetPagination();
     }
 
@@ -82,15 +54,7 @@ class SelectHojaChequeo extends Component
     public function loadMore(): void
     {
         $this->page++;
-
-        // Refresh cache for newly loaded items (optional, but good for consistency)
-        $hojas = $this->fetchHojas(auth()->user()->perfil->hoja_ids);
-        foreach ($hojas as $hoja) {
-            $users = Cache::get("hoja_presence_{$hoja->id}", []);
-            if (! empty($users)) {
-                $this->activeUsers[$hoja->id] = $users;
-            }
-        }
+        $this->fetchHojas();
     }
 
     protected function resetPagination(): void
@@ -98,23 +62,20 @@ class SelectHojaChequeo extends Component
         $this->page = 1;
     }
 
-    public function selectEquipo($id)
+    public function selectHojaChequeo($id)
     {
-        $this->dispatch('checkSheetSelected', $id);
+        $this->dispatch('hojaChequeoSelected', $id);
     }
 
     public function render(): View
     {
-        $userId = auth()->id();
-        $availableIds = auth()->user()->perfil->hoja_ids;
-
-        $cacheKey = $this->buildCacheKey($userId, $availableIds);
+        $cacheKey = $this->buildCacheKey();
         $cacheTtl = now()->addMinutes(15);
 
-        $hojas = Cache::tags(['hojas', "user:{$userId}"])->remember(
+        $hojas = Cache::tags(['hojas', "user:{$this->user->id}"])->remember(
             $cacheKey,
             $cacheTtl,
-            fn () => $this->fetchHojas($availableIds)
+            fn () => $this->fetchHojas()
         );
 
         $hasMore = $hojas->count() >= ($this->perPage * $this->page);
@@ -122,25 +83,25 @@ class SelectHojaChequeo extends Component
         return view('livewire.select-hoja-chequeo', [
             'hojas' => $hojas,
             'hasMore' => $hasMore,
-            'turno' => Auth::user()->turno,
+            'turno' => $this->user->turno,
         ]);
     }
 
-    protected function buildCacheKey(int $userId, array $availableIds): string
+    protected function buildCacheKey(): string
     {
-        $idsHash = md5(implode(',', $availableIds));
+        $idsHash = md5(implode(',', $this->user->perfil->hoja_ids));
         $filter = $this->activeFilter?->value ?? 'all';
         $search = $this->search ? md5(strtolower($this->search)) : 'none';
 
-        return "hojas:list:{$userId}:{$idsHash}:{$filter}:{$search}:page{$this->page}";
+        return "hojas:list:{$this->user->id}:{$idsHash}:{$filter}:{$search}:page{$this->page}";
     }
 
-    protected function fetchHojas(array $availableIds)
+    protected function fetchHojas()
     {
         return HojaChequeo::with(['equipo', 'latestChequeoDiario'])
             ->select(['id', 'equipo_id', 'encendido'])
+            ->availableTo($this->user->perfil)
             ->encendidas()
-            ->availableTo($availableIds)
             ->inArea($this->activeFilter?->value)
             ->search($this->search)
             ->limit($this->perPage * $this->page)

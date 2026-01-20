@@ -56,7 +56,7 @@
         </div>
     </div>
 
-    @if(!$checkSheet)
+    @if(!$hojaChequeo)
         <livewire:select-hoja-chequeo/>
     @else
         <div class="flex sm:flex-row flex-col gap-4 items-center w-full mb-6 mt-3 place-content-center">
@@ -66,23 +66,22 @@
                 Regresar
             </button>
             <div class="flex gap-4 items-center place-content-center flex-wrap">
-                <h2 class="font-bold">{{ $this->checkSheet->equipo->nombre }}</h2>
-                <x-filament::badge color="primary">{{$this->checkSheet->equipo->tag}}</x-filament::badge>
-                <x-filament::badge color="primary">{{auth()->user()->turno->nombre}}</x-filament::badge>
+                <h2 class="font-bold">{{ $this->hojaChequeo->equipo->nombre }}</h2>
+                <x-filament::badge color="primary">{{$this->hojaChequeo->equipo->tag}}</x-filament::badge>
+                <x-filament::badge color="primary">{{$user->turno->nombre}}</x-filament::badge>
                 @if($this->ejecucion)
                     <x-filament::badge color="primary">Reanudando</x-filament::badge>
                 @endif
             </div>
-            @if(!$this->ejecucion)
-                {{$this->dateForm}}
-            @endif
+
+            {{$this->dateForm}}
         </div>
 
-        @if($this->hasItems())
-            <livewire:chequeo-items :hoja="$checkSheet"/>
+    @if($this->hasItems())
+            <livewire:chequeo-items :hoja="$hojaChequeo"/>
 
             <div class="my-5">
-                {!! $this->checkSheet->observaciones !!}
+                {!! $this->hojaChequeo->observaciones !!}
             </div>
 
             <form>

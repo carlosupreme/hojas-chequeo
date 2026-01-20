@@ -13,8 +13,7 @@ class ListPerfils extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()
-                ->modalWidth('2xl'), // Opcional: define el ancho
+            CreateAction::make()->slideOver()
         ];
     }
 }

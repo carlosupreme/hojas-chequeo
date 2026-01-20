@@ -21,6 +21,15 @@ class Perfil extends Model
         ];
     }
 
+    protected static function booted(): void
+    {
+        static::saving(function ($model) {
+            if ($model->acceso_total) {
+                $model->hoja_ids = [];
+            }
+        });
+    }
+
     public function users(): HasMany
     {
         return $this->hasMany(User::class);

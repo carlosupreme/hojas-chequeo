@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Observers\HojaChequeoObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+#[ObservedBy(HojaChequeoObserver::class)]
 class HojaChequeo extends Model
 {
     protected $fillable = [
@@ -33,17 +36,13 @@ class HojaChequeo extends Model
             ->limit(1);
     }
 
-    public function scopeAvailableTo(Builder $query, ?array $ids): Builder
+    public function scopeAvailableTo(Builder $query, Perfil $perfil): Builder
     {
-        if (empty($ids)) {
+        if ($perfil->acceso_total) {
             return $query;
         }
 
-        if (in_array('*', $ids)) {
-            return $query;
-        }
-
-        return $query->whereIn('id', $ids);
+        return $query->whereIn('id', $perfil->hoja_ids);
     }
 
     public function scopeInArea(Builder $query, ?string $area): Builder

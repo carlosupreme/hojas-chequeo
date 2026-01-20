@@ -2,20 +2,10 @@
     saving: false,
     savingTimeout: null,
     init() {
-        window.addEventListener('beforeunload', () => {
-            // We use navigator.sendBeacon if possible for reliable 'closing'
-            // But Livewire method call is async. For reliable 'close tab', we rely on Echo presence or just the cache timeout.
-            // However, for navigation within the app (SPA), this works:
-            $wire.markAsLeft();
-        });
-
-        // When any input updates the Livewire `form` state, show feedback + animate.
         this.$el.addEventListener('chequeo-form-updated', (e) => {
             this.saving = true;
             clearTimeout(this.savingTimeout);
             this.savingTimeout = setTimeout(() => (this.saving = false), 900);
-
-            // Bubble a DOM event that our Vite/GSAP module can catch.
             window.dispatchEvent(new CustomEvent('chequeo-items:form-changed', { detail: e.detail }));
         });
     }
@@ -37,7 +27,7 @@
         </div>
     </div>
 
-    <div class="mb-6 border rounded-lg dark:border-gray-700 ">
+    <div class="mb-6 border rounded-lg dark:border-gray-700 p-1">
         <!-- Desktop View -->
         <div class="hidden lg:block">
             <table class="table-fixed border-collapse w-full">

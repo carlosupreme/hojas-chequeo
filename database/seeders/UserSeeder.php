@@ -6,6 +6,7 @@ use App\Models\Perfil;
 use App\Models\Turno;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class UserSeeder extends Seeder
@@ -38,6 +39,8 @@ class UserSeeder extends Seeder
         $operadorRole = Role::create(['name' => 'Operador']);
         $supervisorRole = Role::create(['name' => 'Supervisor']);
 
+        $canEditDatePermission = Permission::create(['name' => 'chequeos.edit.date']);
+
         $user = User::create([
             'name' => 'Administrador',
             'password' => bcrypt('password'),
@@ -47,6 +50,7 @@ class UserSeeder extends Seeder
         ]);
 
         $user->assignRole($adminRole);
+        $user->givePermissionTo($canEditDatePermission->name);
 
         $operador = User::create([
             'name' => 'Operador',

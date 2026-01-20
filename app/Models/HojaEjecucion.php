@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -44,5 +45,31 @@ class HojaEjecucion extends Model
     public function respuestas(): HasMany
     {
         return $this->hasMany(HojaFilaRespuesta::class);
+    }
+
+    /**
+     * Chequeos (ejecuciones) en proceso (pendientes de finalizar).
+     */
+    public function scopePending(Builder $query): Builder
+    {
+        return $query->whereNull('finalizado_en');
+    }
+
+    /**
+     * Chequeos (ejecuciones) finalizados.
+     */
+    public function scopeFinished(Builder $query): Builder
+    {
+        return $query->whereNotNull('finalizado_en');
+    }
+
+    /**
+     * Restringe las ejecuciones al usuario indicado.
+     */
+    public function scopeForUser(Builder $query, User|int $user): Builder
+    {
+        $userId = $user instanceof User ? $user->id : $user;
+
+        return $query->where('user_id', $userId);
     }
 }

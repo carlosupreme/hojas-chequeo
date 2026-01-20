@@ -2,10 +2,10 @@
 
 namespace App\Filament\Pages;
 
-use App\Events\HojaPresenceUpdated;
 use App\Filament\Resources\Chequeos\Schemas\ChequeosForm;
 use App\Models\HojaChequeo;
 use App\Models\HojaEjecucion;
+use App\Models\User;
 use BackedEnum;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
@@ -14,7 +14,6 @@ use Filament\Pages\Page;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\On;
 
 class CreateChequeo extends Page
@@ -29,7 +28,7 @@ class CreateChequeo extends Page
 
     public null|string|int $hojaId = null;
 
-    public ?HojaChequeo $checkSheet = null;
+    public ?HojaChequeo $hojaChequeo = null;
 
     public $dateSelected;
 
@@ -48,61 +47,38 @@ class CreateChequeo extends Page
         $this->dateSelected = Carbon::now();
 
         if ($this->hojaId) {
-            $this->loadCheckSheet($this->hojaId);
+            $this->loadHojaChequeo($this->hojaId);
         }
     }
 
-    #[On('checkSheetSelected')]
-    public function nextPage(int $checkSheet): void
+    #[On('hojaChequeoSelected')]
+    public function nextPage(int $hojaId): void
     {
-        $this->hojaId = $checkSheet;
-        $this->loadCheckSheet($checkSheet);
+        $this->hojaId = $hojaId;
+        $this->loadHojaChequeo($hojaId);
     }
 
-    protected function loadCheckSheet(int $checkSheetId): void
+    protected function loadHojaChequeo(int $hojaId): void
     {
-        $checkSheet = HojaChequeo::with([
-            'filas.valores.hojaColumna:id,key', 'columnas', 'equipo',
-        ])->find($checkSheetId);
-
-        if (! $checkSheet->encendido) {
-            $this->resetState();
-
-            return;
-        }
-
-        $this->checkSheet = $checkSheet;
+        $this->hojaChequeo = HojaChequeo::with(['filas.valores.hojaColumna', 'columnas', 'equipo'])
+            ->encendidas()
+            ->availableTo($this->user->perfil)
+            ->findOrFail($hojaId);
     }
 
     public function resetState(): void
     {
-        if ($this->hojaId) {
-            $user = Auth::user();
-            $cacheKey = "hoja_presence_{$this->hojaId}";
-            $users = Cache::get($cacheKey, []);
-
-            if (isset($users[$user->id])) {
-                unset($users[$user->id]);
-                Cache::put($cacheKey, $users, now()->addMinutes(30));
-
-                broadcast(new HojaPresenceUpdated(
-                    userId: $user->id,
-                    userName: $user->name,
-                    userAvatar: $user->profile_photo_url ?? null,
-                    hojaId: (int) $this->hojaId,
-                    action: 'left'
-                ));
-            }
-        }
-
         $this->hojaId = null;
-        $this->checkSheet = null;
-        $this->form->fill();
+        $this->hojaChequeo = null;
+        $this->form->fill([
+            'nombre_operador' => $this->user->name,
+        ]);
+        $this->dateSelected = Carbon::now();
     }
 
     public function hasItems(): bool
     {
-        return $this->checkSheet?->hasItems();
+        return $this->hojaChequeo?->hasItems();
     }
 
     public function create(): void
@@ -128,7 +104,7 @@ class CreateChequeo extends Page
     {
         return $schema->components([
             DatePicker::make('dateSelected')
-                ->visible(fn ($component) => auth()->user()->isAdmin())
+                ->disabled(fn ($component) => !$this->user->can(User::$canEditDatesPermission))
                 ->hiddenLabel()
                 ->displayFormat('D d/m/Y')
                 ->native(false)
