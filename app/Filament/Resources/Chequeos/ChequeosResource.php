@@ -27,7 +27,7 @@ class ChequeosResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return ChequeosForm::configure($schema);
+        return ChequeosForm::base($schema);
     }
 
     public static function table(Table $table): Table

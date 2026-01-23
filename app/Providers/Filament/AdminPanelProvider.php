@@ -40,6 +40,7 @@ class AdminPanelProvider extends PanelProvider
                 fn (): string => Blade::render("@vite('resources/js/app.js')")
             )
             ->viteTheme('resources/css/filament/admin/theme.css')
+            ->font('Poppins')
             ->passwordReset()
             ->profile(isSimple: false)
             ->favicon(asset('/logo.png'))

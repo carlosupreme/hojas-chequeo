@@ -20,9 +20,11 @@ class PerfilResource extends Resource
 {
     protected static ?string $model = Perfil::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::UserCircle;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedIdentification;
 
     protected static ?string $recordTitleAttribute = 'nombre';
+
+    protected static ?string $pluralModelLabel = 'Perfiles';
 
     public static function getNavigationGroup(): ?string
     {

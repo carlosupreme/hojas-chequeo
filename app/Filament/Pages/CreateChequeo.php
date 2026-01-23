@@ -5,10 +5,8 @@ namespace App\Filament\Pages;
 use App\Filament\Resources\Chequeos\Schemas\ChequeosForm;
 use App\Models\HojaChequeo;
 use App\Models\HojaEjecucion;
-use App\Models\User;
 use BackedEnum;
 use Carbon\Carbon;
-use Filament\Forms\Components\DatePicker;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
@@ -102,22 +100,12 @@ class CreateChequeo extends Page
 
     public function dateForm(Schema $schema): Schema
     {
-        return $schema->components([
-            DatePicker::make('dateSelected')
-                ->disabled(fn ($component) => !$this->user->can(User::$canEditDatesPermission))
-                ->hiddenLabel()
-                ->displayFormat('D d/m/Y')
-                ->native(false)
-                ->locale('es')
-                ->closeOnDateSelection()
-                ->required()
-                ->maxDate(now()),
-        ]);
+        return ChequeosForm::date($schema);
     }
 
     public function form(Schema $schema): Schema
     {
-        return ChequeosForm::configure($schema)->statePath('data');
+        return ChequeosForm::base($schema)->statePath('data');
     }
 
     public static function getNavigationGroup(): ?string

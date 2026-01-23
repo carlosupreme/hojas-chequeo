@@ -88,4 +88,19 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->perfil->tieneAccesoAHoja($hojaId);
     }
+
+    public function canModifyDate(): bool
+    {
+        return $this->can(User::$canEditDatesPermission);
+    }
+
+    public function enableModifyDate()
+    {
+        $this->givePermissionTo(User::$canEditDatesPermission);
+    }
+
+    public function disableModifyDate()
+    {
+        $this->revokePermissionTo(User::$canEditDatesPermission);
+    }
 }

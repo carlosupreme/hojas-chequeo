@@ -5,28 +5,31 @@ namespace App\Filament\Resources\Users;
 use App\Filament\Resources\Users\Pages\ManageUsers;
 use App\Models\User;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\FontWeight;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    protected static ?string $modelLabel = 'Usuario';
 
     public static function getNavigationGroup(): ?string
     {
@@ -97,29 +100,41 @@ class UserResource extends Resource
             ->recordTitleAttribute('name')
             ->columns([
                 TextColumn::make('name')
-                    ->label('Nombre')
-                    ->searchable()
+                    ->label('Usuario')->weight(FontWeight::Bold)
+                    ->description(fn (User $record) => $record->email)
+                    ->searchable(['name', 'email'])
                     ->sortable(),
-                TextColumn::make('email')
-                    ->label('Email')
-                    ->searchable(),
+
                 TextColumn::make('roles.name')
-                    ->searchable()
-                    ->badge(),
-                TextColumn::make('perfil.nombre')
-                    ->searchable()
-                    ->badge()->color('gray'),
-                ToggleColumn::make('Puede cambiar fecha')
-                    ->state(fn (User $record) => $record->can(User::$canEditDatesPermission))
-                    ->updateStateUsing(function ($state, User $record) {
-                        if ($state) {
-                            $record->givePermissionTo(User::$canEditDatesPermission);
-
-                            return;
-                        }
-
-                        $record->revokePermissionTo(User::$canEditDatesPermission);
+                    ->label('Roles')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'Administrador' => 'danger',
+                        'Supervisor' => 'warning',
+                        'Operador' => 'info',
+                        default => 'gray',
                     }),
+                TextColumn::make('perfil.nombre')
+                    ->label('Perfil')
+                    ->icon('heroicon-m-identification')
+                    ->iconColor('primary')
+                    ->color('gray')
+                    ->searchable(),
+                TextColumn::make('turno.nombre')
+                    ->searchable()
+                    ->badge()
+                    ->color('primary'),
+                TextColumn::make('Edicion de fecha')
+                    ->badge()
+                    ->state(fn (User $user) => $user->canModifyDate()
+                        ? 'Habilitado'
+                        : 'Deshabilitado'
+                    )
+                    ->color(fn (User $user) => $user->canModifyDate()
+                        ? 'success'
+                        : 'gray'
+                    ),
+
                 TextColumn::make('created_at')
                     ->label('Creado el')
                     ->dateTime()
@@ -135,9 +150,22 @@ class UserResource extends Resource
                 //
             ])
             ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+                ActionGroup::make([
+                    EditAction::make(),
+                    Action::make('dar_permisos')
+                        ->icon(Heroicon::Pencil)
+                        ->color('warning')
+                        ->action(function (User $record) {
+                            if ($record->canModifyDate()) {
+                                $record->disableModifyDate();
+                            } else {
+                                $record->enableModifyDate();
+                            }
+                        })
+                        ->requiresConfirmation()
+                        ->label(fn (User $record) => $record->canModifyDate() ? 'Revocar edición de fecha' : 'Habilitar edición de fecha'),
+                    DeleteAction::make(),
+                ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

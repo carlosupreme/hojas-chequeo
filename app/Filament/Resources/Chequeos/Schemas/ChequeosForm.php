@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Chequeos\Schemas;
 
+use App\Models\User;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
@@ -10,7 +12,7 @@ use Saade\FilamentAutograph\Forms\Components\SignaturePad;
 
 class ChequeosForm
 {
-    public static function configure(Schema $schema): Schema
+    public static function base(Schema $schema): Schema
     {
         return $schema
             ->components([
@@ -26,5 +28,20 @@ class ChequeosForm
                     ->label('Observaciones')
                     ->columnSpanFull(),
             ]);
+    }
+
+    public static function date(Schema $schema): Schema
+    {
+        return $schema->components([
+            DatePicker::make('dateSelected')
+                ->disabled(fn ($component) => ! auth()->user()->can(User::$canEditDatesPermission))
+                ->hiddenLabel()
+                ->displayFormat('D d/m/Y')
+                ->native(false)
+                ->locale('es')
+                ->closeOnDateSelection()
+                ->required()
+                ->maxDate(now()),
+        ]);
     }
 }
