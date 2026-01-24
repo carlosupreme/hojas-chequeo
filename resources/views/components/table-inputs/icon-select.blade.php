@@ -1,4 +1,4 @@
-@props(['options'])
+@props(['options', 'readOnly'])
 
 <div
     x-data="{
@@ -24,6 +24,7 @@
 
     {{-- TRIGGER BUTTON --}}
     <button
+        @disabled($readOnly)
         x-ref="trigger"
         type="button"
         @click="open = !open"

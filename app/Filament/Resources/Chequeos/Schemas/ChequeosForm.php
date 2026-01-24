@@ -20,6 +20,7 @@ class ChequeosForm
                     SignaturePad::make('firma_operador')
                         ->label('Firma')
                         ->penColor('blue')
+                        ->penColorOnDark('blue')
                         ->live()
                         ->required(),
                     TextInput::make('nombre_operador')

@@ -8,7 +8,6 @@ use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 
 class SelectHojaChequeo extends Component
@@ -92,15 +91,7 @@ class SelectHojaChequeo extends Component
             ->with(['hojaChequeo.equipo'])
             ->get();
 
-        // 4. Fetch Hojas/New (Cached & Filtered)
-        $cacheKey = $this->buildCacheKey($user->id);
-        $cacheTtl = now()->addMinutes(15);
-
-        $hojas = Cache::tags(['hojas', "user:{$user->id}"])->remember(
-            $cacheKey,
-            $cacheTtl,
-            fn () => $this->fetchHojas($user)
-        );
+        $hojas = $this->fetchHojas($user);
 
         $hasMore = $hojas->count() >= ($this->perPage * $this->page);
 

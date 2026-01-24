@@ -36,6 +36,7 @@
                             <x-table-inputs.input-dispatcher
                                 :item="$item"
                                 model="form.{{ $item['id'] }}"
+                                :readOnly="$readOnly"
                             />
                         </div>
                     </td>
@@ -66,6 +67,7 @@
                     <x-table-inputs.input-dispatcher
                         :item="$item"
                         model="form.{{ $item['id'] }}"
+                        :readOnly="$readOnly"
                     />
                 </div>
 

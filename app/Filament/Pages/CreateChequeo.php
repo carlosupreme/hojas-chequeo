@@ -46,6 +46,9 @@ class CreateChequeo extends Page
     #[Url(as: 'e', except: null)]
     public null|string|int $ejecucionId = null;
 
+    #[Url(as: 'b', except: null)]
+    public ?string $backUrl = null;
+
     public function mount(): void
     {
         $this->user = Auth::user();
@@ -96,7 +99,8 @@ class CreateChequeo extends Page
     {
         $this->form->fill([
             'nombre_operador' => $this->hojaEjecucion?->nombre_operador ?? $this->user->name,
-            'firma_operador' => $this->hojaEjecucion?->firma_operador ? $this->imageService()->getAsBase64($this->hojaEjecucion->firma_operador) : null,
+            'firma_operador' => $this->hojaEjecucion?->firma_operador ? $this->imageService()
+                ->getAsBase64($this->hojaEjecucion->firma_operador) : null,
             'observaciones' => $this->hojaEjecucion?->observaciones ?? '',
         ]);
 
@@ -113,6 +117,9 @@ class CreateChequeo extends Page
             'nombre_operador' => $this->user->name,
         ]);
         $this->dateSelected = Carbon::now();
+        if (! is_null($this->backUrl)) {
+            redirect()->to($this->backUrl);
+        }
     }
 
     public function hasItems(): bool

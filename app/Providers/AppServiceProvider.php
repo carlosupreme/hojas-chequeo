@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Services\ImageService;
+use Carbon\Carbon;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // not working: shows in english
+        Carbon::setLocale('es_MX');
     }
 }

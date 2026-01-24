@@ -1,4 +1,4 @@
-@props(['item', 'model'])
+@props(['item', 'model', 'readOnly'])
 
 @php
     if ($item['type_key'] === 'icon_set') {
@@ -11,16 +11,20 @@
 
 <div class="w-full">
     @if($item['type_key'] === 'icon_set')
-        <x-table-inputs.icon-select :options="$item['options']" :wire:model.live="$model"/>
+        <x-table-inputs.icon-select :options="$item['options']" :wire:model.live="$model" :readOnly="$readOnly"/>
     @elseif($item['type_key'] === 'number')
         <x-filament::input.wrapper>
-            <x-filament::input type="number" :wire:model.blur="$model"/>
+            <x-filament::input type="number" :wire:model.blur="$model" :readonly="$readOnly"/>
         </x-filament::input.wrapper>
     @elseif($item['type_key'] === 'text')
         <x-filament::input.wrapper>
-            <x-filament::input type="text" :wire:model.blur="$model"/>
+            <x-filament::input type="text" :wire:model.blur="$model" :readonly="$readOnly"/>
         </x-filament::input.wrapper>
     @elseif($item['type_key'] === 'boolean')
-        <x-table-inputs.toggle :wire:model.live="$model"/>
+        @if($readOnly)
+            <span class="text-sm">{{$model === true? "Si" : "No"}}</span>
+        @else
+            <x-table-inputs.toggle :wire:model.live="$model"/>
+        @endif
     @endif
 </div>

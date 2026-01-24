@@ -20,8 +20,11 @@ class ChequeoItems extends Component
 
     public $filas;
 
-    public function mount(HojaChequeo $hoja, ?HojaEjecucion $ejecucion = null): void
+    public bool $readOnly = false;
+
+    public function mount(HojaChequeo $hoja, ?HojaEjecucion $ejecucion = null, bool $readOnly = false): void
     {
+        $this->readOnly = $readOnly;
         $this->hojaId = $hoja->id;
         $hoja->load([
             'columnas',
