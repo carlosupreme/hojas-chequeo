@@ -10,3 +10,8 @@ if (document.querySelector('[data-page="create-chequeo"]')) {
 if (document.querySelector('[data-animate="saving-indicator"]')) {
     import('./filament/components/chequeo-items.gsap.js');
 }
+
+// Livewire component helpers
+if (document.querySelector('[data-animate="chequeo-items"]')) {
+    import('./filament/components/chequeo-items.gsap.js');
+}

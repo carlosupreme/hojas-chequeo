@@ -106,11 +106,12 @@ class SelectHojaChequeo extends Component
 
         return view('livewire.select-hoja-chequeo', [
             'hojas' => $hojas,
-            'chequeosPendientes' => $chequeosPendientes, // Now passed explicitly
-            'chequeosCompletados' => $chequeosCompletados, // Now passed explicitly
+            'chequeosPendientes' => $chequeosPendientes,
+            'chequeosCompletados' => $chequeosCompletados,
             'hasMore' => $hasMore,
             'areas' => Area::cases(),
             'user' => $user,
+            'turno' => $user->turno,
         ]);
     }
 
