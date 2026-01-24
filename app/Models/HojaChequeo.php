@@ -32,6 +32,7 @@ class HojaChequeo extends Model
     public function latestChequeoDiario(): HasOne
     {
         return $this->hasOne(HojaEjecucion::class)
+            ->whereNotNull('finalizado_en')
             ->orderByDesc('finalizado_en')
             ->limit(1);
     }

@@ -5,69 +5,110 @@ namespace App\Filament\Pages;
 use App\Filament\Resources\Chequeos\Schemas\ChequeosForm;
 use App\Models\HojaChequeo;
 use App\Models\HojaEjecucion;
+use App\WithImageService;
 use BackedEnum;
 use Carbon\Carbon;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Url;
 
 class CreateChequeo extends Page
 {
+    use WithImageService;
+
     protected string $view = 'filament.pages.create-chequeo';
 
-    public ?HojaEjecucion $ejecucion = null;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPencilSquare;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-pencil-square';
+    public static function getNavigationLabel(): string
+    {
+        return 'Chequeo diario';
+    }
 
     public ?array $data = [];
 
+    #[Url(as: 'h', except: null)]
     public null|string|int $hojaId = null;
 
     public ?HojaChequeo $hojaChequeo = null;
+
+    public ?HojaEjecucion $hojaEjecucion = null;
 
     public $dateSelected;
 
     public $user;
 
-    protected $queryString = [
-        'hojaId' => ['except' => '', 'as' => 'h'],
-    ];
+    #[Url(as: 'e', except: null)]
+    public null|string|int $ejecucionId = null;
 
     public function mount(): void
     {
         $this->user = Auth::user();
-        $this->form->fill([
-            'nombre_operador' => $this->user->name,
-        ]);
-        $this->dateSelected = Carbon::now();
 
-        if ($this->hojaId) {
-            $this->loadHojaChequeo($this->hojaId);
+        if ($this->ejecucionId) {
+            $this->loadEjecucion();
+        }
+
+        $this->loadFormData();
+
+        if ($this->hojaId && ! $this->ejecucionId) {
+            $this->loadHojaChequeo();
         }
     }
 
     #[On('hojaChequeoSelected')]
-    public function nextPage(int $hojaId): void
+    public function setHojaChequeo(int $hojaId): void
     {
         $this->hojaId = $hojaId;
-        $this->loadHojaChequeo($hojaId);
+        $this->loadHojaChequeo();
+        $this->dispatch('scroll-to-top');
     }
 
-    protected function loadHojaChequeo(int $hojaId): void
+    #[On('hojaEjecucionSelected')]
+    public function setHojaEjecucion(int $ejecucionId): void
+    {
+        $this->ejecucionId = $ejecucionId;
+        $this->loadEjecucion();
+    }
+
+    protected function loadEjecucion(): void
+    {
+        $this->hojaEjecucion = HojaEjecucion::findOrFail($this->ejecucionId);
+        $this->hojaId = $this->hojaEjecucion->hoja_chequeo_id;
+        $this->loadHojaChequeo();
+    }
+
+    protected function loadHojaChequeo(): void
     {
         $this->hojaChequeo = HojaChequeo::with(['filas.valores.hojaColumna', 'columnas', 'equipo'])
             ->encendidas()
             ->availableTo($this->user->perfil)
-            ->findOrFail($hojaId);
+            ->findOrFail($this->hojaId);
+        $this->loadFormData();
+    }
+
+    public function loadFormData(): void
+    {
+        $this->form->fill([
+            'nombre_operador' => $this->hojaEjecucion?->nombre_operador ?? $this->user->name,
+            'firma_operador' => $this->hojaEjecucion?->firma_operador ? $this->imageService()->getAsBase64($this->hojaEjecucion->firma_operador) : null,
+            'observaciones' => $this->hojaEjecucion?->observaciones ?? '',
+        ]);
+
+        $this->dateSelected = $this->hojaEjecucion?->created_at ?? Carbon::now();
     }
 
     public function resetState(): void
     {
         $this->hojaId = null;
         $this->hojaChequeo = null;
+        $this->ejecucionId = null;
+        $this->hojaEjecucion = null;
         $this->form->fill([
             'nombre_operador' => $this->user->name,
         ]);
@@ -86,16 +127,38 @@ class CreateChequeo extends Page
             'user_id' => $this->user->id,
             'turno_id' => $this->user->turno_id,
             'created_at' => $this->dateSelected,
+            'hoja_chequeo_id' => $this->hojaChequeo->id,
         ];
 
-        debug($data);
+        if ($this->hojaEjecucion) {
+            if ($data['firma_operador'] === $this->imageService()->getAsBase64($this->hojaEjecucion->firma_operador)) {
+                $data['firma_operador'] = $this->hojaEjecucion->firma_operador;
+            } else {
+                $data['firma_operador'] = $this->imageService()->storeBase64('firmas', $data['firma_operador']);
+            }
 
+            $this->hojaEjecucion->update($data);
+            $this->dispatch('hoja-ejecucion-saved', $this->ejecucionId);
+
+            return;
+        }
+
+        $data['firma_operador'] = $this->imageService()->storeBase64('firmas', $data['firma_operador']);
+        $hojaEjecucion = HojaEjecucion::create($data);
+        $this->dispatch('hoja-ejecucion-saved', $hojaEjecucion->id);
+    }
+
+    #[On('hoja-fila-respuesta-items-created')]
+    public function showSuccessNotification(): void
+    {
         Notification::make()
             ->success()
             ->icon('heroicon-o-document-text')
             ->iconColor('success')
             ->title('Chequeo diario guardado')
             ->send();
+
+        $this->resetState();
     }
 
     public function dateForm(Schema $schema): Schema

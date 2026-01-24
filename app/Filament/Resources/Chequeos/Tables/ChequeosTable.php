@@ -24,7 +24,7 @@ class ChequeosTable
     {
         return $table
             ->modifyQueryUsing(fn () => Auth::user()->hasRole(['Administrador', 'Supervisor'])
-                ? HojaEjecucion::query()->orderByDesc('finalizado_en')
+                ? HojaEjecucion::query()->orderByDesc('finalizado_en')->orderByDesc('created_at')
                 : HojaEjecucion::where('user_id', Auth::id())->orderByDesc('finalizado_en')
             )
             ->columns([

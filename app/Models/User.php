@@ -50,7 +50,15 @@ class User extends Authenticatable implements FilamentUser
     public function chequeosPendientes(): HasMany
     {
         return $this->hasMany(HojaEjecucion::class)
-            ->whereNull('finalizado_en');
+            ->whereNull('finalizado_en')
+            ->orderByDesc('created_at');
+    }
+
+    public function chequeosCompletadosHoy(): HasMany
+    {
+        return $this->hasMany(HojaEjecucion::class)
+            ->whereToday('finalizado_en')
+            ->orderByDesc('finalizado_en');
     }
 
     public function turno(): BelongsTo

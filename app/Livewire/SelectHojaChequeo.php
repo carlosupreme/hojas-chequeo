@@ -28,10 +28,17 @@ class SelectHojaChequeo extends Component
 
     public iterable $areas;
 
+    public $chequeosPendientes;
+
     public function mount(): void
     {
         $this->user = Auth::user();
         $this->areas = Area::cases();
+        $this->chequeosPendientes = $this->user
+            ->chequeosPendientes()
+            ->whereHas('hojaChequeo', fn ($query) => $query->inArea($this->activeFilter)->search($this->search))
+            ->with('hojaChequeo')
+            ->get();
     }
 
     public function toggleFilter(?string $filter = null): void
@@ -62,9 +69,15 @@ class SelectHojaChequeo extends Component
         $this->page = 1;
     }
 
-    public function selectHojaChequeo($id)
+    public function selectHojaChequeo($id): void
     {
         $this->dispatch('hojaChequeoSelected', $id);
+    }
+
+    public function selectHojaEjecucion($chequeo): void
+    {
+        $this->dispatch('hojaChequeoSelected', $chequeo['hoja_chequeo_id']);
+        $this->dispatch('hojaEjecucionSelected', $chequeo['id']);
     }
 
     public function render(): View

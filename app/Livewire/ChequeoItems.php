@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\HojaChequeo;
 use App\Models\HojaEjecucion;
+use App\Models\HojaFilaRespuesta;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -17,6 +18,8 @@ class ChequeoItems extends Component
 
     public $hojaId;
 
+    public $filas;
+
     public function mount(HojaChequeo $hoja, ?HojaEjecucion $ejecucion = null): void
     {
         $this->hojaId = $hoja->id;
@@ -25,6 +28,8 @@ class ChequeoItems extends Component
             'filas.answerType.answerOptions',
             'filas.valores.hojaColumna',
         ]);
+
+        $this->filas = $hoja->filas;
 
         $existingResponses = $ejecucion
             ? $ejecucion->respuestas()->get()->keyBy('hoja_fila_id')
@@ -71,8 +76,40 @@ class ChequeoItems extends Component
         })->toArray();
     }
 
-    #[On('dailyCheckCreated')]
-    public function save(int $id): void {}
+    #[On('hoja-ejecucion-saved')]
+    public function save($hojaEjecucionId): void
+    {
+        $filaIds = array_keys($this->form);
+        $markAsCompleted = true;
+
+        foreach ($filaIds as $filaId) {
+            $fila = $this->filas->find($filaId);
+            $type = $fila->answerType?->key;
+            $value = $this->form[$filaId];
+
+            if (is_null($value)) {
+                $markAsCompleted = false;
+            }
+
+            HojaFilaRespuesta::updateOrCreate([
+                'hoja_ejecucion_id' => $hojaEjecucionId,
+                'hoja_fila_id' => $filaId,
+            ], [
+                'answer_option_id' => $type === 'icon_set' ? $value : null,
+                'numeric_value' => $type === 'number' && is_numeric($value) ? floatval($value) : null,
+                'text_value' => $type === 'text' ? $value : null,
+                'boolean_value' => $type === 'boolean' && is_bool($value) ? $value : null,
+            ]);
+        }
+
+        if ($markAsCompleted) {
+            HojaEjecucion::find($hojaEjecucionId)->update([
+                'finalizado_en' => now(),
+            ]);
+        }
+
+        $this->dispatch('hoja-fila-respuesta-items-created');
+    }
 
     /**
      * Whenever any nested key in `form` changes (e.g. form.123), dispatch a browser event

@@ -10,7 +10,7 @@
         });
     }
 }">
-    <div class="mb-3 flex justify-end min-h-6">
+    <div class="mb-2 flex justify-end min-h-6">
         <div
             data-animate="saving-indicator"
             x-show="saving"
@@ -27,7 +27,7 @@
         </div>
     </div>
 
-    <div class="mb-6 border rounded-lg dark:border-gray-700 p-1">
+    <div class="border rounded-lg dark:border-gray-700 p-1">
         <!-- Desktop View -->
         <div class="hidden lg:block">
             <table class="table-fixed border-collapse w-full">

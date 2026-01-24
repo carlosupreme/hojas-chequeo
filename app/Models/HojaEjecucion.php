@@ -18,6 +18,7 @@ class HojaEjecucion extends Model
         'firma_supervisor',
         'observaciones',
         'finalizado_en',
+        'created_at',
     ];
 
     protected function casts(): array

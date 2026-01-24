@@ -47,85 +47,55 @@
         </div>
     </div>
 
-    {{-- Grid --}}
+    @if($user->chequeosPendientes()->count() > 0)
+        <div>
+            <h2>Pendientes por finalizar: </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                @foreach ($chequeosPendientes as $chequeo)
+                    @php
+                        $hoja = $chequeo->hojaChequeo;
+                    @endphp
+                    <div
+                        wire:click="selectHojaEjecucion({{ $chequeo }})">
+                        <x-hoja-chequeo-card
+                            status="pending"
+                            :hoja="$hoja"/>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+    <hr>
+
+    @if($user->chequeosCompletadosHoy()->count() > 0)
+        <div>
+            <h2>Completados hoy: </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                @foreach ($user->chequeosCompletadosHoy as $chequeo)
+                    @php
+                        $hoja = $chequeo->hojaChequeo;
+                    @endphp
+                    <div
+                        wire:click="selectHojaEjecucion({{ $chequeo }})">
+                        <x-hoja-chequeo-card
+                            status="completed"
+                            :hoja="$hoja"/>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+    <hr>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         @foreach ($hojas as $hoja)
-            <div
-                wire:click="selectHojaChequeo({{ $hoja->id }})"
-                class="group cursor-pointer flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-            >
-                {{-- Card Image --}}
-                <div class="relative h-48 w-full overflow-hidden bg-gray-100 dark:bg-gray-700">
-                    @if ($hoja->equipo->foto)
-                        <img
-                            class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                            src="{{ asset('storage/' . $hoja->equipo->foto) }}"
-                            alt="{{ $hoja->equipo->nombre }}"
-                        >
-                    @else
-                        <div
-                            class="h-full w-full flex items-center justify-center bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
-                            <svg class="h-16 w-16 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24"
-                                 stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                            </svg>
-                        </div>
-                    @endif
-
-                    {{-- Area Badge --}}
-                    @php
-                        $areaColor = match($hoja->equipo->area) {
-                            Area::TINTORERIA->value => 'bg-cyan-500',
-                            Area::LAVANDERIA_INSTITUCIONAL->value => 'bg-indigo-500',
-                            Area::CUARTO_DE_MAQUINAS->value => 'bg-slate-500',
-                            default => 'bg-gray-500'
-                        };
-                    @endphp
-                    <div class="absolute top-3 left-3">
-                        <span
-                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold text-white {{ $areaColor }} shadow-lg backdrop-blur-md bg-opacity-90">
-                            {{ $hoja->equipo->area }}
-                        </span>
-                    </div>
-
-                    {{-- Tag Badge --}}
-                    <div class="absolute bottom-3 right-3">
-                        <span
-                            class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-bold bg-white/90 dark:bg-black/70 text-gray-800 dark:text-gray-200 shadow-sm backdrop-blur-sm">
-                            {{ $hoja->equipo->nombre }}
-                        </span>
-                    </div>
-                </div>
-                {{-- Card Content --}}
-                <div class="flex-1 p-5 flex flex-col justify-between">
-                    <div class="mb-4">
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white leading-tight line-clamp-2 mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                            {{ $hoja->equipo->tag }}
-                        </h3>
-                    </div>
-
-                    <div class="pt-4 border-t border-gray-100 dark:border-gray-700">
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-gray-500 dark:text-gray-400">Último chequeo</span>
-                            <span
-                                class="flex items-center font-medium {{ $hoja->latestChequeoDiario ? 'text-green-600 dark:text-green-400' : 'text-gray-400' }}">
-                                @if($hoja->latestChequeoDiario)
-                                    <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    {{ $hoja->latestChequeoDiario->finalizado_en->diffForHumans() }}
-                                @else
-                                    <span class="italic">Nunca</span>
-                                @endif
-                            </span>
-                        </div>
-                    </div>
-                </div>
+            <div wire:click="selectHojaChequeo({{ $hoja->id }})">
+                <x-hoja-chequeo-card
+                    status="new"
+                    :hoja="$hoja"/>
             </div>
         @endforeach
     </div>
+
 
     {{-- Empty State --}}
     @if($hojas->isEmpty())

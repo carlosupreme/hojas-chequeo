@@ -19,6 +19,8 @@ class ChequeosForm
                 Grid::make()->schema([
                     SignaturePad::make('firma_operador')
                         ->label('Firma')
+                        ->penColor('blue')
+                        ->live()
                         ->required(),
                     TextInput::make('nombre_operador')
                         ->label('Nombre')
