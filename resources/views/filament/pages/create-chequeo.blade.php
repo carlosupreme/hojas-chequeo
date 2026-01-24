@@ -23,7 +23,7 @@
             <livewire:chequeo-items :hoja="$hojaChequeo" :ejecucion="$hojaEjecucion"/>
 
             @if($this->hojaChequeo->observaciones)
-                <div>
+                <div class="my-4">
                     <h2 class="font-bold">Observaciones:</h2>
                     {!! $this->hojaChequeo->observaciones !!}
                 </div>
@@ -39,15 +39,7 @@
         </div>
         <x-filament-actions::modals/>
     @else
-
         <livewire:select-hoja-chequeo/>
     @endif
-    <script>
-        document.addEventListener('livewire:init', () => {
-            Livewire.on('scroll-to-top', () => {
-                window.scrollTo({top: 0, behavior: 'smooth'});
-                // animateEnter();
-            });
-        });
-    </script>
+
 </x-filament-panels::page>

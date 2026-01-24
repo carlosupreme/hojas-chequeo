@@ -86,7 +86,7 @@
                 <input
                     wire:model.live.debounce.300ms="search"
                     type="search"
-                    placeholder="Filtrar tarjetas..."
+                    placeholder="Filtrar equipos..."
                     class="block w-full rounded-lg border-gray-200 bg-gray-50 py-2 pl-9 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                 >
             </div>

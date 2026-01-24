@@ -27,11 +27,9 @@ function animateSavingIndicator() {
 }
 
 export function animateEnter() {
-    if (prefersReducedMotion()) return;
 
     const el = document.querySelector('[data-animate="chequeo-items"]');
     if (!el) return;
-
 
     // Use Back.out for a very subtle "overshoot" that feels mechanical and tactile
     gsap.fromTo(el,
@@ -58,8 +56,11 @@ function boot() {
         animateSavingIndicator();
     });
 
-    window.addEventListener("scroll-to-top", () => {
-        animateEnter();
+    document.addEventListener('livewire:init', () => {
+        Livewire.on('scroll-to-top', () => {
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            animateEnter();
+        });
     });
 }
 
