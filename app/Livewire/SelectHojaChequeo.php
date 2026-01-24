@@ -6,39 +6,26 @@ use App\Area;
 use App\Models\HojaChequeo;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 
 class SelectHojaChequeo extends Component
 {
-    public $selectedId;
-
     public string $search = '';
 
     public int $perPage = 12;
 
     public int $page = 1;
 
-    protected $queryString = ['search' => ['except' => '']];
-
     public ?Area $activeFilter = null;
 
-    public User $user;
-
-    public iterable $areas;
-
-    public $chequeosPendientes;
+    protected $queryString = ['search' => ['except' => '']];
 
     public function mount(): void
     {
-        $this->user = Auth::user();
-        $this->areas = Area::cases();
-        $this->chequeosPendientes = $this->user
-            ->chequeosPendientes()
-            ->whereHas('hojaChequeo', fn ($query) => $query->inArea($this->activeFilter)->search($this->search))
-            ->with('hojaChequeo')
-            ->get();
+        // No heavy lifting here anymore to ensure filters apply dynamically
     }
 
     public function toggleFilter(?string $filter = null): void
@@ -61,7 +48,6 @@ class SelectHojaChequeo extends Component
     public function loadMore(): void
     {
         $this->page++;
-        $this->fetchHojas();
     }
 
     protected function resetPagination(): void
@@ -74,46 +60,76 @@ class SelectHojaChequeo extends Component
         $this->dispatch('hojaChequeoSelected', $id);
     }
 
-    public function selectHojaEjecucion($chequeo): void
+    public function selectHojaEjecucion($chequeoId): void
     {
-        $this->dispatch('hojaChequeoSelected', $chequeo['hoja_chequeo_id']);
-        $this->dispatch('hojaEjecucionSelected', $chequeo['id']);
+        // Assuming you need the Chequeo ID to continue
+        $this->dispatch('hojaEjecucionSelected', $chequeoId);
     }
 
     public function render(): View
     {
-        $cacheKey = $this->buildCacheKey();
+        $user = Auth::user();
+
+        // 1. Shared Filter Logic (Closure)
+        // This ensures the exact same logic applies to all 3 lists
+        $applyFilters = function (Builder $query) {
+            $query->whereHas('hojaChequeo', function ($q) {
+                $q->inArea($this->activeFilter?->value)
+                    ->search($this->search);
+            });
+        };
+
+        // 2. Fetch Pending (Filtered)
+        $chequeosPendientes = $user->chequeosPendientes()
+            ->tap($applyFilters)
+            ->with(['hojaChequeo.equipo'])
+            ->get();
+
+        // 3. Fetch Completed Today (Filtered)
+        // We use the relation query but add our filters before getting results
+        $chequeosCompletados = $user->chequeosCompletadosHoy()
+            ->tap($applyFilters)
+            ->with(['hojaChequeo.equipo'])
+            ->get();
+
+        // 4. Fetch Hojas/New (Cached & Filtered)
+        $cacheKey = $this->buildCacheKey($user->id);
         $cacheTtl = now()->addMinutes(15);
 
-        $hojas = Cache::tags(['hojas', "user:{$this->user->id}"])->remember(
+        $hojas = Cache::tags(['hojas', "user:{$user->id}"])->remember(
             $cacheKey,
             $cacheTtl,
-            fn () => $this->fetchHojas()
+            fn () => $this->fetchHojas($user)
         );
 
         $hasMore = $hojas->count() >= ($this->perPage * $this->page);
 
         return view('livewire.select-hoja-chequeo', [
             'hojas' => $hojas,
+            'chequeosPendientes' => $chequeosPendientes, // Now passed explicitly
+            'chequeosCompletados' => $chequeosCompletados, // Now passed explicitly
             'hasMore' => $hasMore,
-            'turno' => $this->user->turno,
+            'areas' => Area::cases(),
+            'user' => $user,
         ]);
     }
 
-    protected function buildCacheKey(): string
+    protected function buildCacheKey(int $userId): string
     {
-        $idsHash = md5(implode(',', $this->user->perfil->hoja_ids));
+        // Added userId to params to ensure purity if method is moved later
+        $user = User::find($userId);
+        $idsHash = md5(implode(',', $user->perfil->hoja_ids ?? []));
         $filter = $this->activeFilter?->value ?? 'all';
         $search = $this->search ? md5(strtolower($this->search)) : 'none';
 
-        return "hojas:list:{$this->user->id}:{$idsHash}:{$filter}:{$search}:page{$this->page}";
+        return "hojas:list:{$userId}:{$idsHash}:{$filter}:{$search}:page{$this->page}";
     }
 
-    protected function fetchHojas()
+    protected function fetchHojas(User $user)
     {
         return HojaChequeo::with(['equipo', 'latestChequeoDiario'])
             ->select(['id', 'equipo_id', 'encendido'])
-            ->availableTo($this->user->perfil)
+            ->availableTo($user->perfil)
             ->encendidas()
             ->inArea($this->activeFilter?->value)
             ->search($this->search)
