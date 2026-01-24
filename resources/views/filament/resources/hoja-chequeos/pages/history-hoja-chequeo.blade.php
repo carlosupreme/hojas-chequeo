@@ -280,7 +280,7 @@
                                     @endphp
                                     <td class="px-3 py-3 text-center border-l border-r border-gray-200 dark:border-gray-700">
                                         @if($ejecucion?->firma_operador)
-                                            <img src="{{ asset('storage/' . $ejecucion->firma_operador) }}"
+                                            <img src="{{ app(\App\Services\ImageService::class)->getAsBase64($ejecucion->firma_operador) }}"
                                                  alt="Firma Operador"
                                                  class="h-12 mx-auto">
                                         @endif
@@ -294,7 +294,7 @@
                                 @endphp
                                 <td class="px-3 py-3 text-center border-l border-r border-gray-200 dark:border-gray-700">
                                     @if($ejecucion?->firma_operador)
-                                        <img src="{{ asset('storage/' . $ejecucion->firma_operador) }}"
+                                        <img src="{{ app(\App\Services\ImageService::class)->getAsBase64($ejecucion->firma_operador) }}"
                                              alt="Firma Operador"
                                              class="h-12 mx-auto">
                                     @endif
@@ -320,7 +320,7 @@
                                     @endphp
                                     <td class="px-3 py-3 text-center border-l border-r border-gray-200 dark:border-gray-700">
                                         @if($ejecucion?->firma_supervisor)
-                                            <img src="{{ asset('storage/' . $ejecucion->firma_supervisor) }}"
+                                            <img src="{{ app(\App\Services\ImageService::class)->getAsBase64($ejecucion->firma_supervisor) }}"
                                                  alt="Firma Supervisor"
                                                  class="h-12 mx-auto">
                                         @endif
@@ -334,7 +334,7 @@
                                 @endphp
                                 <td class="px-3 py-3 text-center border-l border-r border-gray-200 dark:border-gray-700">
                                     @if($ejecucion?->firma_supervisor)
-                                        <img src="{{ asset('storage/' . $ejecucion->firma_supervisor) }}"
+                                        <img src="{{ app(\App\Services\ImageService::class)->getAsBase64($ejecucion->firma_supervisor) }}"
                                              alt="Firma Supervisor"
                                              class="h-12 mx-auto">
                                     @endif

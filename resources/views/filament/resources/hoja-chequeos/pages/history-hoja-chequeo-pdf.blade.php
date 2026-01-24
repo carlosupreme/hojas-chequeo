@@ -243,7 +243,7 @@
                             $ejecucion = $chunk['ejecuciones'][$day] ?? null;
                         @endphp
                         @if($ejecucion?->firma_operador)
-                            <img src="{{ storage_path('app/public/' . $ejecucion->firma_operador) }}"
+                            <img src="{{ app(\App\Services\ImageService::class)->getAsBase64($ejecucion->firma_operador) }}"
                                  alt="Firma del Operador"
                                  class="signature-img">
                         @else
@@ -262,7 +262,7 @@
                             $ejecucion = $chunk['ejecuciones'][$day] ?? null;
                         @endphp
                         @if($ejecucion?->firma_supervisor)
-                            <img src="{{ storage_path('app/public/' . $ejecucion->firma_supervisor) }}"
+                            <img src="{{ app(\App\Services\ImageService::class)->getAsBase64($ejecucion->firma_supervisor) }}"
                                  alt="Firma del Supervisor"
                                  class="signature-img">
                         @endif
