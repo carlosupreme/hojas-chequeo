@@ -59,9 +59,13 @@ class HojaChequeo extends Model
         ));
     }
 
-    public function scopeEncendidas($query): void
+    public function scopeEncendidas($query, bool $active = true): void
     {
-        $query->where('encendido', true);
+        if (! $active) {
+            return;
+        }
+
+        $query->where('encendido', $active);
     }
 
     public function equipo(): BelongsTo

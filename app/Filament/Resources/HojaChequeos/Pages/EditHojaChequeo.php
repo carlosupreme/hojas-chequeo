@@ -36,6 +36,7 @@ class EditHojaChequeo extends Page
     public function update(): void
     {
         $data = $this->form->getState();
+        $data['observaciones'] = $data['observaciones'] === '<p></p>' ? null : $data['observaciones'];
         $record = HojaChequeo::create($data);
         $this->dispatch('hoja-chequeo-created', $record->id);
         $this->record->update([

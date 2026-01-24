@@ -129,7 +129,7 @@ class SelectHojaChequeo extends Component
     protected function fetchHojas(User $user)
     {
         return HojaChequeo::with(['equipo', 'latestChequeoDiario'])
-            ->select(['id', 'equipo_id', 'encendido'])
+            ->select(['id', 'equipo_id', 'encendido', 'version'])
             ->availableTo($user->perfil)
             ->encendidas()
             ->inArea($this->activeFilter?->value)

@@ -153,6 +153,7 @@
                             class="transition-all duration-200"
                             wire:click="selectHojaChequeo({{ $hoja->id }})">
                             <x-kanban-card
+                                :version="$hoja->version"
                                 status="new"
                                 :equipo="$hoja->equipo"
                                 :date="null"
@@ -192,6 +193,7 @@
                     @foreach ($chequeosPendientes as $chequeo)
                         <div wire:click="selectHojaEjecucion({{ $chequeo->id }})">
                             <x-kanban-card
+                                :version="$chequeo->hojaChequeo->version"
                                 status="pending"
                                 :equipo="$chequeo->hojaChequeo->equipo"
                                 :date="$chequeo->updated_at"
@@ -220,6 +222,7 @@
                     @foreach ($chequeosCompletados as $chequeo)
                         <div wire:click="selectHojaEjecucion({{ $chequeo->id }})">
                             <x-kanban-card
+                                :version="$chequeo->hojaChequeo->version"
                                 status="completed"
                                 :equipo="$chequeo->hojaChequeo->equipo"
                                 :date="$chequeo->finalizado_en"

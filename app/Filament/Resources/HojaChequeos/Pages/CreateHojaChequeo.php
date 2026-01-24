@@ -28,6 +28,7 @@ class CreateHojaChequeo extends Page
     public function create(): void
     {
         $data = $this->form->getState();
+        $data['observaciones'] = $data['observaciones'] === '<p></p>' ? null : $data['observaciones'];
         $record = HojaChequeo::create($data);
         $this->recordCreatedId = $record->id;
         $this->dispatch('hoja-chequeo-created', $record->id);

@@ -86,7 +86,7 @@ class CreateChequeo extends Page
     {
         $this->dispatch('scroll-to-top');
         $this->hojaChequeo = HojaChequeo::with(['filas.valores.hojaColumna', 'columnas', 'equipo'])
-            ->encendidas()
+            ->encendidas(! $this->hojaEjecucion)
             ->availableTo($this->user->perfil)
             ->findOrFail($this->hojaId);
         $this->loadFormData();

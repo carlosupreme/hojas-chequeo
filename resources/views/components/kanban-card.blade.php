@@ -1,4 +1,4 @@
-@props(['status', 'equipo', 'date'])
+@props(['status', 'equipo', 'date', 'version'])
 
 @php
     $config = match($status) {

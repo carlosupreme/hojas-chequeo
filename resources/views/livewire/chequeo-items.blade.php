@@ -1,104 +1,98 @@
 <div x-data="{
-    saving: false,
-    savingTimeout: null,
-    init() {
-        this.$el.addEventListener('chequeo-form-updated', (e) => {
-            this.saving = true;
-            clearTimeout(this.savingTimeout);
-            this.savingTimeout = setTimeout(() => (this.saving = false), 900);
-            window.dispatchEvent(new CustomEvent('chequeo-items:form-changed', { detail: e.detail }));
-        });
+    notifySave() {
+        this.$el.dispatchEvent(new CustomEvent('chequeo-form-updated', { bubbles: true }));
     }
 }">
-    <div class="mb-2 flex justify-end min-h-6">
-        <div
-            data-animate="saving-indicator"
-            x-show="saving"
-            x-transition.opacity.duration.150ms
-            class="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 shadow-sm dark:border-blue-900/40 dark:bg-blue-950/30 dark:text-blue-200"
-            role="status"
-            aria-live="polite"
-        >
-            <svg class="h-3.5 w-3.5 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v3.2a4.8 4.8 0 00-4.8 4.8H4z"></path>
-            </svg>
-            <span>Guardando…</span>
-        </div>
+    {{--
+        DESKTOP VIEW (> lg)
+        Classic Table for high density data
+    --}}
+    <div class="hidden lg:block overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+            <tr class="border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30">
+                @foreach($columnas as $columna)
+                    <th class="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        {{ $columna['label'] }}
+                    </th>
+                @endforeach
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">
+                    Estado / Valor
+                </th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900">
+            @foreach($items as $item)
+                <tr class="group hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-colors">
+                    @foreach($columnas as $columna)
+                        <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
+                            {{ $item['cells'][$columna['key']] ?? '—' }}
+                        </td>
+                    @endforeach
+
+                    {{-- Input Cell --}}
+                    <td class="px-6 py-3 w-64" @change="notifySave()">
+                        <div class="relative">
+                            <x-table-inputs.input-dispatcher
+                                :item="$item"
+                                model="form.{{ $item['id'] }}"
+                            />
+                        </div>
+                    </td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
     </div>
 
-    <div class="border rounded-lg dark:border-gray-700 p-1">
-        <!-- Desktop View -->
-        <div class="hidden lg:block">
-            <table class="table-fixed border-collapse w-full">
-                <thead class="bg-gray-50 dark:bg-gray-800">
-                <tr>
-                    @foreach($columnas as $columna)
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            {{ $columna['label'] }}
-                        </th>
-                    @endforeach
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Check
-                    </th>
-                </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                @foreach($items as $item)
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
-                        @foreach($columnas as $columna)
-                            <td class="px-4 py-4 text-sm text-gray-900 dark:text-gray-300">
-                                {{ $item['cells'][$columna['key']] ?? 'N/A' }}
-                            </td>
+    {{--
+        MOBILE VIEW (< lg)
+        Card Layout for better touch targets
+    --}}
+    <div class="block lg:hidden divide-y divide-gray-100 dark:divide-gray-800">
+        @foreach($items as $item)
+            <div class="p-4 bg-white dark:bg-gray-900" wire:key="mobile-item-{{$item['id']}}">
+
+                {{-- Header: Item Name --}}
+                <div class="mb-3">
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-wide">Item</span>
+                    <p class="text-sm font-semibold text-gray-900 dark:text-white leading-tight">
+                        {{ $item['cells'][$columnas[0]['key']] ?? 'N/A' }}
+                    </p>
+                </div>
+
+                {{-- Input Area (Prominent) --}}
+                <div class="mb-4" @change="notifySave()">
+                    <x-table-inputs.input-dispatcher
+                        :item="$item"
+                        model="form.{{ $item['id'] }}"
+                    />
+                </div>
+
+                {{-- Details Toggle (Accordion) --}}
+                <div x-data="{ expanded: false }" class="border-t border-gray-100 dark:border-gray-800 pt-2">
+                    <button
+                        @click="expanded = !expanded"
+                        class="flex items-center justify-between w-full text-xs text-gray-500 dark:text-gray-400 py-1"
+                    >
+                        <span>Ver detalles (Frecuencia, Método...)</span>
+                        <svg class="w-4 h-4 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                    </button>
+
+                    <div x-show="expanded" x-collapse class="mt-2 space-y-2 pb-2">
+                        @foreach($columnas as $index => $header)
+                            @if($index > 0)
+                                <div class="grid grid-cols-3 gap-2 text-xs">
+                                    <span class="font-medium text-gray-500 dark:text-gray-400">{{ $header['label'] }}</span>
+                                    <span class="col-span-2 text-gray-700 dark:text-gray-300">
+                                        {{ $item['cells'][$header['key']] ?? '—' }}
+                                    </span>
+                                </div>
+                            @endif
                         @endforeach
-
-                        <td class="px-2 py-4 w-48">
-                            <x-table-inputs.input-dispatcher :item="$item" model="form.{{ $item['id'] }}"/>
-                        </td>
-                    </tr>
-                @endforeach
-                </tbody>
-
-            </table>
-        </div>
-
-        <!-- Mobile View -->
-        <div class="block lg:hidden">
-            <div class="border-t dark:border-gray-700">
-                @foreach($items as $item)
-                    <div class="p-2 border-b dark:border-gray-700 last:border-b-0" x-data="{ open: false }"
-                         wire:key="item={{$item['id']}}}">
-                        <div class="grid grid-cols-2 gap-2 items-center">
-                            <button
-                                @click="open = !open"
-                                class="text-left focus:outline-none"
-                            >
-                                <h3 class="font-medium text-xs text-gray-900 dark:text-gray-100">
-                                    {{ $item['cells'][$columnas[0]['key']] ?? 'N/A' }}
-                                </h3>
-                            </button>
-                            <div class="relative overflow-visible">
-                                <x-table-inputs.input-dispatcher :item="$item" model="form.{{ $item['id'] }}"/>
-                            </div>
-                        </div>
-
-                        <div x-show="open" x-collapse>
-                            <div class="mt-4 space-y-2">
-                                @foreach($columnas as $index => $header)
-                                    @if($index > 0)
-                                        <div class="text-xs">
-                                                    <span
-                                                        class="font-medium text-gray-700 dark:text-gray-300">{{ $header['label'] }}:</span>
-                                            <span
-                                                class="text-gray-600 dark:text-gray-400 ml-2">{{ $item['cells'][$header['key']] ?? 'N/A' }}</span>
-                                        </div>
-                                    @endif
-                                @endforeach
-                            </div>
-                        </div>
                     </div>
-                @endforeach
+                </div>
             </div>
-        </div>
+        @endforeach
     </div>
 </div>

@@ -30,6 +30,7 @@ class PerfilResource extends Resource
     {
         return 'Administración';
     }
+
     public static function form(Schema $schema): Schema
     {
         return PerfilForm::configure($schema);
