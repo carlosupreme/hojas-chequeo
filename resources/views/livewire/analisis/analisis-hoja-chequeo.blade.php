@@ -149,4 +149,105 @@
         </div>
     </div>
 
+    {{-- CALDERAS SECTION --}}
+    <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"></path>
+                </svg>
+                Análisis de Calderas
+            </h3>
+        </div>
+
+        <div class="p-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                @foreach($this->calderasStats as $caldera)
+                    <div class="space-y-4">
+                        {{-- Caldera Header --}}
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-lg font-bold text-gray-900 dark:text-white">
+                                {{ $caldera['nombre'] }}
+                                <span class="text-sm font-normal text-gray-500">({{ $caldera['tag'] }})</span>
+                            </h4>
+                            <span class="px-3 py-1 bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400 rounded-full text-sm font-medium">
+                                {{ $caldera['tarjetones_count'] }} tarjetones
+                            </span>
+                        </div>
+
+                        {{-- Stats Cards Grid --}}
+                        <div class="grid grid-cols-2 gap-4">
+                            {{-- TOTALES Card --}}
+                            <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+                                <h5 class="text-sm font-semibold text-blue-800 dark:text-blue-400 mb-3 flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                    </svg>
+                                    TOTALES
+                                </h5>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs text-gray-600 dark:text-gray-400">Horas Trabajo</span>
+                                        <span class="font-bold text-gray-900 dark:text-white">{{ $caldera['totals']['horas_trabajo'] }} hrs</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs text-gray-600 dark:text-gray-400">Efectividad Vapor</span>
+                                        <span @class([
+                                            'font-bold',
+                                            'text-green-600' => $caldera['totals']['efectividad_vapor'] >= 90,
+                                            'text-yellow-600' => $caldera['totals']['efectividad_vapor'] >= 70 && $caldera['totals']['efectividad_vapor'] < 90,
+                                            'text-red-600' => $caldera['totals']['efectividad_vapor'] < 70,
+                                        ])>{{ $caldera['totals']['efectividad_vapor'] }}%</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs text-gray-600 dark:text-gray-400">Temperatura</span>
+                                        <span class="font-bold text-gray-900 dark:text-white">{{ $caldera['totals']['temperatura'] }}°</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs text-gray-600 dark:text-gray-400">Presión</span>
+                                        <span class="font-bold text-gray-900 dark:text-white">{{ $caldera['totals']['presion'] }} PSI</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- PROMEDIOS Card --}}
+                            <div class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl p-4 border border-green-200 dark:border-green-800">
+                                <h5 class="text-sm font-semibold text-green-800 dark:text-green-400 mb-3 flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                                    </svg>
+                                    PROMEDIOS
+                                </h5>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs text-gray-600 dark:text-gray-400">Horas Trabajo</span>
+                                        <span class="font-bold text-gray-900 dark:text-white">{{ $caldera['averages']['horas_trabajo'] }} hrs</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs text-gray-600 dark:text-gray-400">Efectividad Vapor</span>
+                                        <span @class([
+                                            'font-bold',
+                                            'text-green-600' => $caldera['averages']['efectividad_vapor'] >= 90,
+                                            'text-yellow-600' => $caldera['averages']['efectividad_vapor'] >= 70 && $caldera['averages']['efectividad_vapor'] < 90,
+                                            'text-red-600' => $caldera['averages']['efectividad_vapor'] < 70,
+                                        ])>{{ $caldera['averages']['efectividad_vapor'] }}%</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs text-gray-600 dark:text-gray-400">Temperatura</span>
+                                        <span class="font-bold text-gray-900 dark:text-white">{{ $caldera['averages']['temperatura'] }}°</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs text-gray-600 dark:text-gray-400">Presión</span>
+                                        <span class="font-bold text-gray-900 dark:text-white">{{ $caldera['averages']['presion'] }} PSI</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
 </div>

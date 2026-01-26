@@ -27,6 +27,7 @@ use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -265,6 +266,10 @@ class TarjetonResource extends Resource
                         'warning' => 'mantenimiento',
                     ])
                     ->badge(fn (string $state): string => ucfirst($state)),
+                ToggleColumn::make('falla_vapor')
+                    ->label('Falla de vapor')
+                    ->offColor('success')
+                    ->onColor('danger'),
             ])
             ->filters([
                 SelectFilter::make('equipo_id')

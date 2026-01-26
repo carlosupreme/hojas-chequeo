@@ -19,12 +19,14 @@ class Tarjeton extends Model
         'tiempo_operacion_minutos',
         'observaciones',
         'estado',
+        'falla_vapor',
     ];
 
     protected $casts = [
         'fecha' => 'date',
         'hora_encendido' => 'string',
         'hora_apagado' => 'string',
+        'falla_vapor' => 'boolean',
     ];
 
     // Relación con equipos

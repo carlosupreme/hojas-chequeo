@@ -2,9 +2,12 @@
 
 namespace App\Livewire\Analisis;
 
+use App\Models\Equipo;
 use App\Models\HojaChequeo;
 use App\Models\HojaEjecucion;
+use App\Models\HojaFila;
 use App\Models\HojaFilaRespuesta;
+use App\Models\Tarjeton;
 use App\Models\Turno;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -50,6 +53,136 @@ class AnalisisHojaChequeo extends Component
     public function render()
     {
         return view('livewire.analisis.analisis-hoja-chequeo');
+    }
+
+    /**
+     * Get Calderas stats (Caldera 1 and Caldera 2)
+     */
+    public function getCalderasStatsProperty()
+    {
+        $startDate = Carbon::parse($this->startDate)->startOfDay();
+        $endDate = Carbon::parse($this->endDate)->endOfDay();
+
+        $calderas = [
+            ['tag' => 'CM-CAL-01', 'nombre' => 'Caldera 1'],
+            ['tag' => 'CM-CAL-02', 'nombre' => 'Caldera 2'],
+        ];
+
+        $stats = [];
+
+        foreach ($calderas as $calderaInfo) {
+            $equipo = Equipo::where('tag', $calderaInfo['tag'])->first();
+
+            if (! $equipo) {
+                $stats[] = [
+                    'nombre' => $calderaInfo['nombre'],
+                    'tag' => $calderaInfo['tag'],
+                    'totals' => [
+                        'horas_trabajo' => 0,
+                        'efectividad_vapor' => 0,
+                        'temperatura' => 0,
+                        'presion' => 0,
+                    ],
+                    'averages' => [
+                        'horas_trabajo' => 0,
+                        'efectividad_vapor' => 0,
+                        'temperatura' => 0,
+                        'presion' => 0,
+                    ],
+                    'tarjetones_count' => 0,
+                ];
+
+                continue;
+            }
+
+            // Get tarjetones stats
+            $tarjetones = Tarjeton::where('equipo_id', $equipo->id)
+                ->whereBetween('fecha', [$startDate, $endDate])
+                ->get();
+
+            $tarjetonesCount = $tarjetones->count();
+            $totalMinutos = $tarjetones->sum('tiempo_operacion_minutos') ?? 0;
+            $totalHoras = round($totalMinutos / 60, 1);
+            $avgHoras = $tarjetonesCount > 0 ? round($totalHoras / $tarjetonesCount, 1) : 0;
+
+            // Efectividad de vapor (% without falla_vapor)
+            $sinFallaVapor = $tarjetones->where('falla_vapor', false)->count();
+            $efectividadVapor = $tarjetonesCount > 0 ? round(($sinFallaVapor / $tarjetonesCount) * 100, 1) : 0;
+
+            // Get HojaChequeo for this equipo to find temperatura and presion
+            $hojaChequeo = HojaChequeo::where('equipo_id', $equipo->id)->first();
+
+            $temperaturaTotal = 0;
+            $temperaturaAvg = 0;
+            $presionTotal = 0;
+            $presionAvg = 0;
+            $temperaturaCount = 0;
+            $presionCount = 0;
+
+            if ($hojaChequeo) {
+                // Get ejecuciones in date range
+                $ejecucionIds = HojaEjecucion::where('hoja_chequeo_id', $hojaChequeo->id)
+                    ->whereNotNull('finalizado_en')
+                    ->whereBetween('finalizado_en', [$startDate, $endDate])
+                    ->pluck('id');
+
+                if ($ejecucionIds->isNotEmpty()) {
+                    // Find filas with temperatura answer type
+                    $temperaturaFilaIds = HojaFila::where('hoja_chequeo_id', $hojaChequeo->id)
+                        ->whereHas('answerType', fn ($q) => $q->where('key', 'temperatura'))
+                        ->pluck('id');
+
+                    // Find filas with presion answer type
+                    $presionFilaIds = HojaFila::where('hoja_chequeo_id', $hojaChequeo->id)
+                        ->whereHas('answerType', fn ($q) => $q->where('key', 'presion'))
+                        ->pluck('id');
+
+                    // Get temperatura values
+                    if ($temperaturaFilaIds->isNotEmpty()) {
+                        $temperaturaRespuestas = HojaFilaRespuesta::whereIn('hoja_ejecucion_id', $ejecucionIds)
+                            ->whereIn('hoja_fila_id', $temperaturaFilaIds)
+                            ->whereNotNull('numeric_value')
+                            ->pluck('numeric_value');
+
+                        $temperaturaCount = $temperaturaRespuestas->count();
+                        $temperaturaTotal = round($temperaturaRespuestas->sum(), 1);
+                        $temperaturaAvg = $temperaturaCount > 0 ? round($temperaturaTotal / $temperaturaCount, 1) : 0;
+                    }
+
+                    // Get presion values
+                    if ($presionFilaIds->isNotEmpty()) {
+                        $presionRespuestas = HojaFilaRespuesta::whereIn('hoja_ejecucion_id', $ejecucionIds)
+                            ->whereIn('hoja_fila_id', $presionFilaIds)
+                            ->whereNotNull('numeric_value')
+                            ->pluck('numeric_value');
+
+                        $presionCount = $presionRespuestas->count();
+                        $presionTotal = round($presionRespuestas->sum(), 1);
+                        $presionAvg = $presionCount > 0 ? round($presionTotal / $presionCount, 1) : 0;
+                    }
+                }
+            }
+
+            $stats[] = [
+                'nombre' => $calderaInfo['nombre'],
+                'tag' => $calderaInfo['tag'],
+                'totals' => [
+                    'horas_trabajo' => $totalHoras,
+                    'efectividad_vapor' => $efectividadVapor,
+                    'temperatura' => $temperaturaTotal,
+                    'presion' => $presionTotal,
+                ],
+                'averages' => [
+                    'horas_trabajo' => $avgHoras,
+                    'efectividad_vapor' => $efectividadVapor,
+                    'temperatura' => $temperaturaAvg,
+                    'presion' => $presionAvg,
+                ],
+                'tarjetones_count' => $tarjetonesCount,
+            ];
+        }
+
+        return $stats;
     }
 
     /**

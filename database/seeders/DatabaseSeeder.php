@@ -50,6 +50,20 @@ class DatabaseSeeder extends Seeder
             'aggregable' => false,
         ]);
 
+        $temperatura = AnswerType::create([
+            'key' => 'temperatura',
+            'label' => 'Temperatura',
+            'behavior' => 'numeric',
+            'aggregable' => true,
+        ]);
+
+        $temperatura = AnswerType::create([
+            'key' => 'presion',
+            'label' => 'Presion',
+            'behavior' => 'numeric',
+            'aggregable' => true,
+        ]);
+
         $realizado = AnswerOption::create([
             'answer_type_id' => $iconType->id,
             'key' => 'realizado',

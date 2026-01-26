@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('encendido_por')->nullable();
             $table->string('apagado_por')->nullable();
 
+            $table->boolean('falla_vapor')->default(false);
+
             // Campo calculado para tiempo de operación en minutos
             $table->integer('tiempo_operacion_minutos')->nullable();
 
