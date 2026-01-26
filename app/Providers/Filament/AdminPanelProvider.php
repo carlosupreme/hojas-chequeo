@@ -37,6 +37,308 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
+                fn (): string => Blade::render("<script src='https://cdn.jsdelivr.net/npm/apexcharts'></script>")
+            )
+            ->renderHook(
+                PanelsRenderHook::HEAD_END,
+                fn (): string => Blade::render("
+                <script>
+                document.addEventListener('alpine:init', () => {
+                    // History Chart Component - Global Definition
+                    Alpine.data('reportesHistoryChart', () => ({
+                        chart: null,
+
+                        initChart(config) {
+                            const options = {
+                                series: [{
+                                    name: 'Reportes',
+                                    data: config.data || []
+                                }],
+                                chart: {
+                                    type: 'area',
+                                    height: '100%',
+                                    fontFamily: 'inherit',
+                                    toolbar: { show: false },
+                                    background: 'transparent',
+                                    animations: {
+                                        enabled: true,
+                                        easing: 'easeinout',
+                                        speed: 800,
+                                        animateGradually: {
+                                            enabled: true,
+                                            delay: 150
+                                        },
+                                        dynamicAnimation: {
+                                            enabled: true,
+                                            speed: 350
+                                        }
+                                    }
+                                },
+                                xaxis: {
+                                    categories: config.labels || [],
+                                    labels: {
+                                        style: {
+                                            colors: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+                                        }
+                                    },
+                                    axisBorder: { show: false },
+                                    axisTicks: { show: false }
+                                },
+                                yaxis: {
+                                    labels: {
+                                        style: {
+                                            colors: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+                                        }
+                                    }
+                                },
+                                colors: ['#3b82f6'],
+                                fill: {
+                                    type: 'gradient',
+                                    gradient: {
+                                        shadeIntensity: 1,
+                                        opacityFrom: 0.7,
+                                        opacityTo: 0.3,
+                                        stops: [0, 90, 100]
+                                    }
+                                },
+                                grid: {
+                                    borderColor: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb',
+                                    strokeDashArray: 4,
+                                },
+                                theme: {
+                                    mode: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                                },
+                                dataLabels: { enabled: false },
+                                stroke: {
+                                    curve: 'smooth',
+                                    width: 2
+                                },
+                                tooltip: {
+                                    theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                                }
+                            };
+
+                            this.chart = new ApexCharts(this.\$el, options);
+                            this.chart.render();
+                        },
+
+                        updateChart(config) {
+                            if (this.chart) {
+                                this.chart.updateSeries([{
+                                    name: 'Reportes',
+                                    data: config.data || []
+                                }], true);
+
+                                this.chart.updateOptions({
+                                    xaxis: {
+                                        categories: config.labels || []
+                                    }
+                                }, false, true);
+                            }
+                        }
+                    }));
+
+                    // Priority Donut Chart Component - Global Definition
+                    Alpine.data('priorityDonutChart', () => ({
+                        chart: null,
+
+                        initChart(config) {
+                            const options = {
+                                series: config.data || [],
+                                chart: {
+                                    type: 'donut',
+                                    height: '100%',
+                                    fontFamily: 'inherit',
+                                    background: 'transparent',
+                                    animations: {
+                                        enabled: true,
+                                        easing: 'easeinout',
+                                        speed: 800,
+                                        animateGradually: {
+                                            enabled: true,
+                                            delay: 150
+                                        },
+                                        dynamicAnimation: {
+                                            enabled: true,
+                                            speed: 350
+                                        }
+                                    }
+                                },
+                                labels: config.labels || [],
+                                colors: ['#ef4444', '#f59e0b', '#10b981'],
+                                plotOptions: {
+                                    pie: {
+                                        donut: {
+                                            size: '70%',
+                                            labels: {
+                                                show: true,
+                                                total: {
+                                                    show: true,
+                                                    showAlways: true,
+                                                    label: 'Total',
+                                                    fontSize: '14px',
+                                                    fontWeight: 600,
+                                                    color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280',
+                                                    formatter: function (w) {
+                                                        return w.globals.seriesTotals.reduce((a, b) => {
+                                                            return a + b;
+                                                        }, 0);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                legend: {
+                                    show: false
+                                },
+                                dataLabels: {
+                                    enabled: true,
+                                    formatter: function(val, opts) {
+                                        return opts.w.config.series[opts.seriesIndex];
+                                    },
+                                    style: {
+                                        fontSize: '12px',
+                                        fontWeight: 'bold',
+                                        colors: ['#fff']
+                                    }
+                                },
+                                tooltip: {
+                                    theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+                                    y: {
+                                        formatter: function(val) {
+                                            return val + ' reportes';
+                                        }
+                                    }
+                                }
+                            };
+
+                            this.chart = new ApexCharts(this.\$el, options);
+                            this.chart.render();
+                        },
+
+                        updateChart(config) {
+                            if (this.chart) {
+                                this.chart.updateSeries(config.data || [], true);
+                            }
+                        }
+                    }));
+
+                    // Recorridos Chart Component - Global Definition
+                    Alpine.data('recorridosChart', () => ({
+                        chart: null,
+
+                        initChart(config) {
+                            const options = {
+                                series: config.series || [],
+                                chart: {
+                                    type: 'line',
+                                    height: '100%',
+                                    fontFamily: 'inherit',
+                                    toolbar: { show: false },
+                                    background: 'transparent',
+                                    animations: {
+                                        enabled: true,
+                                        easing: 'easeinout',
+                                        speed: 800,
+                                        animateGradually: {
+                                            enabled: true,
+                                            delay: 150
+                                        },
+                                        dynamicAnimation: {
+                                            enabled: true,
+                                            speed: 350
+                                        }
+                                    }
+                                },
+                                xaxis: {
+                                    categories: config.labels || [],
+                                    labels: {
+                                        style: {
+                                            colors: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+                                        }
+                                    },
+                                    axisBorder: { show: false },
+                                    axisTicks: { show: false }
+                                },
+                                yaxis: {
+                                    labels: {
+                                        style: {
+                                            colors: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+                                        }
+                                    }
+                                },
+                                colors: ['#3b82f6', '#10b981', '#f59e0b'],
+                                grid: {
+                                    borderColor: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb',
+                                    strokeDashArray: 4,
+                                },
+                                theme: {
+                                    mode: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                                },
+                                dataLabels: { enabled: false },
+                                stroke: {
+                                    curve: 'smooth',
+                                    width: 3
+                                },
+                                markers: {
+                                    size: 5,
+                                    strokeWidth: 2,
+                                    strokeColors: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
+                                    hover: {
+                                        size: 7
+                                    }
+                                },
+                                tooltip: {
+                                    theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                                },
+                                legend: {
+                                    position: 'top',
+                                    horizontalAlign: 'right',
+                                    floating: true,
+                                    offsetY: -25,
+                                    offsetX: -5,
+                                    labels: {
+                                        colors: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+                                    }
+                                }
+                            };
+
+                            this.chart = new ApexCharts(this.\$el, options);
+                            this.chart.render();
+                        },
+
+                        updateChart(config) {
+                            if (this.chart) {
+                                this.chart.updateSeries(config.series || [], true);
+
+                                this.chart.updateOptions({
+                                    xaxis: {
+                                        categories: config.labels || []
+                                    }
+                                }, false, true);
+                            }
+                        }
+                    }));
+                });
+
+                // Listen for Livewire events
+                document.addEventListener('livewire:initialized', () => {
+                    Livewire.on('chartDataUpdated', () => {
+                        // Dispatch custom event for Alpine.js components
+                        window.dispatchEvent(new CustomEvent('chart-data-updated'));
+                    });
+
+                    Livewire.on('update-charts', () => {
+                        // Charts will be updated via Alpine.js reactivity
+                        console.log('Charts update triggered');
+                    });
+                });
+                </script>
+                ")
+            )
+            ->renderHook(
+                PanelsRenderHook::HEAD_END,
                 fn (): string => Blade::render("@vite('resources/js/app.js')")
             )
             ->viteTheme('resources/css/filament/admin/theme.css')

@@ -23,7 +23,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // not working: shows in english
-        Carbon::setLocale('es_MX');
+        // Set Carbon locale to match Laravel's locale
+        Carbon::setLocale(config('app.locale'));
+
+        // Set specific Spanish localization for better formatting
+        if (config('app.locale') === 'es') {
+            setlocale(LC_TIME, 'es_ES.UTF-8', 'es_ES', 'Spanish_Spain.1252');
+        }
     }
 }

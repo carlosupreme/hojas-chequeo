@@ -9,16 +9,20 @@ class Reporte extends Model
 {
     protected $fillable = [
         'equipo_id',
+        'user_id',
         'hoja_chequeo_id',
         'fecha',
-        'name',
+        'nombre',
         'area',
-        'priority',
-        'observations',
-        'failure',
-        'photo',
-        'user_id',
+        'prioridad',
+        'observaciones',
+        'falla',
+        'foto',
         'estado',
+    ];
+
+    protected $casts = [
+        'fecha' => 'datetime',
     ];
 
     public function equipo(): BelongsTo
@@ -29,5 +33,10 @@ class Reporte extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function hojaChequeo(): BelongsTo
+    {
+        return $this->belongsTo(HojaChequeo::class);
     }
 }

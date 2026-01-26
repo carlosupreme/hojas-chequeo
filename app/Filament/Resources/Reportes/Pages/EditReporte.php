@@ -4,7 +4,6 @@ namespace App\Filament\Resources\Reportes\Pages;
 
 use App\Filament\Resources\Reportes\ReporteResource;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditReporte extends EditRecord
@@ -14,7 +13,6 @@ class EditReporte extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make(),
             DeleteAction::make(),
         ];
     }

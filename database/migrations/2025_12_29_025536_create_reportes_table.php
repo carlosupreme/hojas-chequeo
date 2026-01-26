@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Equipo;
+use App\Models\HojaChequeo;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -17,13 +18,14 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Equipo::class)->nullable();
             $table->foreignIdFor(User::class)->nullable();
-            $table->date('fecha');
-            $table->string('name')->nullable();
+            $table->foreignIdFor(HojaChequeo::class)->nullable();
+            $table->timestamp('fecha');
+            $table->string('nombre')->nullable();
             $table->string('area')->nullable();
-            $table->string('priority')->nullable();
-            $table->string('observations')->nullable();
-            $table->string('failure')->nullable();
-            $table->string('photo')->nullable();
+            $table->string('prioridad')->nullable();
+            $table->string('observaciones')->nullable();
+            $table->string('falla')->nullable();
+            $table->string('foto')->nullable();
             $table->string('estado')->default('pendiente');
             $table->timestamps();
         });

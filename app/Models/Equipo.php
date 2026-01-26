@@ -25,4 +25,9 @@ class Equipo extends Model
     {
         return $this->hasMany(HojaChequeo::class);
     }
+
+    public function reportes(): HasMany
+    {
+        return $this->hasMany(Reporte::class);
+    }
 }

@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\Reportes\Schemas;
 
-use Filament\Forms\Components\DatePicker;
+use App\Area;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
@@ -19,29 +20,30 @@ class ReporteForm
             ->components([
                 Section::make('Datos del reporte')
                     ->schema([
-                        TextInput::make('name')
+                        TextInput::make('nombre')
                             ->label('Nombre')
                             ->default(fn () => auth()->user()->name)
                             ->required(),
-                        DatePicker::make('fecha')
+                        DateTimePicker::make('fecha')
                             ->label('Fecha de hoy')
-                            ->default(now())
-                            ->readOnly()
-                            ->displayFormat('\d\e F, Y')
+                            ->default(fn () => now())
+                            ->displayFormat('D \d\e F, Y')
                             ->native(false),
 
-                        Select::make('priority')
+                        Select::make('prioridad')
                             ->label('Prioridad')
                             ->required()
                             ->options([
-                                'Alta' => 'Alta',
-                                'Media' => 'Media',
-                                'Baja' => 'Baja',
+                                'alta' => 'Alta',
+                                'media' => 'Media',
+                                'baja' => 'Baja',
                             ])
-                            ->default('Baja'),
+                            ->default('baja'),
                     ]),
                 Hidden::make('status')
-                    ->default('Pendiente'),
+                    ->default('pendiente'),
+                Hidden::make('user_id')
+                    ->default(fn () => auth()->user()->id),
                 Section::make('Detalles del equipo')
                     ->description('Selecciona el equipo que presenta la falla')
                     ->schema([
@@ -57,25 +59,26 @@ class ReporteForm
                         Select::make('area')
                             ->label('Area')
                             ->required()
-                            ->options([
-                                'Cuarto de máquinas' => 'Cuarto de máquinas',
-                                'Lavandería Institucional' => 'Lavandería Institucional',
-                                'Tintorería' => 'Tintorería',
-                            ]),
+                            ->options(collect(Area::cases())
+                                ->mapWithKeys(fn (Area $area) => [
+                                    $area->value => $area->label(),
+                                ])
+                                ->toArray()
+                            ),
                     ]),
                 Section::make('Detalles de la falla')
                     ->description('Describe el problema que presenta')
                     ->schema([
-                        TextInput::make('failure')
+                        TextInput::make('falla')
                             ->label('Falla')
                             ->required(),
-                        Textarea::make('observations')
+                        Textarea::make('observaciones')
                             ->label('Observaciones'),
                     ]),
                 Section::make('Evidencia')
                     ->description('Adjunta evidencia del equipo que presenta la falla')
                     ->schema([
-                        FileUpload::make('photo')
+                        FileUpload::make('foto')
                             ->image()
                             ->label('Foto'),
 
