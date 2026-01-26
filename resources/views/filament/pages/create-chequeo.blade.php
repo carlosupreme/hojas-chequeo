@@ -17,11 +17,7 @@
                                 class="group flex items-center justify-center h-10 w-10 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 title="Volver al listado"
                             >
-                                <svg class="w-5 h-5 transform group-hover:-translate-x-0.5 transition-transform"
-                                     fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                                </svg>
+                                @svg('heroicon-o-arrow-left', 'w-5 h-5 transform group-hover:-translate-x-0.5 transition-transform')
                             </button>
 
                             <div>

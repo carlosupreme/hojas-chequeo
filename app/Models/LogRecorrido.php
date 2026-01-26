@@ -47,8 +47,8 @@ class LogRecorrido extends Model
         return $this->belongsTo(Turno::class);
     }
 
-    public function entregaTurno(): HasOne
+    public function formularioRecorrido(): BelongsTo
     {
-        return $this->hasOne(EntregaTurno::class, 'log_recorrido_id');
+        return $this->belongsTo(FormularioRecorrido::class);
     }
 }

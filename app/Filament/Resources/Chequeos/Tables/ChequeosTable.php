@@ -168,7 +168,7 @@ class ChequeosTable
                         ->modalContent(fn (HojaEjecucion $record) => view('livewire.view-chequeo', compact('record'))),
 
                     DeleteAction::make()
-                        ->visible(fn () => Auth::user()->hasRole('Administrador')),
+                        ->visible(fn () => Auth::user()->isAdmin()),
                 ])
                     ->icon('heroicon-m-ellipsis-vertical')
                     ->tooltip('Acciones'),

@@ -19,7 +19,10 @@ return new class extends Migration
             $table->foreignIdFor(ItemRecorrido::class)->constrained();
             $table->string('estado')->nullable(); // Guardará √, X, PP, PM
             $table->decimal('valor_numerico', 12, 4)->nullable(); // Para medidores o %
+            $table->string('valor_texto')->nullable();
             $table->text('observaciones')->nullable();
+
+            $table->unique(['log_recorrido_id', 'item_recorrido_id']);
             $table->timestamps();
         });
     }

@@ -12,6 +12,7 @@ class ValorRecorrido extends Model
         'item_recorrido_id',
         'estado',
         'valor_numerico',
+        'valor_texto',
         'observaciones',
     ];
 

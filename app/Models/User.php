@@ -92,6 +92,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasRole('Supervisor');
     }
 
+    public function isOperador(): bool
+    {
+        return $this->hasRole('Operador');
+    }
+
     public function tieneAccesoAHoja($hojaId): bool
     {
         return $this->perfil->tieneAccesoAHoja($hojaId);
