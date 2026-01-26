@@ -13,7 +13,9 @@ use Livewire\Component;
 class AnalisisHojaChequeo extends Component
 {
     public $startDate;
+
     public $endDate;
+
     public ?int $hojaChequeoId = null;
 
     protected $listeners = ['dateRangeUpdated' => 'handleDateRangeUpdate'];
@@ -40,6 +42,7 @@ class AnalisisHojaChequeo extends Component
     {
         return HojaChequeo::with('equipo')->get()->mapWithKeys(function ($hoja) {
             $equipoName = $hoja->equipo?->nombre ?? 'Sin equipo';
+
             return [$hoja->id => "{$equipoName} (v{$hoja->version})"];
         })->toArray();
     }
@@ -66,7 +69,7 @@ class AnalisisHojaChequeo extends Component
                 ->whereNotNull('finalizado_en')
                 ->whereBetween('finalizado_en', [
                     Carbon::parse($this->startDate)->startOfDay(),
-                    Carbon::parse($this->endDate)->endOfDay()
+                    Carbon::parse($this->endDate)->endOfDay(),
                 ]);
 
             // Filter by HojaChequeo if specified
@@ -79,6 +82,7 @@ class AnalisisHojaChequeo extends Component
             if ($ejecucionIds->isEmpty()) {
                 $labels[] = $turno->nombre;
                 $percentages[] = 0;
+
                 continue;
             }
 
@@ -120,7 +124,7 @@ class AnalisisHojaChequeo extends Component
                 ->whereNotNull('finalizado_en')
                 ->whereBetween('finalizado_en', [
                     Carbon::parse($this->startDate)->startOfDay(),
-                    Carbon::parse($this->endDate)->endOfDay()
+                    Carbon::parse($this->endDate)->endOfDay(),
                 ]);
 
             if ($this->hojaChequeoId) {
@@ -150,7 +154,7 @@ class AnalisisHojaChequeo extends Component
                 ->whereNotNull('finalizado_en')
                 ->whereBetween('finalizado_en', [
                     Carbon::parse($this->startDate)->startOfDay(),
-                    Carbon::parse($this->endDate)->endOfDay()
+                    Carbon::parse($this->endDate)->endOfDay(),
                 ]);
 
             if ($this->hojaChequeoId) {
@@ -171,6 +175,7 @@ class AnalisisHojaChequeo extends Component
                     'no_aplica' => 0,
                     'porcentaje_ok' => 0,
                 ];
+
                 continue;
             }
 

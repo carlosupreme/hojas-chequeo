@@ -1,7 +1,7 @@
 @php use App\Area; @endphp
 
 <div
-    class="relative flex flex-col h-[calc(100vh-1rem)] sm:h-[calc(100vh-2rem)] space-y-4 font-sans bg-gray-50/50 dark:bg-gray-950">
+    class="relative flex flex-col h-[calc(100vh-1rem)] sm:h-[calc(100vh-2rem)] space-y-4 font-sans">
 
     {{-- ✨ BEAUTIFUL LOADING OVERLAY ✨ --}}
     {{-- This only shows when 'selectHojaChequeo' or 'selectHojaEjecucion' are running --}}
@@ -156,7 +156,9 @@
                                 :version="$hoja->version"
                                 status="new"
                                 :equipo="$hoja->equipo"
-                                :date="null"
+                                :date="$hoja->latestChequeoDiario?->finalizado_en"
+                                :capacidad="$hoja->equipo->capacidad()"
+
                             />
                         </div>
                     @endforeach
@@ -197,6 +199,8 @@
                                 status="pending"
                                 :equipo="$chequeo->hojaChequeo->equipo"
                                 :date="$chequeo->updated_at"
+                                :capacidad="$hoja->equipo->capacidad()"
+
                             />
                         </div>
                     @endforeach
@@ -226,6 +230,7 @@
                                 status="completed"
                                 :equipo="$chequeo->hojaChequeo->equipo"
                                 :date="$chequeo->finalizado_en"
+                                :capacidad="$hoja->equipo->capacidad()"
                             />
                         </div>
                     @endforeach

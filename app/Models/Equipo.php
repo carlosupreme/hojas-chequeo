@@ -16,6 +16,18 @@ class Equipo extends Model
         'revision',
     ];
 
+    public function capacidad(): string
+    {
+        $capacidad = $this->specs()->where('tipo', 'like', '%Capacidad%')->first();
+
+        if (! $capacidad) {
+            return '';
+        }
+
+        return $capacidad->optimo.''.$capacidad->unidad;
+
+    }
+
     public function specs(): HasMany
     {
         return $this->hasMany(EquipoSpec::class);

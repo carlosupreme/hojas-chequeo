@@ -2,11 +2,11 @@
     {{-- We use a full-width container to break out of default Filament padding if needed --}}
 
     @if($hojaChequeo && $this->hasItems())
-        <div data-animate="chequeo-items" class="min-h-screen bg-gray-50/50 dark:bg-gray-950 pb-20">
+        <div data-animate="chequeo-items" class="min-h-screen pb-20">
 
             {{-- 1. STICKY HEADER BAR --}}
             <div
-                class="sticky top-0 z-30 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 shadow-sm transition-all rounded-b-lg">
+                class=" border-b border-gray-200 dark:border-gray-800 transition-all ">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
 

@@ -2,18 +2,16 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Dashboard;
 use Filament\Enums\GlobalSearchPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\View\PanelsRenderHook;
-use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -224,7 +222,178 @@ class AdminPanelProvider extends PanelProvider
                         }
                     }));
 
-                    // Recorridos Chart Component - Global Definition
+                    // Recorridos Estado Chart (Stacked Bar) - Global Definition
+                    Alpine.data('recorridosEstadoChart', () => ({
+                        chart: null,
+
+                        initChart(config) {
+                            const options = {
+                                series: config.series || [],
+                                chart: {
+                                    type: 'bar',
+                                    height: '100%',
+                                    stacked: true,
+                                    fontFamily: 'inherit',
+                                    toolbar: { show: false },
+                                    background: 'transparent',
+                                    animations: {
+                                        enabled: true,
+                                        easing: 'easeinout',
+                                        speed: 800
+                                    }
+                                },
+                                plotOptions: {
+                                    bar: {
+                                        horizontal: false,
+                                        borderRadius: 4,
+                                        columnWidth: '60%'
+                                    }
+                                },
+                                colors: ['#10b981', '#ef4444', '#3b82f6', '#f59e0b'],
+                                xaxis: {
+                                    categories: config.labels || [],
+                                    labels: {
+                                        style: {
+                                            colors: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+                                        }
+                                    }
+                                },
+                                yaxis: {
+                                    labels: {
+                                        style: {
+                                            colors: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+                                        }
+                                    }
+                                },
+                                grid: {
+                                    borderColor: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb',
+                                    strokeDashArray: 4,
+                                },
+                                dataLabels: { enabled: false },
+                                legend: {
+                                    position: 'top',
+                                    horizontalAlign: 'center',
+                                    labels: {
+                                        colors: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+                                    }
+                                },
+                                theme: {
+                                    mode: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                                },
+                                tooltip: {
+                                    theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                                }
+                            };
+
+                            this.chart = new ApexCharts(this.\$el, options);
+                            this.chart.render();
+                        },
+
+                        updateChart(config) {
+                            if (this.chart) {
+                                this.chart.updateSeries(config.series || [], true);
+                                this.chart.updateOptions({
+                                    xaxis: {
+                                        categories: config.labels || []
+                                    }
+                                }, false, true);
+                            }
+                        }
+                    }));
+
+                    // Recorridos Total by Turno Chart (Vertical Bar) - Global Definition
+                    Alpine.data('recorridosTotalChart', () => ({
+                        chart: null,
+
+                        initChart(config) {
+                            const options = {
+                                series: [{
+                                    name: 'Total Recorridos',
+                                    data: config.data || []
+                                }],
+                                chart: {
+                                    type: 'bar',
+                                    height: '100%',
+                                    fontFamily: 'inherit',
+                                    toolbar: { show: false },
+                                    background: 'transparent',
+                                    animations: {
+                                        enabled: true,
+                                        easing: 'easeinout',
+                                        speed: 800
+                                    }
+                                },
+                                plotOptions: {
+                                    bar: {
+                                        horizontal: false,
+                                        borderRadius: 4,
+                                        distributed: true,
+                                        columnWidth: '60%',
+                                        dataLabels: {
+                                            position: 'top'
+                                        }
+                                    }
+                                },
+                                colors: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'],
+                                xaxis: {
+                                    categories: config.labels || [],
+                                    labels: {
+                                        style: {
+                                            colors: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+                                        }
+                                    }
+                                },
+                                yaxis: {
+                                    labels: {
+                                        style: {
+                                            colors: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+                                        }
+                                    }
+                                },
+                                grid: {
+                                    borderColor: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb',
+                                    strokeDashArray: 4,
+                                },
+                                dataLabels: {
+                                    enabled: true,
+                                    formatter: function(val) {
+                                        return val;
+                                    },
+                                    offsetY: -20,
+                                    style: {
+                                        fontSize: '12px',
+                                        colors: [document.documentElement.classList.contains('dark') ? '#fff' : '#333']
+                                    }
+                                },
+                                legend: { show: false },
+                                theme: {
+                                    mode: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                                },
+                                tooltip: {
+                                    theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                                }
+                            };
+
+                            this.chart = new ApexCharts(this.\$el, options);
+                            this.chart.render();
+                        },
+
+                        updateChart(config) {
+                            if (this.chart) {
+                                this.chart.updateSeries([{
+                                    name: 'Total Recorridos',
+                                    data: config.data || []
+                                }], true);
+                                this.chart.updateOptions({
+                                    xaxis: {
+                                        categories: config.labels || []
+                                    }
+                                }, false, true);
+                            }
+                        }
+                    }));
+
+                    // Recorridos Chart Component (Line) - Global Definition
                     Alpine.data('recorridosChart', () => ({
                         chart: null,
 
@@ -557,10 +726,7 @@ class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
-            ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
-            ])
+            ->widgets([])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

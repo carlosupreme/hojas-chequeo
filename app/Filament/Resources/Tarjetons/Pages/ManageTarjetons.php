@@ -22,5 +22,4 @@ class ManageTarjetons extends ManageRecords
                 ->url(fn (): string => static::$resource::getUrl('bitacora')),
         ];
     }
-
 }

@@ -2,11 +2,15 @@
 
 namespace App\Filament\Pages;
 
+use App\Models\LogRecorrido;
+use App\Models\Turno;
+use App\Models\ValorRecorrido;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Facades\DB;
 
 class Analisis extends Page
 {
@@ -65,25 +69,19 @@ class Analisis extends Page
 
     public function updatedDateRangeInicio()
     {
-        // When period changes, charts will re-render because they depend on these computed properties
         $this->dispatch('update-charts');
-
-        // Also notify reportes component about date changes
         $this->dispatch('dateRangeUpdated', [
             'inicio' => $this->dateRange['inicio'],
-            'final' => $this->dateRange['final']
+            'final' => $this->dateRange['final'],
         ]);
     }
 
     public function updatedDateRangeFinal()
     {
-        // When period changes, charts will re-render because they depend on these computed properties
         $this->dispatch('update-charts');
-
-        // Also notify reportes component about date changes
         $this->dispatch('dateRangeUpdated', [
             'inicio' => $this->dateRange['inicio'],
-            'final' => $this->dateRange['final']
+            'final' => $this->dateRange['final'],
         ]);
     }
 
@@ -92,45 +90,135 @@ class Analisis extends Page
     | SECTION 1: RECORRIDOS (Data Provider)
     |--------------------------------------------------------------------------
     */
+
+    /**
+     * Get equipment status counts by Turno
+     * √ = Funcionando, X = Falla, PPP = Paro Producción, PPM = Paro Mantenimiento
+     */
     public function getRecorridosKpisProperty()
     {
-        // TODO: QUERY -> Count equipments by status and area
-        // Example: Equipo::where('area', 'Tintoreria')->where('status', 'active')->count();
+        $turnos = Turno::where('activo', true)->orderBy('id')->get();
+
+        $stats = [
+            'funcionando' => [],
+            'falla' => [],
+            'parados_ppm' => [],
+            'parados_ppp' => [],
+        ];
+
+        foreach ($turnos as $turno) {
+            // Get LogRecorrido IDs for this turno in date range
+            $logIds = LogRecorrido::where('turno_id', $turno->id)
+                ->whereBetween('fecha', [
+                    Carbon::parse($this->dateRange['inicio'])->startOfDay(),
+                    Carbon::parse($this->dateRange['final'])->endOfDay(),
+                ])
+                ->pluck('id');
+
+            if ($logIds->isEmpty()) {
+                $stats['funcionando'][$turno->nombre] = 0;
+                $stats['falla'][$turno->nombre] = 0;
+                $stats['parados_ppm'][$turno->nombre] = 0;
+                $stats['parados_ppp'][$turno->nombre] = 0;
+
+                continue;
+            }
+
+            // Count by estado
+            $estadoCounts = ValorRecorrido::whereIn('log_recorrido_id', $logIds)
+                ->whereNotNull('estado')
+                ->select('estado', DB::raw('count(*) as total'))
+                ->groupBy('estado')
+                ->pluck('total', 'estado')
+                ->toArray();
+
+            $stats['funcionando'][$turno->nombre] = $estadoCounts['√'] ?? 0;
+            $stats['falla'][$turno->nombre] = $estadoCounts['X'] ?? 0;
+            $stats['parados_ppm'][$turno->nombre] = $estadoCounts['PPM'] ?? 0;
+            $stats['parados_ppp'][$turno->nombre] = $estadoCounts['PPP'] ?? 0;
+        }
+
+        return $stats;
+    }
+
+    /**
+     * Get total LogRecorrido count by Turno for chart
+     */
+    public function getRecorridosTotalByTurnoProperty()
+    {
+        $turnos = Turno::where('activo', true)->orderBy('id')->get();
+
+        $labels = [];
+        $data = [];
+
+        foreach ($turnos as $turno) {
+            $count = LogRecorrido::where('turno_id', $turno->id)
+                ->whereBetween('fecha', [
+                    Carbon::parse($this->dateRange['inicio'])->startOfDay(),
+                    Carbon::parse($this->dateRange['final'])->endOfDay(),
+                ])
+                ->count();
+
+            $labels[] = $turno->nombre;
+            $data[] = $count;
+        }
 
         return [
-            'funcionando' => [
-                'tintoreria' => 12,
-                'lavanderia' => 8,
-            ],
-            'parados_ppm' => [ // Programmed Maintenance
-                'tintoreria' => 2,
-                'lavanderia' => 1,
-            ],
-            'parados_ppp' => [ // Production Stoppage
-                'tintoreria' => 0,
-                'lavanderia' => 3,
-            ],
+            'labels' => $labels,
+            'data' => $data,
         ];
     }
 
-    public function getRecorridosHistoryProperty()
+    /**
+     * Get equipment status stats for chart (by turno)
+     */
+    public function getRecorridosEstadoChartProperty()
     {
-        // TODO: QUERY -> Count completed HojaEjecucion grouped by week and area
+        $turnos = Turno::where('activo', true)->orderBy('id')->get();
+        $labels = $turnos->pluck('nombre')->toArray();
+
+        $funcionando = [];
+        $falla = [];
+        $ppm = [];
+        $ppp = [];
+
+        foreach ($turnos as $turno) {
+            $logIds = LogRecorrido::where('turno_id', $turno->id)
+                ->whereBetween('fecha', [
+                    Carbon::parse($this->dateRange['inicio'])->startOfDay(),
+                    Carbon::parse($this->dateRange['final'])->endOfDay(),
+                ])
+                ->pluck('id');
+
+            if ($logIds->isEmpty()) {
+                $funcionando[] = 0;
+                $falla[] = 0;
+                $ppm[] = 0;
+                $ppp[] = 0;
+
+                continue;
+            }
+
+            $estadoCounts = ValorRecorrido::whereIn('log_recorrido_id', $logIds)
+                ->whereNotNull('estado')
+                ->select('estado', DB::raw('count(*) as total'))
+                ->groupBy('estado')
+                ->pluck('total', 'estado')
+                ->toArray();
+
+            $funcionando[] = $estadoCounts['√'] ?? 0;
+            $falla[] = $estadoCounts['X'] ?? 0;
+            $ppm[] = $estadoCounts['PPM'] ?? 0;
+            $ppp[] = $estadoCounts['PPP'] ?? 0;
+        }
+
         return [
-            'labels' => ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'],
+            'labels' => $labels,
             'series' => [
-                [
-                    'name' => 'Tintorería',
-                    'data' => [15, 20, 18, 22],
-                ],
-                [
-                    'name' => 'Lavandería',
-                    'data' => [12, 15, 10, 14],
-                ],
-                [
-                    'name' => 'Mantenimiento', // Generic or Engine Room
-                    'data' => [5, 5, 5, 5],
-                ],
+                ['name' => 'Funcionando (✓)', 'data' => $funcionando],
+                ['name' => 'Falla (X)', 'data' => $falla],
+                ['name' => 'P. Mantenimiento (PPM)', 'data' => $ppm],
+                ['name' => 'P. Producción (PPP)', 'data' => $ppp],
             ],
         ];
     }
