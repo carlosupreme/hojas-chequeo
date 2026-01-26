@@ -2,10 +2,7 @@
 
 namespace App\Filament\Resources\Perfils;
 
-use App\Filament\Resources\Perfils\Pages\CreatePerfil;
-use App\Filament\Resources\Perfils\Pages\EditPerfil;
 use App\Filament\Resources\Perfils\Pages\ListPerfils;
-use App\Filament\Resources\Perfils\Pages\ViewPerfil;
 use App\Filament\Resources\Perfils\Schemas\PerfilForm;
 use App\Filament\Resources\Perfils\Schemas\PerfilInfolist;
 use App\Filament\Resources\Perfils\Tables\PerfilsTable;
@@ -57,9 +54,6 @@ class PerfilResource extends Resource
     {
         return [
             'index' => ListPerfils::route('/'),
-            // 'create' => CreatePerfil::route('/create'),
-            'view' => ViewPerfil::route('/{record}'),
-            'edit' => EditPerfil::route('/{record}/edit'),
         ];
     }
 }
