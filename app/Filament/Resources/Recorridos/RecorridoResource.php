@@ -46,7 +46,13 @@ class RecorridoResource extends Resource
     public static function table(Table $table): Table
     {
         return $table->modifyQueryUsing(function (Builder $query) {
-            $query->with(['operador', 'turno']);
+            $query->with(['operador', 'turno'])
+                ->withCount([
+                    'valores as funcionando_count' => fn (Builder $q) => $q->where('estado', '√'),
+                    'valores as falla_count' => fn (Builder $q) => $q->where('estado', 'X'),
+                    'valores as ppm_count' => fn (Builder $q) => $q->where('estado', 'PPM'),
+                    'valores as ppp_count' => fn (Builder $q) => $q->where('estado', 'PPP'),
+                ]);
 
             if (Auth::user()->isOperador()) {
                 return $query->where('user_id', Auth::id());
@@ -67,6 +73,26 @@ class RecorridoResource extends Resource
                 TextColumn::make('operador.name')
                     ->label('Operador')->weight(FontWeight::Bold)
                     ->description(fn (LogRecorrido $record) => $record->turno->nombre),
+                TextColumn::make('funcionando_count')
+                    ->label('✓')
+                    ->badge()
+                    ->color('success')
+                    ->alignCenter(),
+                TextColumn::make('falla_count')
+                    ->label('X')
+                    ->badge()
+                    ->color('danger')
+                    ->alignCenter(),
+                TextColumn::make('ppm_count')
+                    ->label('PPM')
+                    ->badge()
+                    ->color('info')
+                    ->alignCenter(),
+                TextColumn::make('ppp_count')
+                    ->label('PPP')
+                    ->badge()
+                    ->color('warning')
+                    ->alignCenter(),
             ])
             ->filters([
                 //

@@ -33,6 +33,7 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
+            ->databaseNotifications()
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
                 fn (): string => Blade::render("<script src='https://cdn.jsdelivr.net/npm/apexcharts'></script>")
