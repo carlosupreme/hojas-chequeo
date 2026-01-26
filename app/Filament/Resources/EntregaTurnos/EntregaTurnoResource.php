@@ -37,6 +37,12 @@ class EntregaTurnoResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Entregas de Turno';
 
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Mantenimiento';
+    }
+
+
     public static function form(Schema $schema): Schema
     {
         return $schema
