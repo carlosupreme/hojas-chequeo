@@ -9,6 +9,7 @@ class CreateReporte extends CreateRecord
 {
     protected static string $resource = ReporteResource::class;
 
+
     /**
      * Título de la página
      */

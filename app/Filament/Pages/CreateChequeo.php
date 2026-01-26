@@ -2,12 +2,21 @@
 
 namespace App\Filament\Pages;
 
+use App\Area;
 use App\Filament\Resources\Chequeos\Schemas\ChequeosForm;
+use App\Models\Equipo;
 use App\Models\HojaChequeo;
 use App\Models\HojaEjecucion;
+use App\Models\Reporte;
 use App\WithImageService;
 use BackedEnum;
 use Carbon\Carbon;
+use Filament\Actions\Action;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
@@ -125,6 +134,76 @@ class CreateChequeo extends Page
     public function hasItems(): bool
     {
         return $this->hojaChequeo?->hasItems();
+    }
+
+    public function reportAction(): Action
+    {
+        return Action::make('report')
+            ->label('Reportar falla')
+            ->icon(Heroicon::OutlinedExclamationTriangle)
+            ->color('danger')
+            ->modalHeading('Nuevo Reporte de Falla')
+            ->modalDescription('Complete los campos para registrar un reporte de falla del equipo.')
+            ->modalSubmitActionLabel('Crear Reporte')
+            ->fillForm(fn () => [
+                'nombre' => $this->data['nombre_operador'] ?? $this->user->name,
+                'equipo_id' => $this->hojaChequeo?->equipo_id,
+                'observaciones' => $this->data['observaciones'] ?? '',
+                'fecha' => now(),
+                'prioridad' => 'media',
+            ])
+            ->schema([
+                TextInput::make('nombre')
+                    ->label('Nombre del operador')
+                    ->required(),
+                Hidden::make('fecha')->default($this->dateSelected),
+                Select::make('equipo_id')
+                    ->label('Equipo')
+                    ->options(fn () => Equipo::pluck('tag', 'id'))
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+                Select::make('area')
+                    ->label('Área')
+                    ->options(collect(Area::cases())
+                        ->mapWithKeys(fn (Area $area) => [
+                            $area->value => $area->label(),
+                        ])
+                        ->toArray()
+                    )
+                    ->required(),
+                Select::make('prioridad')
+                    ->label('Prioridad')
+                    ->options([
+                        'alta' => 'Alta',
+                        'media' => 'Media',
+                        'baja' => 'Baja',
+                    ])
+                    ->required(),
+                TextInput::make('falla')
+                    ->label('Descripción de la falla')
+                    ->required(),
+                Textarea::make('observaciones')
+                    ->label('Observaciones'),
+                FileUpload::make('foto')
+                    ->label('Evidencia fotográfica')
+                    ->image()
+                    ->directory('reportes'),
+            ])
+            ->action(function (array $data): void {
+                Reporte::create([
+                    ...$data,
+                    'user_id' => $this->user->id,
+                    'hoja_chequeo_id' => $this->hojaChequeo?->id,
+                    'estado' => 'pendiente',
+                ]);
+
+                Notification::make()
+                    ->success()
+                    ->title('Reporte creado')
+                    ->body('El reporte de falla ha sido registrado correctamente.')
+                    ->send();
+            });
     }
 
     public function create(): void
