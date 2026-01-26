@@ -3,7 +3,12 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\CreateChequeo;
+use App\Filament\Pages\CreateRecorrido;
 use App\Filament\Resources\Chequeos\ChequeosResource;
+use App\Filament\Resources\EntregaTurnos\EntregaTurnoResource;
+use App\Filament\Resources\Recorridos\RecorridoResource;
+use App\Filament\Resources\Reportes\ReporteResource;
+use App\Filament\Resources\Tarjetons\TarjetonResource;
 use Filament\Enums\GlobalSearchPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -54,12 +59,17 @@ class OperadorPanelProvider extends PanelProvider
             ->sidebarWidth('300px')
             ->resources([
                 ChequeosResource::class,
+                RecorridoResource::class,
+                EntregaTurnoResource::class,
+                TarjetonResource::class,
+                ReporteResource::class
             ])
             ->discoverResources(in: app_path('Filament/Operador/Resources'), for: 'App\Filament\Operador\Resources')
             ->discoverPages(in: app_path('Filament/Operador/Pages'), for: 'App\Filament\Operador\Pages')
             ->pages([
                 Dashboard::class,
                 CreateChequeo::class,
+                CreateRecorrido::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Operador/Widgets'), for: 'App\Filament\Operador\Widgets')
             ->widgets([

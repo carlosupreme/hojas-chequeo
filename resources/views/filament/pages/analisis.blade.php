@@ -1,4 +1,4 @@
-<x-filament-panels::page class="min-h-screen bg-gray-50/50 dark:bg-gray-950 p-6 space-y-6">
+<x-filament-panels::page class="min-h-screen space-y-6">
 
     {{-- HEADER & FILTERS --}}
     <div
@@ -10,13 +10,7 @@
 
         {{-- Period Selector --}}
         <div class="flex items-center gap-2">
-            <span class="text-xs font-semibold text-gray-500 uppercase">Periodo:</span>
-            <select wire:model.live="period"
-                    class="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500">
-                <option value="weekly">Semanal</option>
-                <option value="biweekly">Quincenal</option>
-                <option value="monthly">Mensual</option>
-            </select>
+            {{$this->dateRangeForm}}
         </div>
     </div>
 

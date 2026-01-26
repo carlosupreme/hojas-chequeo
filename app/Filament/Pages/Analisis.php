@@ -2,7 +2,10 @@
 
 namespace App\Filament\Pages;
 
+use Carbon\Carbon;
+use Filament\Forms\Components\DatePicker;
 use Filament\Pages\Page;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 
 class Analisis extends Page
@@ -12,6 +15,36 @@ class Analisis extends Page
     protected static ?string $title = 'Análisis de información';
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedChartBar;
+
+    public $dateRange = [];
+
+    public function mount()
+    {
+        $this->dateRange['inicio'] = Carbon::now()->startOfMonth();
+        $this->dateRange['final'] = Carbon::now();
+    }
+
+    public function dateRangeForm(Schema $schema): Schema
+    {
+        return $schema->components([
+            DatePicker::make('inicio')
+                ->inlineLabel()
+                ->displayFormat('D d/m/Y')
+                ->native(false)
+                ->locale('es')
+                ->closeOnDateSelection()
+                ->required()
+                ->maxDate(now()),
+            DatePicker::make('final')
+                ->inlineLabel()
+                ->displayFormat('D d/m/Y')
+                ->native(false)
+                ->locale('es')
+                ->closeOnDateSelection()
+                ->required()
+                ->maxDate(now()),
+        ])->statePath('dateRange');
+    }
 
     public static function getNavigationGroup(): ?string
     {

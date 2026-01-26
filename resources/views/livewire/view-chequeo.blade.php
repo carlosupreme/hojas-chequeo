@@ -176,7 +176,7 @@
                                 </div>
                             </div>
                             <div class="h-24 flex items-center justify-center">
-                                <img src="{{app(\App\Services\ImageService::class)->getAsBase64($ejecucion->firma_supervisor) }}" class="max-h-full object-contain"
+                                <img src="{{app(\App\Services\ImageService::class)->getAsBase64($record->firma_supervisor) }}" class="max-h-full object-contain"
                                      alt="Firma Supervisor">
                             </div>
                         </div>

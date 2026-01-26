@@ -19,6 +19,7 @@ use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Url;
 
 class CreateRecorrido extends Page
@@ -26,6 +27,8 @@ class CreateRecorrido extends Page
     protected string $view = 'filament.resources.recorridos.pages.create-recorrido';
 
     protected static string|null|BackedEnum $navigationIcon = Heroicon::OutlinedPencil;
+
+    protected static ?string $title = 'Empezar recorrido';
 
     public static function getNavigationLabel(): string
     {
@@ -142,11 +145,12 @@ class CreateRecorrido extends Page
             DB::beginTransaction();
 
             $log = $this->recorrido
-                ? tap($this->recorrido)->update($validated)
+                ? tap($this->recorrido)->update([...$validated, 'fecha' => $this->fecha])
                 : LogRecorrido::create([
                     ...$validated,
                     'formulario_recorrido_id' => $this->formularioId,
                     'user_id' => $this->user->id,
+                    'fecha' => $this->fecha,
                 ]);
 
             foreach ($this->respuestas as $itemId => $datos) {
@@ -183,6 +187,10 @@ class CreateRecorrido extends Page
                 ->title('Error al guardar')
                 ->body('Ocurrió un error al guardar el recorrido. Por favor, intente nuevamente.')
                 ->send();
+
+            Log::error('Error', [
+                'E' => $e->getMessage(),
+            ]);
         }
     }
 

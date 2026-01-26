@@ -17,6 +17,7 @@ use Filament\Support\Enums\FontWeight;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 class RecorridoResource extends Resource
@@ -44,7 +45,16 @@ class RecorridoResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return $table
+        return $table->modifyQueryUsing(function (Builder $query) {
+            $query->with(['operador', 'turno']);
+
+            if (Auth::user()->isOperador()) {
+                return $query->where('user_id', Auth::id());
+            }
+
+            return $query;
+
+        })
             ->recordUrl(function (LogRecorrido $record) {
                 $b = RecorridoResource::getUrl('index');
 
