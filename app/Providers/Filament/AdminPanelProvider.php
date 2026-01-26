@@ -3,7 +3,6 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Dashboard;
-use Filament\Enums\GlobalSearchPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -706,6 +705,7 @@ class AdminPanelProvider extends PanelProvider
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->font('Poppins')
             ->passwordReset()
+            ->globalSearch(false)
             ->profile(isSimple: false)
             ->favicon(asset('/logo.png'))
             ->brandLogo(asset('logo.png'))
@@ -713,11 +713,8 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('Tacuba')
             ->brandLogoHeight('35px')
             ->sidebarCollapsibleOnDesktop()
-            ->globalSearch()
             ->topbar(false)
             ->unsavedChangesAlerts()
-            ->globalSearch(position: GlobalSearchPosition::Sidebar)
-            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->sidebarWidth('300px')
             ->renderHook(PanelsRenderHook::AUTH_LOGIN_FORM_AFTER,
                 fn (): View => view('operador-login-button'))

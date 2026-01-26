@@ -5,17 +5,16 @@ namespace App\Providers\Filament;
 use App\Filament\Pages\Analisis;
 use App\Filament\Pages\CreateChequeo;
 use App\Filament\Pages\CreateRecorrido;
+use App\Filament\Pages\Dashboard;
 use App\Filament\Resources\Chequeos\ChequeosResource;
 use App\Filament\Resources\EntregaTurnos\EntregaTurnoResource;
 use App\Filament\Resources\Recorridos\RecorridoResource;
 use App\Filament\Resources\Reportes\ReporteResource;
 use App\Filament\Resources\Tarjetons\TarjetonResource;
-use Filament\Enums\GlobalSearchPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use App\Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -719,11 +718,9 @@ class SupervisorPanelProvider extends PanelProvider
             ->brandName('Tacuba')
             ->brandLogoHeight('35px')
             ->sidebarCollapsibleOnDesktop()
-            ->globalSearch()
+            ->globalSearch(false)
             ->topbar(false)
             ->unsavedChangesAlerts()
-            ->globalSearch(position: GlobalSearchPosition::Sidebar)
-            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->sidebarWidth('300px')
             ->renderHook(PanelsRenderHook::AUTH_LOGIN_FORM_AFTER,
                 fn (): View => view('operador-login-button'))

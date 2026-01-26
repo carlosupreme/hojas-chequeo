@@ -9,7 +9,6 @@ use App\Filament\Resources\EntregaTurnos\EntregaTurnoResource;
 use App\Filament\Resources\Recorridos\RecorridoResource;
 use App\Filament\Resources\Reportes\ReporteResource;
 use App\Filament\Resources\Tarjetons\TarjetonResource;
-use Filament\Enums\GlobalSearchPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -51,11 +50,9 @@ class OperadorPanelProvider extends PanelProvider
             ->brandName('Tacuba')
             ->brandLogoHeight('35px')
             ->sidebarCollapsibleOnDesktop()
-            ->globalSearch()
+            ->globalSearch(false)
             ->topbar(false)
             ->unsavedChangesAlerts()
-            ->globalSearch(position: GlobalSearchPosition::Sidebar)
-            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->sidebarWidth('300px')
             ->resources([
                 ChequeosResource::class,
