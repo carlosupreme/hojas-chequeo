@@ -39,7 +39,7 @@
     }
 }
 
-.create-chequeo-page {
+.create-chequeo-page, .create-recorrido-page  {
     & .fi-header {
         @apply hidden;
     }

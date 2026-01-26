@@ -2,6 +2,13 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\CreateChequeo;
+use App\Filament\Pages\CreateRecorrido;
+use App\Filament\Resources\Chequeos\ChequeosResource;
+use App\Filament\Resources\EntregaTurnos\EntregaTurnoResource;
+use App\Filament\Resources\Recorridos\RecorridoResource;
+use App\Filament\Resources\Reportes\ReporteResource;
+use App\Filament\Resources\Tarjetons\TarjetonResource;
 use Filament\Enums\GlobalSearchPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -50,8 +57,17 @@ class SupervisorPanelProvider extends PanelProvider
                 fn (): View => view('operador-login-button'))
             ->discoverResources(in: app_path('Filament/Supervisor/Resources'), for: 'App\Filament\Supervisor\Resources')
             ->discoverPages(in: app_path('Filament/Supervisor/Pages'), for: 'App\Filament\Supervisor\Pages')
+            ->resources([
+                ChequeosResource::class,
+                RecorridoResource::class,
+                EntregaTurnoResource::class,
+                TarjetonResource::class,
+                ReporteResource::class,
+            ])
             ->pages([
                 Dashboard::class,
+                CreateChequeo::class,
+                CreateRecorrido::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Supervisor/Widgets'), for: 'App\Filament\Supervisor\Widgets')
             ->widgets([

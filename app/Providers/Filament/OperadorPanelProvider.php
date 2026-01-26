@@ -62,7 +62,7 @@ class OperadorPanelProvider extends PanelProvider
                 RecorridoResource::class,
                 EntregaTurnoResource::class,
                 TarjetonResource::class,
-                ReporteResource::class
+                ReporteResource::class,
             ])
             ->discoverResources(in: app_path('Filament/Operador/Resources'), for: 'App\Filament\Operador\Resources')
             ->discoverPages(in: app_path('Filament/Operador/Pages'), for: 'App\Filament\Operador\Pages')
