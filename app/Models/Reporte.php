@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Observers\ReporteObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[ObservedBy(ReporteObserver::class)]
 class Reporte extends Model
 {
     protected $fillable = [
