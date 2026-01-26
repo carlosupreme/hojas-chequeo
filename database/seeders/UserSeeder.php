@@ -15,16 +15,16 @@ class UserSeeder extends Seeder
     {
         $turnoTintoreria = Turno::create([
             'nombre' => 'Tintoreria',
-            'dias' => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+            'dias' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'],
             'hora_inicio' => '08:00:00',
             'hora_final' => '17:00:00',
         ]);
 
         $turnoLavanderia = Turno::create([
             'nombre' => 'Lavanderia',
-            'dias' => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-            'hora_inicio' => '17:00:00',
-            'hora_final' => '01:00:00',
+            'dias' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
+            'hora_inicio' => '00:00:00',
+            'hora_final' => '23:59:59',
         ]);
 
         $turnos = [$turnoTintoreria->id, $turnoLavanderia->id];

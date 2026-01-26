@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -18,12 +17,5 @@ class Turno extends Model
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
-    }
-
-    public function worksOn($date): bool
-    {
-        $dayName = Carbon::parse($date)->format('l');
-
-        return in_array($dayName, $this->working_days);
     }
 }

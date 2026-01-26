@@ -70,6 +70,12 @@ class UserResource extends Resource
                     ->placeholder('Selecciona el perfil del usuario')
                     ->preload()
                     ->searchable(),
+                Select::make('turno_id')
+                    ->relationship('turno', 'nombre')
+                    ->required()
+                    ->placeholder('Selecciona el turno del usuario')
+                    ->preload()
+                    ->searchable(),
             ]);
     }
 

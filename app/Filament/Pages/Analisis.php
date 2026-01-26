@@ -13,6 +13,11 @@ class Analisis extends Page
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedChartBar;
 
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Administración';
+    }
+
     protected static ?string $navigationLabel = 'Análisis de información';
 
     public string $activeTab = 'recorridos'; // Options: recorridos, mantenimiento, reportes
