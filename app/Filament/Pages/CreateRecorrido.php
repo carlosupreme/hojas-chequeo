@@ -87,7 +87,7 @@ class CreateRecorrido extends Page
             $this->formulario = FormularioRecorrido::with('categorias.items')->findOrFail($this->formularioId);
         }
 
-        $this->fecha = $this->recorrido->created_at;
+        $this->fecha = $this->recorrido->fecha;
         $this->turno_id = $this->recorrido->turno_id;
         $this->loadRespuestas();
     }

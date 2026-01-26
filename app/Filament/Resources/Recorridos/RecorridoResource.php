@@ -45,6 +45,11 @@ class RecorridoResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->recordUrl(function (LogRecorrido $record) {
+                $b = RecorridoResource::getUrl('index');
+
+                return CreateRecorrido::getUrl()."?f=$record->formulario_recorrido_id&e=$record->id&b=$b";
+            })
             ->defaultSort('fecha', 'desc')
             ->columns([
                 TextColumn::make('fecha')->dateTime('D d/m/Y H:II')->label('Fecha'),
@@ -73,7 +78,7 @@ class RecorridoResource extends Resource
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                ]),
+                ])->hidden(fn () => Auth::user()->isOperador()),
             ]);
     }
 

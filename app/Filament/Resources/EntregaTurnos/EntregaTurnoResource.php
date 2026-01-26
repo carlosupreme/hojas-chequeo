@@ -26,6 +26,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class EntregaTurnoResource extends Resource
 {
@@ -41,7 +42,6 @@ class EntregaTurnoResource extends Resource
     {
         return 'Mantenimiento';
     }
-
 
     public static function form(Schema $schema): Schema
     {
@@ -177,14 +177,14 @@ class EntregaTurnoResource extends Resource
                             'fecha' => $data['fecha'].' '.$data['hora'],
                         ];
                     }),
-                    DeleteAction::make(),
+                    DeleteAction::make()->hidden(fn () => Auth::user()->isOperador()),
                 ]),
             ])
             ->defaultSort('fecha', 'desc')
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                ]),
+                ])->hidden(fn () => Auth::user()->isOperador()),
             ]);
     }
 

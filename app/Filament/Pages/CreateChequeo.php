@@ -137,20 +137,17 @@ class CreateChequeo extends Page
             'hoja_chequeo_id' => $this->hojaChequeo->id,
         ];
 
-        if ($this->hojaEjecucion) {
-            if ($data['firma_operador'] === $this->imageService()->getAsBase64($this->hojaEjecucion->firma_operador)) {
-                $data['firma_operador'] = $this->hojaEjecucion->firma_operador;
-            } else {
-                $data['firma_operador'] = $this->imageService()->storeBase64('firmas', $data['firma_operador']);
-            }
+        if ($data['firma_operador']) {
+            $data['firma_operador'] = $this->imageService()->storeBase64('firmas', $data['firma_operador']);
+        }
 
+        if ($this->hojaEjecucion) {
             $this->hojaEjecucion->update($data);
             $this->dispatch('hoja-ejecucion-saved', $this->ejecucionId);
 
             return;
         }
 
-        $data['firma_operador'] = $this->imageService()->storeBase64('firmas', $data['firma_operador']);
         $hojaEjecucion = HojaEjecucion::create($data);
         $this->dispatch('hoja-ejecucion-saved', $hojaEjecucion->id);
     }

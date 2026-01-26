@@ -25,6 +25,9 @@ class ChequeosTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->recordAction(function () {
+                return 'view-chequeo';
+            })
             // 1. PERFORMANCE: Eager load relationships to fix N+1
             ->modifyQueryUsing(function (Builder $query) {
                 $query->with(['hojaChequeo.equipo', 'user', 'turno']);

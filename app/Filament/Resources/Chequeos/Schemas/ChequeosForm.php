@@ -21,8 +21,7 @@ class ChequeosForm
                         ->label('Firma')
                         ->penColor('blue')
                         ->penColorOnDark('blue')
-                        ->live()
-                        ->required(),
+                        ->live(),
                     TextInput::make('nombre_operador')
                         ->label('Nombre')
                         ->required(),
