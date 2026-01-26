@@ -107,7 +107,9 @@
 
         {{-- ================= TAB: MANTENIMIENTO ================= --}}
         @if($activeTab === 'mantenimiento')
-            <livewire:analisis.analisis-hoja-chequeo/>
+            <livewire:analisis.analisis-hoja-chequeo :start-date="$this->dateRange['inicio']"
+                                                     :end-date="$this->dateRange['final']"
+                                                     :key="'hojachequeo-'.md5($this->dateRange['inicio'].$this->dateRange['final'])"/>
         @endif
 
         {{-- ================= TAB: REPORTES ================= --}}

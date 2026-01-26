@@ -1,97 +1,152 @@
 <div class="space-y-6">
 
-    {{-- REGISTROS COMPARISON --}}
+    {{-- FILTERS --}}
+    <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Filtros</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {{-- HojaChequeo Filter --}}
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Hoja de Chequeo</label>
+            <select
+                wire:model.live="hojaChequeoId"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+            >
+                <option value="">Todas las hojas</option>
+                @foreach($this->hojaChequeos as $id => $nombre)
+                    <option value="{{ $id }}">{{ $nombre }}</option>
+                @endforeach
+            </select>
+
+        </div>
+    </div>
+
+    {{-- CHARTS ROW --}}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div
-            class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Total Registros
-                Realizados</h3>
-            <!-- Simple Bars Visualization -->
-            <div class="space-y-4">
-                @foreach($this->registrosStats['realizados'] as $area => $count)
-                    <div>
-                        <div class="flex justify-between text-sm mb-1">
-                            <span class="capitalize">{{ $area }}</span>
-                            <span class="font-bold">{{ $count }}</span>
-                        </div>
-                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                            <div class="bg-blue-600 h-2.5 rounded-full"
-                                 style="width: {{ min($count * 2, 100) }}%"></div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
+
+        {{-- Chart: % Completion by Turno --}}
+        <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                % de Ítems Realizados por Turno
+                <span class="text-sm font-normal text-gray-500">(Marcados con = ✓)</span>
+            </h3>
+            <div
+                x-data="turnoCompletionBarChart"
+                x-init="initChart({
+                    labels: @js($this->turnoCompletionStats['labels']),
+                    data: @js($this->turnoCompletionStats['data'])
+                })"
+                @chart-data-updated.window="updateChart({
+                    labels: @js($this->turnoCompletionStats['labels']),
+                    data: @js($this->turnoCompletionStats['data'])
+                })"
+                class="h-72 w-full"
+                wire:ignore
+            ></div>
         </div>
 
-        <div
-            class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Registros Completos
-                (100%)</h3>
-            <div class="space-y-4">
-                @foreach($this->registrosStats['completos'] as $area => $count)
-                    <div>
-                        <div class="flex justify-between text-sm mb-1">
-                            <span class="capitalize">{{ $area }}</span>
-                            <span class="font-bold text-green-600">{{ $count }}</span>
-                        </div>
-                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                            <div class="bg-green-500 h-2.5 rounded-full"
-                                 style="width: {{ min($count * 2, 100) }}%"></div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
+        {{-- Chart: Total Ejecuciones by Turno --}}
+        <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Total de Chequeos por Turno
+            </h3>
+            <div
+                x-data="turnoEjecucionChart"
+                x-init="initChart({
+                    labels: @js($this->turnoEjecucionCount['labels']),
+                    data: @js($this->turnoEjecucionCount['data'])
+                })"
+                @chart-data-updated.window="updateChart({
+                    labels: @js($this->turnoEjecucionCount['labels']),
+                    data: @js($this->turnoEjecucionCount['data'])
+                })"
+                class="h-72 w-full"
+                wire:ignore
+            ></div>
         </div>
     </div>
 
-    {{-- CALDERAS STATS GRID --}}
-    <div
-        class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
-        <div class="p-4 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Análisis de Calderas
-                (Promedios)</h3>
+    {{-- DETAILED STATS TABLE --}}
+    <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Detalle por Turno</h3>
         </div>
-        <div
-            class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200 dark:divide-gray-800">
-            @foreach(['caldera_1' => 'Caldera 1', 'caldera_2' => 'Caldera 2'] as $key => $title)
-                <div class="p-6">
-                    <h4 class="font-bold text-gray-700 dark:text-gray-300 mb-4">{{ $title }}</h4>
-                    <div class="grid grid-cols-2 gap-4">
-                        @foreach($this->calderasStats[$key] as $metric => $data)
-                            <div
-                                class="p-3 rounded-lg border {{ $data['warning'] ? 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800' : 'bg-gray-50 border-gray-100 dark:bg-gray-800 dark:border-gray-700' }}">
-                                <p class="text-xs text-gray-500 uppercase">{{ str_replace('_', ' ', $metric) }}</p>
-                                <p class="text-xl font-bold {{ $data['warning'] ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white' }}">
-                                    {{ $data['val'] }}
-                                    @if($data['warning'])
-                                        <span
-                                            class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-100 text-red-800">
-                                                        Check
-                                                    </span>
-                                    @endif
-                                </p>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            @endforeach
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
+                <tr>
+                    <th scope="col" class="px-6 py-3">Turno</th>
+                    <th scope="col" class="px-6 py-3 text-center">Chequeos</th>
+                    <th scope="col" class="px-6 py-3 text-center">
+                            <span class="inline-flex items-center text-green-600">
+                                <x-heroicon-o-check class="w-4 h-4 mr-1"/> Realizados bien
+                            </span>
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-center">
+                            <span class="inline-flex items-center text-red-600">
+                                <x-heroicon-o-x-mark class="w-4 h-4 mr-1"/> Mal
+                            </span>
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-center">
+                            <span class="inline-flex items-center text-yellow-600">
+                                <x-heroicon-o-no-symbol class="w-4 h-4 mr-1"/> No Realizado
+                            </span>
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-center">
+                            <span class="inline-flex items-center text-gray-500">
+                                <x-heroicon-o-minus-circle class="w-4 h-4 mr-1"/> N/A
+                            </span>
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-center">% OK</th>
+                </tr>
+                </thead>
+                <tbody>
+                @forelse($this->turnoDetailedStats as $stat)
+                    <tr class="bg-white border-b dark:bg-gray-900 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800">
+                        <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                            {{ $stat['turno'] }}
+                        </td>
+                        <td class="px-6 py-4 text-center font-semibold">
+                            {{ $stat['total_ejecuciones'] }}
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                                {{ $stat['realizados'] }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                                {{ $stat['realizados_mal'] }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
+                                {{ $stat['no_realizados'] }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">
+                                {{ $stat['no_aplica'] }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            @php
+                                $pct = $stat['porcentaje_ok'];
+                                $colorClass = $pct >= 80 ? 'text-green-600' : ($pct >= 50 ? 'text-yellow-600' : 'text-red-600');
+                            @endphp
+                            <span class="font-bold {{ $colorClass }}">
+                                {{ $pct }}%
+                            </span>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+                            No hay datos para el período seleccionado.
+                        </td>
+                    </tr>
+                @endforelse
+                </tbody>
+            </table>
         </div>
-    </div>
-
-    {{-- CHART: HORAS DE TRABAJO --}}
-    <div
-        class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Horas de Trabajo
-            Acumuladas</h3>
-        <div
-            x-data="chartComponent({
-                            type: 'bar',
-                            series: [{ name: 'Horas', data: @js($this->horasTrabajo['data']) }],
-                            labels: @js($this->horasTrabajo['labels']),
-                            colors: ['#6366f1']
-                        })"
-            class="h-80 w-full"
-        ></div>
     </div>
 
 </div>

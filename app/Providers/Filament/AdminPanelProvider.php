@@ -320,6 +320,198 @@ class AdminPanelProvider extends PanelProvider
                             }
                         }
                     }));
+
+                    // Turno Completion Bar Chart (Horizontal Bar for %) - Global Definition
+                    Alpine.data('turnoCompletionBarChart', () => ({
+                        chart: null,
+
+                        initChart(config) {
+                            const options = {
+                                series: [{
+                                    name: '% Realizados',
+                                    data: config.data || []
+                                }],
+                                chart: {
+                                    type: 'bar',
+                                    height: '100%',
+                                    fontFamily: 'inherit',
+                                    toolbar: { show: false },
+                                    background: 'transparent',
+                                    animations: {
+                                        enabled: true,
+                                        easing: 'easeinout',
+                                        speed: 800
+                                    }
+                                },
+                                plotOptions: {
+                                    bar: {
+                                        horizontal: true,
+                                        borderRadius: 4,
+                                        distributed: true,
+                                        dataLabels: {
+                                            position: 'center'
+                                        }
+                                    }
+                                },
+                                colors: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'],
+                                xaxis: {
+                                    categories: config.labels || [],
+                                    max: 100,
+                                    labels: {
+                                        style: {
+                                            colors: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+                                        },
+                                        formatter: function(val) {
+                                            return val + '%';
+                                        }
+                                    }
+                                },
+                                yaxis: {
+                                    labels: {
+                                        style: {
+                                            colors: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+                                        }
+                                    }
+                                },
+                                grid: {
+                                    borderColor: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb',
+                                    strokeDashArray: 4,
+                                },
+                                dataLabels: {
+                                    enabled: true,
+                                    formatter: function(val) {
+                                        return val + '%';
+                                    },
+                                    style: {
+                                        fontSize: '12px',
+                                        fontWeight: 'bold',
+                                        colors: ['#fff']
+                                    }
+                                },
+                                legend: { show: false },
+                                theme: {
+                                    mode: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                                },
+                                tooltip: {
+                                    theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+                                    y: {
+                                        formatter: function(val) {
+                                            return val + '%';
+                                        }
+                                    }
+                                }
+                            };
+
+                            this.chart = new ApexCharts(this.\$el, options);
+                            this.chart.render();
+                        },
+
+                        updateChart(config) {
+                            if (this.chart) {
+                                this.chart.updateSeries([{
+                                    name: '% Realizados',
+                                    data: config.data || []
+                                }], true);
+                                this.chart.updateOptions({
+                                    xaxis: {
+                                        categories: config.labels || []
+                                    }
+                                }, false, true);
+                            }
+                        }
+                    }));
+
+                    // Turno Ejecucion Count Chart (Bar) - Global Definition
+                    Alpine.data('turnoEjecucionChart', () => ({
+                        chart: null,
+
+                        initChart(config) {
+                            const options = {
+                                series: [{
+                                    name: 'Ejecuciones',
+                                    data: config.data || []
+                                }],
+                                chart: {
+                                    type: 'bar',
+                                    height: '100%',
+                                    fontFamily: 'inherit',
+                                    toolbar: { show: false },
+                                    background: 'transparent',
+                                    animations: {
+                                        enabled: true,
+                                        easing: 'easeinout',
+                                        speed: 800
+                                    }
+                                },
+                                plotOptions: {
+                                    bar: {
+                                        horizontal: false,
+                                        borderRadius: 4,
+                                        distributed: true,
+                                        columnWidth: '60%',
+                                        dataLabels: {
+                                            position: 'top'
+                                        }
+                                    }
+                                },
+                                colors: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'],
+                                xaxis: {
+                                    categories: config.labels || [],
+                                    labels: {
+                                        style: {
+                                            colors: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+                                        }
+                                    }
+                                },
+                                yaxis: {
+                                    labels: {
+                                        style: {
+                                            colors: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280'
+                                        }
+                                    }
+                                },
+                                grid: {
+                                    borderColor: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb',
+                                    strokeDashArray: 4,
+                                },
+                                dataLabels: {
+                                    enabled: true,
+                                    formatter: function(val) {
+                                        return val;
+                                    },
+                                    offsetY: -20,
+                                    style: {
+                                        fontSize: '12px',
+                                        colors: [document.documentElement.classList.contains('dark') ? '#fff' : '#333']
+                                    }
+                                },
+                                legend: { show: false },
+                                theme: {
+                                    mode: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                                },
+                                tooltip: {
+                                    theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                                }
+                            };
+
+                            this.chart = new ApexCharts(this.\$el, options);
+                            this.chart.render();
+                        },
+
+                        updateChart(config) {
+                            if (this.chart) {
+                                this.chart.updateSeries([{
+                                    name: 'Ejecuciones',
+                                    data: config.data || []
+                                }], true);
+                                this.chart.updateOptions({
+                                    xaxis: {
+                                        categories: config.labels || []
+                                    }
+                                }, false, true);
+                            }
+                        }
+                    }));
                 });
 
                 // Listen for Livewire events

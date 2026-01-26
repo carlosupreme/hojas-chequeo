@@ -18,4 +18,9 @@ class Turno extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    public function ejecuciones(): HasMany
+    {
+        return $this->hasMany(HojaEjecucion::class);
+    }
 }
