@@ -10,11 +10,9 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -57,34 +55,27 @@ class EquipoResource extends Resource
                     ->maxLength(255),
                 FileUpload::make('foto')->image(),
                 Repeater::make('Especificaciones')->columnSpanFull()
-                    ->relationship('specs')
+                    ->relationship('specs')->label('Especificaciones')
                     ->schema([
                         TextInput::make('tipo')
+                            ->label('Nombre')
                             ->required()
                             ->maxLength(255),
-                        TextInput::make('unidad')
+                        TextInput::make('unidad')->label('Unidad de medida')
                             ->required()
                             ->maxLength(255),
-                        TextInput::make('min')
+                        TextInput::make('min')->label('Valor mínimo')
                             ->required()
                             ->numeric(),
-                        TextInput::make('optimo')
+                        TextInput::make('optimo')->label('Valor óptimo')
                             ->required()
                             ->numeric(),
-                        TextInput::make('max')
+                        TextInput::make('max')->label('Valor máximo')
                             ->required()
                             ->numeric(),
                     ])
                     ->columns(3)
                     ->collapsible(),
-            ]);
-    }
-
-    public static function infolist(Schema $schema): Schema
-    {
-        return $schema
-            ->components([
-                TextEntry::make('tag'),
             ]);
     }
 
@@ -123,7 +114,6 @@ class EquipoResource extends Resource
             ->persistFiltersInSession()
             ->recordActions([
                 ActionGroup::make([
-                    ViewAction::make(),
                     EditAction::make()->closeModalByClickingAway(false),
                     DeleteAction::make(),
                 ]),
