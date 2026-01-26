@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\CategoriaRecorrido;
+use App\Models\EntregaTurno;
 use App\Models\FormularioRecorrido;
 use App\Models\ItemRecorrido;
 use App\Models\LogRecorrido;
@@ -101,7 +102,7 @@ class RecorridoTintoreriaSeeder extends Seeder
                     'fecha' => "2025-12-0$dia",
                 ]);
 
-                $log->entregaTurno()->create([
+                EntregaTurno::create([
                     'fecha' => now()->format('Y-m-d'),
                     'hora' => now()->format('H:i:s'),
                     'entrega_equipos' => 'Compresores 1 y 2 en automático, Generador de vapor estable a 85 psi.',
@@ -122,8 +123,9 @@ class RecorridoTintoreriaSeeder extends Seeder
                     ValorRecorrido::create([
                         'log_recorrido_id' => $log->id,
                         'item_recorrido_id' => $item->id,
-                        'estado' => $item->tipo_entrada == 'estado' ? (rand(0, 5) > 0 ? '√' : 'PP') : null,
-                        'valor_numerico' => $item->tipo_entrada == 'numero' ? rand(100, 999) : null,
+                        'estado' => $item->isTipoEstado() ? (rand(0, 5) > 0 ? '√' : 'PPP') : null,
+                        'valor_numerico' => $item->isTipoNumero() ? rand(100, 999) : null,
+                        'valor_texto' => $item->isTipoTexto() ? rand(100, 999) : null,
                         'observaciones' => rand(0, 10) > 8 ? 'Todo bien' : null,
                     ]);
                 }

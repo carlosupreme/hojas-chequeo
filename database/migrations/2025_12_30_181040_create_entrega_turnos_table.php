@@ -14,7 +14,6 @@ return new class extends Migration
     {
         Schema::create('entrega_turnos', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(LogRecorrido::class)->constrained()->cascadeOnDelete();
             $table->date('fecha');
             $table->time('hora');
             $table->text('entrega_equipos')->nullable();

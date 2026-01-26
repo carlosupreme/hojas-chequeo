@@ -16,6 +16,16 @@ class ItemRecorrido extends Model
 
     const TIPO_TEXTO = 'texto';
 
+    public static function estados()
+    {
+        return [
+            ['value' => '√', 'label' => 'Funcionando', 'emoji' => '✓', 'color' => 'green'],
+            ['value' => 'X', 'label' => 'Falla', 'emoji' => '✕', 'color' => 'red'],
+            ['value' => 'PPP', 'label' => 'P. Producción', 'emoji' => '⏸', 'color' => 'amber'],
+            ['value' => 'PPM', 'label' => 'P. Mantenimiento', 'emoji' => '🔧', 'color' => 'blue'],
+        ];
+    }
+
     public function categoriaRecorrido(): BelongsTo
     {
         return $this->belongsTo(CategoriaRecorrido::class);

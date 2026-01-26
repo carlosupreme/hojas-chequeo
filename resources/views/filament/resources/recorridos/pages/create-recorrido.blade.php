@@ -91,12 +91,7 @@
                                                 @if($item->isTipoEstado())
                                                     <div class="grid grid-cols-2 gap-2 sm:gap-3">
                                                         @php
-                                                            $estados = [
-                                                                ['value' => '√', 'label' => 'Funcionando', 'emoji' => '✓', 'color' => 'green'],
-                                                                ['value' => 'X', 'label' => 'Falla', 'emoji' => '✕', 'color' => 'red'],
-                                                                ['value' => 'PPP', 'label' => 'P. Producción', 'emoji' => '⏸', 'color' => 'amber'],
-                                                                ['value' => 'PPM', 'label' => 'P. Mantenimiento', 'emoji' => '🔧', 'color' => 'blue'],
-                                                            ];
+                                                            $estados = \App\Models\ItemRecorrido::estados();
                                                         @endphp
 
                                                         @foreach($estados as $estado)

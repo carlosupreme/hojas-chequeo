@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class EntregaTurno extends Model
 {
     protected $fillable = [
-        'log_recorrido_id',
         'fecha',
         'hora',
         'entrega_equipos',
@@ -20,9 +19,4 @@ class EntregaTurno extends Model
         'recepcion_servicios',
         'recepcion_observaciones_servicios',
     ];
-
-    public function logRecorrido(): BelongsTo
-    {
-        return $this->belongsTo(LogRecorrido::class);
-    }
 }
