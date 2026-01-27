@@ -84,13 +84,13 @@
                 @if($date)
                     @php($warn = \Carbon\Carbon::parse($date)->lt(now()->subDay()))
                     <span @class([
-                            "text-[10px] font-medium text-gray-400 text-right leading-none",
+                            "text-[10px] font-medium text-gray-400 flex items-center gap-1 text-right leading-none",
                             "text-red-500" => $warn
                         ])>
                             @if($warn)
                                 @svg('heroicon-o-exclamation-triangle', 'w-5 h-5 text-red-500')
                             @endif
-                            {{ $date->diffForHumans(null, true, true) }}
+                            {{ $date->diffForHumans() }}
                     </span>
                 @endif
             </div>
