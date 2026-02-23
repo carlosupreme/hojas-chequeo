@@ -16,7 +16,7 @@ class HojaEjecucion extends Model
         'hoja_chequeo_id',
         'user_id',
         'turno_id',
-        'cento_costo_id',
+        'centro_costo_id',
         'nombre_operador',
         'firma_operador',
         'firma_supervisor',

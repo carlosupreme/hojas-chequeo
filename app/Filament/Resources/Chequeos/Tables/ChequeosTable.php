@@ -34,10 +34,10 @@ class ChequeosTable
 
                 // Role Logic
                 if (Auth::user()->hasRole(['Administrador', 'Supervisor'])) {
-                    return $query->orderByDesc('created_at');
+                    return $query->orderByDesc('finalizado_en');
                 }
 
-                return $query->where('user_id', Auth::id())->orderByDesc('created_at');
+                return $query->where('user_id', Auth::id())->orderByDesc('finalizado_en');
             })
             // 2. FILTERS: CentroCosto handled by tabs; status + area + dates in a clean modal
             ->filtersTriggerAction(
@@ -68,7 +68,7 @@ class ChequeosTable
                         fn ($q) => $q->whereHas('hojaChequeo.equipo', fn ($eq) => $eq->where('area', $data['value']))
                     )),
 
-                Filter::make('created_at')
+                Filter::make('finalizado_en')
                     ->label('Fecha de Ejecución')
                     ->schema([
                         DatePicker::make('desde')->label('Desde')->native(false),
@@ -77,13 +77,13 @@ class ChequeosTable
                     ->columns(2)
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
-                            ->when($data['desde'], fn ($q, $date) => $q->whereDate('created_at', '>=', $date))
-                            ->when($data['hasta'], fn ($q, $date) => $q->whereDate('created_at', '<=', $date));
+                            ->when($data['desde'], fn ($q, $date) => $q->whereDate('finalizado_en', '>=', $date))
+                            ->when($data['hasta'], fn ($q, $date) => $q->whereDate('finalizado_en', '<=', $date));
                     }),
             ], layout: FiltersLayout::Modal)
             ->columns([
                 // COLUMN 5: DATE
-                TextColumn::make('created_at')
+                TextColumn::make('finalizado_en')
                     ->label('Fecha')
                     ->dateTime('d M, Y H:i')
                     ->sortable()
@@ -145,7 +145,7 @@ class ChequeosTable
                     }),
 
             ])
-            ->defaultSort('created_at', 'desc')
+            ->defaultSort('finalizado_en', 'desc')
             ->persistSortInSession()
             ->persistFiltersInSession()
             ->recordActions([

@@ -166,9 +166,9 @@ class DatabaseSeeder extends Seeder
 
         $usersByTurno = $allUsers->groupBy('turno_id');
 
-        // Create executions (simulate a month) for each shift
-        foreach (range(1, 30) as $day) {
-            $date = Carbon::now()->subMonth()->addDays($day);
+        // Create executions from 30 days ago up to yesterday
+        foreach (range(30, 1) as $day) {
+            $date = Carbon::now()->subDays($day);
 
             // Create execution for each turno
             foreach ($usersByTurno as $turnoId => $users) {
