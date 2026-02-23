@@ -102,14 +102,14 @@ class CreateRecorrido extends Page
         $this->loadRespuestas();
 
         $this->entregaData = [
-            'equipos_funcionando'     => $this->recorrido->equipos_funcionando,
-            'observaciones_equipos'   => $this->recorrido->observaciones_equipos,
-            'servicios_funcionando'   => $this->recorrido->servicios_funcionando,
+            'equipos_funcionando' => $this->recorrido->equipos_funcionando,
+            'observaciones_equipos' => $this->recorrido->observaciones_equipos,
+            'servicios_funcionando' => $this->recorrido->servicios_funcionando,
             'observaciones_servicios' => $this->recorrido->observaciones_servicios,
-            'firma_operador'          => $this->recorrido->firma_operador
+            'firma_operador' => $this->recorrido->firma_operador
                 ? $this->imageService()->getAsBase64($this->recorrido->firma_operador)
                 : null,
-            'firma_supervisor'        => $this->recorrido->firma_supervisor
+            'firma_supervisor' => $this->recorrido->firma_supervisor
                 ? $this->imageService()->getAsBase64($this->recorrido->firma_supervisor)
                 : null,
         ];

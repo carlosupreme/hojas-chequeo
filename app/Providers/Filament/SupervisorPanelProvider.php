@@ -7,7 +7,6 @@ use App\Filament\Pages\CreateChequeo;
 use App\Filament\Pages\CreateRecorrido;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Resources\Chequeos\ChequeosResource;
-use App\Filament\Resources\EntregaTurnos\EntregaTurnoResource;
 use App\Filament\Resources\Recorridos\RecorridoResource;
 use App\Filament\Resources\Reportes\ReporteResource;
 use App\Filament\Resources\Tarjetons\TarjetonResource;
@@ -729,7 +728,6 @@ class SupervisorPanelProvider extends PanelProvider
             ->resources([
                 ChequeosResource::class,
                 RecorridoResource::class,
-                EntregaTurnoResource::class,
                 TarjetonResource::class,
                 ReporteResource::class,
             ])

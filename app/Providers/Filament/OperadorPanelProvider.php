@@ -5,7 +5,6 @@ namespace App\Providers\Filament;
 use App\Filament\Pages\CreateChequeo;
 use App\Filament\Pages\CreateRecorrido;
 use App\Filament\Resources\Chequeos\ChequeosResource;
-use App\Filament\Resources\EntregaTurnos\EntregaTurnoResource;
 use App\Filament\Resources\Recorridos\RecorridoResource;
 use App\Filament\Resources\Reportes\ReporteResource;
 use App\Filament\Resources\Tarjetons\TarjetonResource;
@@ -57,7 +56,6 @@ class OperadorPanelProvider extends PanelProvider
             ->resources([
                 ChequeosResource::class,
                 RecorridoResource::class,
-                EntregaTurnoResource::class,
                 TarjetonResource::class,
                 ReporteResource::class,
             ])

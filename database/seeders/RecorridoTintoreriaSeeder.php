@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\CategoriaRecorrido;
-use App\Models\EntregaTurno;
 use App\Models\FormularioRecorrido;
 use App\Models\ItemRecorrido;
 use App\Models\LogRecorrido;
@@ -100,19 +99,12 @@ class RecorridoTintoreriaSeeder extends Seeder
                     'user_id' => $usuario->id,
                     'turno_id' => $turno->id,
                     'fecha' => "2025-12-0$dia",
-                ]);
-
-                EntregaTurno::create([
-                    'fecha' => now()->format('Y-m-d'),
-                    'hora' => now()->format('H:i:s'),
-                    'entrega_equipos' => 'Compresores 1 y 2 en automático, Generador de vapor estable a 85 psi.',
-                    'entrega_observaciones_equipos' => 'Se detectó una ligera vibración en la bomba sumergible, requiere revisión en el siguiente turno.',
-                    'entrega_servicios' => 'Suavizador de agua operando al 100%, niveles de gas LP al 65%.',
-                    'entrega_observaciones_servicios' => 'Sin novedades en el suministro eléctrico.',
-                    'recepcion_equipos' => 'Se recibe equipo funcionando, se confirma reporte de vibración en bomba.',
-                    'recepcion_observaciones_equipos' => 'Se programará lubricación preventiva a las 16:00 hrs.',
-                    'recepcion_servicios' => 'Confirmado niveles de gas y suavizador.',
-                    'recepcion_observaciones_servicios' => 'Todo conforme.',
+                    'equipos_funcionando' => 'Generadores de vapor 1 y 2, compresor de aire, bombas sumergibles en funcionamiento normal.',
+                    'observaciones_equipos' => 'Sin novedades. Niveles dentro de parámetros.',
+                    'servicios_funcionando' => 'Vapor, agua suavizada, aire comprimido y energía eléctrica disponibles.',
+                    'observaciones_servicios' => 'Presión de vapor estable. Medidor de agua sin fugas.',
+                    'firma_operador' => 'firmas/firma.svg',
+                    'firma_supervisor' => 'firmas/firma.svg',
                 ]);
 
                 $items = ItemRecorrido::whereHas('categoriaRecorrido', function ($q) use ($formulario) {

@@ -20,6 +20,7 @@ class Tarjeton extends Model
         'observaciones',
         'estado',
         'falla_vapor',
+        'falla_vapor_descripcion',
     ];
 
     protected $casts = [

@@ -26,8 +26,8 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -266,10 +266,16 @@ class TarjetonResource extends Resource
                         'warning' => 'mantenimiento',
                     ])
                     ->badge(fn (string $state): string => ucfirst($state)),
-                ToggleColumn::make('falla_vapor')
+                IconColumn::make('falla_vapor')
                     ->label('Falla de vapor')
-                    ->offColor('success')
-                    ->onColor('danger'),
+                    ->boolean()
+                    ->trueIcon('heroicon-s-fire')
+                    ->falseIcon('heroicon-o-minus-circle')
+                    ->trueColor('danger')
+                    ->falseColor('gray')
+                    ->tooltip(fn (Tarjeton $record): ?string => $record->falla_vapor && $record->falla_vapor_descripcion
+                        ? "Falla: {$record->falla_vapor_descripcion}"
+                        : null),
             ])
             ->filters([
                 SelectFilter::make('equipo_id')
@@ -360,6 +366,47 @@ class TarjetonResource extends Resource
                     ->requiresConfirmation()
                     ->modalHeading(fn (Tarjeton $record) => $record->estado === 'encendido' ? 'Apagar Equipo' : 'Encender Equipo')
                     ->modalDescription(fn (Tarjeton $record) => '¿Confirmas que quieres '.($record->estado === 'encendido' ? 'apagar' : 'encender')." el equipo {$record->equipo->tag}?"),
+
+                Action::make('toggle_falla_vapor')
+                    ->label(fn (Tarjeton $record) => $record->falla_vapor ? 'Limpiar Falla Vapor' : 'Reportar Falla Vapor')
+                    ->icon(fn (Tarjeton $record) => $record->falla_vapor ? 'heroicon-o-check-circle' : 'heroicon-o-fire')
+                    ->color(fn (Tarjeton $record) => $record->falla_vapor ? 'gray' : 'danger')
+                    ->schema(fn (Tarjeton $record) => ! $record->falla_vapor ? [
+                        Textarea::make('falla_vapor_descripcion')
+                            ->label('Descripción de la falla')
+                            ->placeholder('Describe la falla de vapor detectada...')
+                            ->required()
+                            ->rows(3),
+                    ] : [])
+                    ->requiresConfirmation()
+                    ->modalHeading(fn (Tarjeton $record) => $record->falla_vapor
+                        ? 'Limpiar Falla de Vapor'
+                        : 'Reportar Falla de Vapor')
+                    ->modalDescription(fn (Tarjeton $record) => $record->falla_vapor
+                        ? '¿Confirmas que deseas limpiar el registro de falla de vapor?'
+                        : 'Ingresa una descripción de la falla de vapor detectada.')
+                    ->action(function (Tarjeton $record, array $data) {
+                        if ($record->falla_vapor) {
+                            $record->update([
+                                'falla_vapor' => false,
+                                'falla_vapor_descripcion' => null,
+                            ]);
+                            Notification::make()
+                                ->success()
+                                ->title('Falla de vapor eliminada')
+                                ->send();
+                        } else {
+                            $record->update([
+                                'falla_vapor' => true,
+                                'falla_vapor_descripcion' => $data['falla_vapor_descripcion'],
+                            ]);
+                            Notification::make()
+                                ->warning()
+                                ->title('Falla de vapor registrada')
+                                ->body($data['falla_vapor_descripcion'])
+                                ->send();
+                        }
+                    }),
 
                 Action::make('mantenimiento')
                     ->label('Mantenimiento')
