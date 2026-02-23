@@ -39,12 +39,12 @@ class UserSeeder extends Seeder
         $turnoLavanderia->equipos()->sync([20, 21, 22, 24, 23, 26, 27, 28, 29, 30, 31]);
 
         $turnoLavanderiaL2 = Turno::create([
-            'centro_costo_id' => 1,
             'nombre' => 'Lavenderia 2',
             'dias' => ['monday', 'friday', 'saturday', 'tuesday', 'wednesday', 'sunday', 'thursday'],
             'hora_inicio' => '22:00:00',
             'hora_final' => '06:00:00',
             'activo' => true,
+            'centro_costo_id' => $centroCostoLavanderia->id,
         ]);
 
         $turnoLavanderiaL2->equipos()->sync([21, 20, 22, 24, 23, 26, 31, 30, 28, 29, 27, 33, 34, 12, 13, 14, 15, 16, 17, 18, 19, 3]);

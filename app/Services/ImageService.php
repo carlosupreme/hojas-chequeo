@@ -24,9 +24,17 @@ class ImageService
 
     public function storeBase64(string $folder, string $base64): string
     {
-        // Remove data:image/png;base64, prefix if exists
-        if (preg_match('/^data:image\/(\w+);base64,/', $base64, $matches)) {
-            $extension = $matches[1];
+        // Remove data:<mime>;base64, prefix if present.
+        // Use a broad capture so compound types like image/svg+xml are handled.
+        if (preg_match('/^data:([^;]+);base64,/', $base64, $matches)) {
+            $extension = match ($matches[1]) {
+                'image/svg+xml' => 'svg',
+                'image/jpeg', 'image/jpg' => 'jpg',
+                'image/png' => 'png',
+                'image/gif' => 'gif',
+                'image/webp' => 'webp',
+                default => explode('/', $matches[1])[1] ?? 'bin',
+            };
             $base64 = substr($base64, strpos($base64, ',') + 1);
         } else {
             // Try to detect extension from decoded data

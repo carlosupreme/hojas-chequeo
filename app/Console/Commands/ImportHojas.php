@@ -95,6 +95,13 @@ class ImportHojas extends Command
 
         // v1_hoja_id => ['v2_id' => int, 'area' => string]
         $hojaIdMap = [];
+        // Track v2 hoja IDs whose filas/columnas have already been imported so that
+        // duplicate v1 hojas (same equipo+version, different area) only contribute
+        // their structure once. Their ejecucions are still imported in Phase 2.
+        $filasImportedFor = [];
+        // v1 item_id (from a skipped/losing hoja) → v2 hoja_fila.id (from the winning hoja),
+        // matched by position so Phase 2 respuestas don't hit FK violations.
+        $itemIdRemap = [];
         $totalColumnas = 0;
         $totalFilas = 0;
         $totalValores = 0;
@@ -127,6 +134,35 @@ class ImportHojas extends Command
             ];
 
             // ── items → columnas + filas + valores ───────────────────────
+            // When two v1 hojas share the same (equipo_id, version) but differ by
+            // area, they collapse into one v2 hoja. Only import filas from the
+            // first v1 hoja encountered; subsequent ones are skipped here but
+            // their ejecucions are still imported in Phase 2.
+            if (isset($filasImportedFor[$v2HojaId])) {
+                // Build order-based remap so Phase 2 respuestas from this hoja's
+                // chequeo_diarios can resolve to the winning hoja's fila IDs.
+                $losingItemIds = DB::connection('mysql_v1')
+                    ->table('items')
+                    ->where('hoja_chequeo_id', $hoja->id)
+                    ->orderBy('id')
+                    ->pluck('id');
+
+                $winningFilaIds = DB::table('hoja_filas')
+                    ->where('hoja_chequeo_id', $v2HojaId)
+                    ->orderBy('order')
+                    ->pluck('id');
+
+                foreach ($losingItemIds as $i => $losingId) {
+                    if (isset($winningFilaIds[$i])) {
+                        $itemIdRemap[$losingId] = $winningFilaIds[$i];
+                    }
+                }
+
+                $bar->advance();
+
+                continue;
+            }
+
             $items = DB::connection('mysql_v1')
                 ->table('items')
                 ->where('hoja_chequeo_id', $hoja->id)
@@ -138,6 +174,8 @@ class ImportHojas extends Command
 
                 continue;
             }
+
+            $filasImportedFor[$v2HojaId] = true;
 
             // Build columns from the JSON keys of the first item
             $firstValores = json_decode($items->first()->valores, true) ?? [];
@@ -237,12 +275,19 @@ class ImportHojas extends Command
         $this->newLine();
         $this->info('Phase 2: importing chequeo_diarios…');
 
+        // Build a fast-lookup set of every fila ID that was actually imported.
+        // Any item_chequeo_diario that references an unknown fila (cross-hoja
+        // data inconsistency in v1, or hoja whose equipo was not imported) is
+        // silently skipped to avoid FK violations.
+        $validFilaIds = DB::table('hoja_filas')->pluck('id')->flip()->all();
+
         $imageService = app(ImageService::class);
         $bar2 = $this->output->createProgressBar($chequeos->count());
         $bar2->start();
 
         $importedEjecuciones = 0;
         $totalRespuestas = 0;
+        $skippedRespuestas = 0;
         $firmaErrors = 0;
 
         foreach ($chequeos as $row) {
@@ -311,12 +356,20 @@ class ImportHojas extends Command
                 ->get();
 
             foreach ($itemRows as $item) {
+                $resolvedFilaId = $itemIdRemap[$item->item_id] ?? $item->item_id;
+
+                if (! isset($validFilaIds[$resolvedFilaId])) {
+                    $skippedRespuestas++;
+
+                    continue;
+                }
+
                 [$answerOptionId, $numericValue, $textValue] = $this->resolveAnswer($item);
 
                 DB::table('hoja_fila_respuestas')->upsert(
                     [
                         'hoja_ejecucion_id' => $row->id,
-                        'hoja_fila_id' => $item->item_id,
+                        'hoja_fila_id' => $resolvedFilaId,
                         'answer_option_id' => $answerOptionId,
                         'numeric_value' => $numericValue,
                         'text_value' => $textValue,
@@ -344,6 +397,10 @@ class ImportHojas extends Command
         $this->info('Phase 2 done.');
         $this->line("  hoja_ejecucions      : {$importedEjecuciones}");
         $this->line("  hoja_fila_respuestas : {$totalRespuestas}");
+
+        if ($skippedRespuestas > 0) {
+            $this->warn("  {$skippedRespuestas} respuesta(s) skipped — item_id not found in hoja_filas (v1 cross-hoja reference or missing equipo).");
+        }
 
         if ($firmaErrors > 0) {
             $this->warn("  {$firmaErrors} firma(s) could not be stored and were set to NULL.");
