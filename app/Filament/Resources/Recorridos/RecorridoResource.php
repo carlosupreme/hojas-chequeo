@@ -108,7 +108,7 @@ class RecorridoResource extends Resource
 
                             return CreateRecorrido::getUrl()."?f=$record->formulario_recorrido_id&e=$record->id&b=$b";
                         }),
-                    DeleteAction::make()->hidden(fn () => Auth::user()->isOperador()),
+                    DeleteAction::make()->hidden(fn () => ! Auth::user()->isAdmin()),
                 ]),
             ])
             ->toolbarActions([

@@ -5,10 +5,10 @@ namespace Database\Seeders;
 use App\Models\CategoriaRecorrido;
 use App\Models\FormularioRecorrido;
 use App\Models\ItemRecorrido;
-use App\Models\LogRecorrido;
-use App\Models\Turno;
-use App\Models\User;
-use App\Models\ValorRecorrido;
+// use App\Models\LogRecorrido;
+// use App\Models\Turno;
+// use App\Models\User;
+// use App\Models\ValorRecorrido;
 use Illuminate\Database\Seeder;
 
 class RecorridoTintoreriaSeeder extends Seeder
@@ -89,39 +89,39 @@ class RecorridoTintoreriaSeeder extends Seeder
             }
         }
 
-        $usuario = User::first();
-        $turno = Turno::first();
+        // $usuario = User::first();
+        // $turno = Turno::first();
 
-        if ($usuario && $turno) {
-            for ($dia = 1; $dia <= 3; $dia++) {
-                $log = LogRecorrido::create([
-                    'formulario_recorrido_id' => $formulario->id,
-                    'user_id' => $usuario->id,
-                    'turno_id' => $turno->id,
-                    'fecha' => "2025-12-0$dia",
-                    'equipos_funcionando' => 'Generadores de vapor 1 y 2, compresor de aire, bombas sumergibles en funcionamiento normal.',
-                    'observaciones_equipos' => 'Sin novedades. Niveles dentro de parámetros.',
-                    'servicios_funcionando' => 'Vapor, agua suavizada, aire comprimido y energía eléctrica disponibles.',
-                    'observaciones_servicios' => 'Presión de vapor estable. Medidor de agua sin fugas.',
-                    'firma_operador' => 'firmas/firma.svg',
-                    'firma_supervisor' => 'firmas/firma.svg',
-                ]);
+        // if ($usuario && $turno) {
+        //     for ($dia = 1; $dia <= 3; $dia++) {
+        //         $log = LogRecorrido::create([
+        //             'formulario_recorrido_id' => $formulario->id,
+        //             'user_id' => $usuario->id,
+        //             'turno_id' => $turno->id,
+        //             'fecha' => "2025-12-0$dia",
+        //             'equipos_funcionando' => 'Generadores de vapor 1 y 2, compresor de aire, bombas sumergibles en funcionamiento normal.',
+        //             'observaciones_equipos' => 'Sin novedades. Niveles dentro de parámetros.',
+        //             'servicios_funcionando' => 'Vapor, agua suavizada, aire comprimido y energía eléctrica disponibles.',
+        //             'observaciones_servicios' => 'Presión de vapor estable. Medidor de agua sin fugas.',
+        //             'firma_operador' => 'firmas/firma.svg',
+        //             'firma_supervisor' => 'firmas/firma.svg',
+        //         ]);
 
-                $items = ItemRecorrido::whereHas('categoriaRecorrido', function ($q) use ($formulario) {
-                    $q->where('formulario_recorrido_id', $formulario->id);
-                })->get();
+        //         $items = ItemRecorrido::whereHas('categoriaRecorrido', function ($q) use ($formulario) {
+        //             $q->where('formulario_recorrido_id', $formulario->id);
+        //         })->get();
 
-                foreach ($items as $item) {
-                    ValorRecorrido::create([
-                        'log_recorrido_id' => $log->id,
-                        'item_recorrido_id' => $item->id,
-                        'estado' => $item->isTipoEstado() ? (rand(0, 5) > 0 ? '√' : 'PPP') : null,
-                        'valor_numerico' => $item->isTipoNumero() ? rand(100, 999) : null,
-                        'valor_texto' => $item->isTipoTexto() ? rand(100, 999) : null,
-                        'observaciones' => rand(0, 10) > 8 ? 'Todo bien' : null,
-                    ]);
-                }
-            }
-        }
+        //         foreach ($items as $item) {
+        //             ValorRecorrido::create([
+        //                 'log_recorrido_id' => $log->id,
+        //                 'item_recorrido_id' => $item->id,
+        //                 'estado' => $item->isTipoEstado() ? (rand(0, 5) > 0 ? '√' : 'PPP') : null,
+        //                 'valor_numerico' => $item->isTipoNumero() ? rand(100, 999) : null,
+        //                 'valor_texto' => $item->isTipoTexto() ? rand(100, 999) : null,
+        //                 'observaciones' => rand(0, 10) > 8 ? 'Todo bien' : null,
+        //             ]);
+        //         }
+        //     }
+        // }
     }
 }
