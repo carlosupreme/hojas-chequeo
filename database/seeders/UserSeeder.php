@@ -35,55 +35,35 @@ class UserSeeder extends Seeder
 
         $turnos = [$turnoTintoreria->id, $turnoLavanderia->id];
 
-        $perfil = Perfil::create([
-            'nombre' => 'Administrador',
-            'hoja_ids' => [],
-            'acceso_total' => true,
-        ]);
+        $perfil = Perfil::firstOrCreate(
+            [
+                'nombre' => 'Administrador',
+            ],
+            [
+                'hoja_ids' => [],
+                'acceso_total' => true,
+            ]
+        );
 
         $adminRole = Role::create(['name' => 'Administrador']);
-        $operadorRole = Role::create(['name' => 'Operador']);
-        $supervisorRole = Role::create(['name' => 'Supervisor']);
+        Role::create(['name' => 'Operador']);
+        Role::create(['name' => 'Supervisor']);
 
-        $canEditDatePermission = Permission::create(['name' => 'chequeos.edit.date']);
+        $canEditDatePermission = Permission::create(['name' => User::$canEditDatesPermission]);
 
-        $user = User::create([
-            'name' => 'Administrador',
-            'password' => bcrypt('password'),
-            'email' => 'admin@admin.com',
-            'perfil_id' => $perfil->id,
-            'turno_id' => $turnos[array_rand($turnos)],
-        ]);
+        $user = User::firstOrCreate(
+            [
+                'email' => 'admin@admin.com',
+            ],
+            [
+                'name' => 'Administrador',
+                'password' => bcrypt('password'),
+                'perfil_id' => $perfil->id,
+                'turno_id' => $turnos[array_rand($turnos)],
+            ]
+        );
 
         $user->assignRole($adminRole);
         $user->givePermissionTo($canEditDatePermission->name);
-
-        $operador = User::create([
-            'name' => 'Operador',
-            'password' => bcrypt('password'),
-            'email' => 'operador@admin.com',
-            'perfil_id' => $perfil->id,
-            'turno_id' => $turnos[array_rand($turnos)],
-        ]);
-
-        foreach (range(1, 20) as $i) {
-            $user = User::factory()->create([
-                'perfil_id' => $perfil->id,
-                'turno_id' => $turnos[array_rand($turnos)],
-            ]);
-            $user->assignRole($operadorRole);
-        }
-
-        $operador->assignRole($operadorRole);
-
-        $supervisor = User::create([
-            'name' => 'supervisor',
-            'password' => bcrypt('password'),
-            'email' => 'supervisor@admin.com',
-            'perfil_id' => $perfil->id,
-            'turno_id' => $turnos[array_rand($turnos)],
-        ]);
-
-        $supervisor->assignRole($supervisorRole);
     }
 }

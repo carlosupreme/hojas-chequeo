@@ -5,9 +5,9 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
-class ImportEquipos extends Command
+class ImportPerfils extends Command
 {
-    protected $signature = 'import:equipos
+    protected $signature = 'import:perfils
         {--host=127.0.0.1 : MySQL v1 host}
         {--port=3306 : MySQL v1 port}
         {--database= : MySQL v1 database name (required)}
@@ -15,7 +15,7 @@ class ImportEquipos extends Command
         {--password= : MySQL v1 password}
         {--dry-run : Preview records without saving}';
 
-    protected $description = 'Import equipos from v1 MySQL into v2 PostgreSQL';
+    protected $description = 'Import perfils from v1 MySQL into v2 PostgreSQL';
 
     public function handle(): int
     {
@@ -25,7 +25,6 @@ class ImportEquipos extends Command
             return self::FAILURE;
         }
 
-        // Register a dynamic MySQL connection from the CLI options
         config()->set('database.connections.mysql_v1', [
             'driver' => 'mysql',
             'host' => $this->option('host'),
@@ -44,19 +43,19 @@ class ImportEquipos extends Command
         $this->info('Connecting to MySQL v1...');
 
         try {
-            $rows = DB::connection('mysql_v1')->table('equipos')->get();
+            $rows = DB::connection('mysql_v1')->table('perfils')->get();
         } catch (\Exception $e) {
             $this->error('Connection failed: '.$e->getMessage());
 
             return self::FAILURE;
         }
 
-        $this->info("Found {$rows->count()} equipos in v1.");
+        $this->info("Found {$rows->count()} perfils in v1.");
 
         if ($this->option('dry-run')) {
             $this->table(
-                ['v1 id', 'tag', 'nombre', 'area', 'numeroControl', 'revision'],
-                $rows->map(fn ($r) => [$r->id, $r->tag, $r->nombre, $r->area, $r->numeroControl ?? '-', $r->revision ?? '-'])
+                ['v1 id', 'name', 'hoja_ids'],
+                $rows->map(fn ($r) => [$r->id, $r->name, $r->hoja_ids])
             );
 
             return self::SUCCESS;
@@ -68,21 +67,24 @@ class ImportEquipos extends Command
         $imported = 0;
 
         foreach ($rows as $row) {
-            // Use DB::table() to bypass Eloquent guards and preserve id + timestamps
-            DB::table('equipos')->upsert(
+            // Normalize hoja_ids: v1 can have mixed int/string values like [33,"3","35"]
+            $hojaIds = collect(json_decode($row->hoja_ids, true) ?? [])
+                ->map(fn ($id) => (int) $id)
+                ->unique()
+                ->values()
+                ->toArray();
+
+            DB::table('perfils')->upsert(
                 [
                     'id' => $row->id,
-                    'nombre' => $row->nombre,
-                    'tag' => $row->tag,
-                    'area' => $row->area,
-                    'foto' => $row->foto ?? null,
-                    'numeroControl' => $row->numeroControl ?? null,
-                    'revision' => $row->revision ?? null,
+                    'nombre' => $row->name,  // v1: name → v2: nombre
+                    'hoja_ids' => json_encode($hojaIds),
+                    'acceso_total' => false,        // forced per migration spec
                     'created_at' => $row->created_at,
                     'updated_at' => $row->updated_at,
                 ],
-                ['id'],   // conflict key
-                ['nombre', 'tag', 'area', 'foto', 'numeroControl', 'revision', 'updated_at']
+                ['id'],
+                ['nombre', 'hoja_ids', 'acceso_total', 'updated_at']
             );
 
             $bar->advance();
@@ -92,11 +94,10 @@ class ImportEquipos extends Command
         $bar->finish();
         $this->newLine();
 
-        // Reset the Postgres sequence so new inserts don't collide with imported IDs
-        DB::statement("SELECT setval('equipos_id_seq', (SELECT MAX(id) FROM equipos))");
+        DB::statement("SELECT setval('perfils_id_seq', (SELECT MAX(id) FROM perfils))");
         $this->line('  Postgres sequence reset.');
 
-        $this->info("Done. Imported/updated: {$imported} equipos.");
+        $this->info("Done. Imported/updated: {$imported} perfils.");
 
         return self::SUCCESS;
     }

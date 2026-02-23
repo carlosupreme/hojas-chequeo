@@ -96,9 +96,10 @@ class DatabaseSeeder extends Seeder
             'color' => 'gray',
         ]);
 
-        $equipo = Equipo::create([
-            'nombre' => 'Caldera 1',
+        $equipo = Equipo::createOrFirst([
             'tag' => 'CM-CAL-01',
+        ], [
+            'nombre' => 'Caldera 1',
             'area' => 'Cuarto de maquinas',
         ]);
 
