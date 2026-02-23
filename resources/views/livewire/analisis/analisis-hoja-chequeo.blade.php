@@ -190,33 +190,65 @@
                         <div class="{{ $barColor }} h-2.5 rounded-full transition-all duration-500" style="width: {{ min($pct, 100) }}%"></div>
                     </div>
 
-                    {{-- Turnos breakdown --}}
-                    @if(count($cc['turnos']) > 0)
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
-                            @foreach($cc['turnos'] as $turno)
-                                @php
-                                    $tPct = $turno['percentage'];
-                                    $tColor = $tPct >= 90 ? 'border-green-200 dark:border-green-800' : ($tPct >= 70 ? 'border-yellow-200 dark:border-yellow-800' : 'border-red-200 dark:border-red-800');
-                                    $tBg = $tPct >= 90 ? 'bg-green-50 dark:bg-green-950/30' : ($tPct >= 70 ? 'bg-yellow-50 dark:bg-yellow-950/30' : 'bg-red-50 dark:bg-red-950/30');
-                                    $tBarColor = $tPct >= 90 ? 'bg-green-500' : ($tPct >= 70 ? 'bg-yellow-500' : 'bg-red-500');
-                                    $tTextColor = $tPct >= 90 ? 'text-green-700 dark:text-green-400' : ($tPct >= 70 ? 'text-yellow-700 dark:text-yellow-400' : 'text-red-700 dark:text-red-400');
-                                @endphp
-                                <div class="{{ $tBg }} {{ $tColor }} border rounded-lg p-3 space-y-2">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ $turno['turno'] }}</span>
-                                        <span class="text-sm font-bold {{ $tTextColor }}">{{ $tPct }}%</span>
-                                    </div>
-                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
-                                        <div class="{{ $tBarColor }} h-1.5 rounded-full transition-all duration-500" style="width: {{ min($tPct, 100) }}%"></div>
-                                    </div>
-                                    <div class="flex justify-between text-[11px] text-gray-500 dark:text-gray-400">
-                                        <span>{{ $turno['actual'] }} / {{ $turno['expected'] }} ejecuciones</span>
-                                        <span>{{ $turno['equipos'] }} eq. × {{ $turno['working_days'] }} días</span>
-                                    </div>
+                    {{-- Detailed Equipo Tables per Turno (like the spreadsheet image) --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">
+                        @foreach($cc['turnos'] as $turno)
+                            @php
+                                $tPct = $turno['percentage'];
+                                $headerBg = $tPct >= 90 ? 'bg-green-600' : ($tPct >= 70 ? 'bg-yellow-500' : 'bg-red-500');
+                            @endphp
+                            <div class="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                                {{-- Turno header --}}
+                                <div class="{{ $headerBg }} px-4 py-3 text-white">
+                                    <h5 class="font-bold text-sm uppercase tracking-wide">{{ $turno['turno'] }}</h5>
+                                    <p class="text-xs opacity-90">Días de operación: {{ $turno['working_days'] }}</p>
                                 </div>
-                            @endforeach
-                        </div>
-                    @endif
+
+                                {{-- Equipo table --}}
+                                <table class="w-full text-sm">
+                                    <thead>
+                                        <tr class="bg-gray-50 dark:bg-gray-800">
+                                            <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 dark:text-gray-400">Equipo</th>
+                                            <th class="px-4 py-2 text-right text-xs font-semibold text-gray-600 dark:text-gray-400">Días revisados</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                                        @foreach($turno['equipos_detail'] as $eq)
+                                            @php
+                                                $eqPct = $turno['working_days'] > 0 ? ($eq['dias_revisados'] / $turno['working_days']) * 100 : 0;
+                                                $eqColor = $eqPct >= 90 ? 'text-green-700 dark:text-green-400' : ($eqPct >= 70 ? 'text-yellow-700 dark:text-yellow-400' : 'text-red-700 dark:text-red-400');
+                                                $eqBgBar = $eqPct >= 90 ? 'bg-green-100 dark:bg-green-900/20' : ($eqPct >= 70 ? 'bg-yellow-100 dark:bg-yellow-900/20' : 'bg-red-100 dark:bg-red-900/20');
+                                            @endphp
+                                            <tr class="bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                                <td class="px-4 py-2">
+                                                    <span class="font-mono text-xs text-gray-700 dark:text-gray-300">{{ $eq['tag'] }}</span>
+                                                </td>
+                                                <td class="px-4 py-2 text-right">
+                                                    <div class="flex items-center justify-end gap-2">
+                                                        <div class="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 hidden sm:block">
+                                                            <div class="{{ $eqPct >= 90 ? 'bg-green-500' : ($eqPct >= 70 ? 'bg-yellow-500' : 'bg-red-500') }} h-1.5 rounded-full" style="width: {{ min($eqPct, 100) }}%"></div>
+                                                        </div>
+                                                        <span class="font-semibold {{ $eqColor }} tabular-nums">{{ $eq['dias_revisados'] }}</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+                                            <td class="px-4 py-2 text-xs font-bold text-gray-700 dark:text-gray-300">Cumplimiento</td>
+                                            <td class="px-4 py-2 text-right">
+                                                @php
+                                                    $footColor = $tPct >= 90 ? 'text-green-600 dark:text-green-400' : ($tPct >= 70 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400');
+                                                @endphp
+                                                <span class="font-bold {{ $footColor }}">{{ $tPct }}%</span>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
 
                 @if(! $loop->last)

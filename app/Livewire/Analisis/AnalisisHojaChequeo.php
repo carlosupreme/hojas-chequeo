@@ -127,6 +127,41 @@ class AnalisisHojaChequeo extends Component
                 $totalExpected += $expected;
                 $totalActual += $actual;
 
+                // Per-equipo breakdown: count distinct days with a finished ejecución
+                $equiposBreakdown = [];
+                foreach ($turno->equipos as $equipo) {
+                    $hojaChequeoIds = $equipo->hojaChequeos()->pluck('id');
+
+                    if ($hojaChequeoIds->isEmpty()) {
+                        $equiposBreakdown[] = [
+                            'tag' => $equipo->tag,
+                            'nombre' => $equipo->nombre,
+                            'dias_revisados' => 0,
+                        ];
+
+                        continue;
+                    }
+
+                    $ejecQuery = HojaEjecucion::whereIn('hoja_chequeo_id', $hojaChequeoIds)
+                        ->where('turno_id', $turno->id)
+                        ->whereNotNull('finalizado_en')
+                        ->whereBetween('finalizado_en', [$startDate, $endDate]);
+
+                    if ($this->hojaChequeoId) {
+                        $ejecQuery->where('hoja_chequeo_id', $this->hojaChequeoId);
+                    }
+
+                    $diasRevisados = (clone $ejecQuery)
+                        ->selectRaw('COUNT(DISTINCT DATE(finalizado_en)) as total')
+                        ->value('total') ?? 0;
+
+                    $equiposBreakdown[] = [
+                        'tag' => $equipo->tag,
+                        'nombre' => $equipo->nombre,
+                        'dias_revisados' => $diasRevisados,
+                    ];
+                }
+
                 $turnosBreakdown[] = [
                     'turno' => $turno->nombre,
                     'equipos' => $equiposCount,
@@ -134,6 +169,7 @@ class AnalisisHojaChequeo extends Component
                     'expected' => $expected,
                     'actual' => $actual,
                     'percentage' => $expected > 0 ? round(($actual / $expected) * 100, 1) : 0,
+                    'equipos_detail' => $equiposBreakdown,
                 ];
             }
 
