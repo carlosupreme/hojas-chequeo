@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Turnos;
 
 use App\Filament\Resources\Turnos\Pages\ManageTurnos;
+use App\Models\Equipo;
 use App\Models\Turno;
 use BackedEnum;
 use Filament\Actions\ActionGroup;
@@ -15,7 +16,7 @@ use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
-use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -102,16 +103,18 @@ class TurnoResource extends Resource
                                 ]),
                         ]),
 
-                    Step::make('Estado')->visibleOn('edit')
-                        ->description('Activa o desactiva el turno en el sistema')
-                        ->icon('heroicon-o-power')
+                    Step::make('Equipos')
+                        ->icon('heroicon-o-wrench-screwdriver')
                         ->schema([
-                            Toggle::make('activo')
-                                ->label('Turno Activo')
-                                ->visibleOn('edit')
-                                ->helperText('Desactivar si el turno no está en uso')
-                                ->default(true)
-                                ->required(),
+                            Select::make('equipos')
+                                ->label('Equipos requeridos')
+                                ->relationship('equipos', 'nombre')
+                                ->multiple()
+                                ->preload()
+                                ->searchable()
+                                ->getOptionLabelFromRecordUsing(fn (Equipo $record) => "{$record->tag} — {$record->nombre}")
+                                ->placeholder('Seleccionar equipos...')
+                                ->columnSpanFull(),
                         ]),
                 ])
                     ->skippable()
@@ -138,6 +141,24 @@ class TurnoResource extends Resource
                             ->color('primary'),
                     ])
                     ->columnSpanFull(),
+
+                Section::make('Equipos Requeridos')
+                    ->icon('heroicon-o-wrench-screwdriver')
+                    ->columnSpanFull()
+                    ->schema([
+                        RepeatableEntry::make('equipos')
+                            ->label('')
+                            ->schema([
+                                TextEntry::make('tag')
+                                    ->label('TAG')
+                                    ->badge()
+                                    ->color('gray'),
+                                TextEntry::make('nombre')
+                                    ->label('Nombre'),
+                            ])
+                            ->columns(2)
+                            ->columnSpanFull(),
+                    ]),
 
                 Section::make('Programación')
                     ->icon('heroicon-o-clock')

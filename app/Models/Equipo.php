@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Equipo extends Model
@@ -41,5 +42,10 @@ class Equipo extends Model
     public function reportes(): HasMany
     {
         return $this->hasMany(Reporte::class);
+    }
+
+    public function turnos(): BelongsToMany
+    {
+        return $this->belongsToMany(Turno::class);
     }
 }
