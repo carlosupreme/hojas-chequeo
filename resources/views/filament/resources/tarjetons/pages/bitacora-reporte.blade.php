@@ -117,6 +117,20 @@
                                         </td>
                                     </tr>
                                 @endif
+                                @if($registro->falla_vapor)
+                                    <tr>
+                                        <td colspan="5"
+                                            class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-sm text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/20">
+                                            <div class="flex items-start gap-2">
+                                                <x-heroicon-s-fire class="w-4 h-4 mt-0.5 flex-shrink-0 text-red-500"/>
+                                                <div>
+                                                    <strong>Falla de vapor:</strong>
+                                                    {{ $registro->falla_vapor_descripcion ?? 'Sin descripción registrada' }}
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endif
                             @endforeach
                             </tbody>
                         </table>
@@ -124,7 +138,7 @@
 
                     {{-- Resumen estadístico --}}
                     <div
-                        class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+                        class="mt-6 grid grid-cols-1 md:grid-cols-5 gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
                         <x-filament::card>
                             <div class="text-center">
                                 <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
@@ -175,6 +189,18 @@
                                 </div>
                                 <div class="text-sm text-gray-500 dark:text-gray-400">
                                     Promedio Diario
+                                </div>
+                            </div>
+                        </x-filament::card>
+
+                        <x-filament::card>
+                            <div class="text-center">
+                                @php $fallasCount = $registros->where('falla_vapor', true)->count(); @endphp
+                                <div class="text-2xl font-bold {{ $fallasCount > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-400 dark:text-gray-500' }}">
+                                    {{ $fallasCount }}
+                                </div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                    Fallas de Vapor
                                 </div>
                             </div>
                         </x-filament::card>

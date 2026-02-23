@@ -27,7 +27,7 @@ class BitacoraReporte extends Page
 
     public ?array $data = [];
 
-    public $registros = [];
+    public $registros;
 
     public $equipo = null;
 
