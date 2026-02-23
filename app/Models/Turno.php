@@ -3,16 +3,29 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Turno extends Model
 {
-    protected $fillable = ['nombre', 'dias', 'hora_inicio', 'hora_final', 'activo'];
+    protected $fillable = [
+        'centro_costo_id',
+        'nombre',
+        'dias',
+        'hora_inicio',
+        'hora_final',
+        'activo',
+    ];
 
     protected $casts = [
         'dias' => 'array',
         'activo' => 'boolean',
     ];
+
+    public function centroCosto(): BelongsTo
+    {
+        return $this->belongsTo(CentroCosto::class);
+    }
 
     public function users(): HasMany
     {

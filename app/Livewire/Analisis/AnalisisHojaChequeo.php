@@ -27,6 +27,7 @@ class AnalisisHojaChequeo extends Component
     {
         $this->startDate = $startDate ? Carbon::parse($startDate)->format('Y-m-d') : now()->subMonth()->format('Y-m-d');
         $this->endDate = $endDate ? Carbon::parse($endDate)->format('Y-m-d') : now()->format('Y-m-d');
+        $this->yearsSelected = Carbon::getYears($this->startDate, $this->endDate);
     }
 
     public function handleDateRangeUpdate($data)
@@ -203,7 +204,10 @@ class AnalisisHojaChequeo extends Component
                 ->whereBetween('finalizado_en', [
                     Carbon::parse($this->startDate)->startOfDay(),
                     Carbon::parse($this->endDate)->endOfDay(),
-                ]);
+                ])
+                ;
+
+                // if*$this->conDFiasFEstivos ->except(turno->diasFestivos->whereIn('year', $this->yearsSelected))
 
             // Filter by HojaChequeo if specified
             if ($this->hojaChequeoId) {
@@ -221,7 +225,7 @@ class AnalisisHojaChequeo extends Component
 
             // Total responses with answer_option_id (icon type answers)
             $totalResponses = HojaFilaRespuesta::whereIn('hoja_ejecucion_id', $ejecucionIds)
-                ->whereNotNull('answer_option_id')
+                ->whereNotNull('answer_option_id') // where hojaFila->answerType->is_icon
                 ->count();
 
             // Responses with answer_option_id = 1 (realizado/check)

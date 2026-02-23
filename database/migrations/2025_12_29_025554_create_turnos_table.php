@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\CentroCosto;
 use App\Models\Turno;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -12,8 +13,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('turnos', function (Blueprint $table) {
+        Schema::create('turnos', callback: function (Blueprint $table) {
             $table->id();
+            $table->foreignIdFor(model: CentroCosto::class)->constrained();
             $table->string('nombre')->unique();
             $table->json('dias');
             $table->time('hora_inicio')->nullable();
@@ -23,7 +25,7 @@ return new class extends Migration
         });
 
         Schema::table('users', function (Blueprint $table) {
-            $table->foreignIdFor(Turno::class)->constrained()->nullOnDelete();
+            $table->foreignIdFor(Turno::class)->nullable()->constrained()->nullOnDelete();
         });
     }
 

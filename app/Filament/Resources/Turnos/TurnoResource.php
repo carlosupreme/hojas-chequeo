@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Turnos;
 
 use App\Filament\Resources\Turnos\Pages\ManageTurnos;
+use App\Models\CentroCosto;
 use App\Models\Turno;
 use BackedEnum;
 use Filament\Actions\ActionGroup;
@@ -12,6 +13,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\Toggle;
@@ -40,6 +42,13 @@ class TurnoResource extends Resource
     {
         return $schema
             ->components([
+                Select::make('centro_costo_id')
+                    ->label('Centro de Costo')
+                    ->relationship('centroCosto', 'nombre')
+                    ->required()
+                    ->searchable()
+                    ->preload(),
+
                 TextInput::make('nombre')
                     ->label('Nombre del Turno')
                     ->required()
@@ -167,6 +176,8 @@ class TurnoResource extends Resource
         return $table
             ->recordTitleAttribute('nombre')
             ->columns([
+                TextColumn::make('centroCosto.nombre')->label('Centro de costo')
+                    ->searchable(),
                 TextColumn::make('nombre')->label('Turno')
                     ->searchable(),
                 TextColumn::make('hora_inicio')->label('Hora entrada')

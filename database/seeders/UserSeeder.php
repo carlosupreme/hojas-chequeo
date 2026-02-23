@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\CentroCosto;
 use App\Models\Perfil;
 use App\Models\Turno;
 use App\Models\User;
@@ -13,11 +14,15 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        $centroCostoTintoreria = CentroCosto::create(['nombre' => 'Tintoreria']);
+        $centroCostoLavanderia = CentroCosto::create(['nombre' => 'Lavanderia']);
+
         $turnoTintoreria = Turno::create([
             'nombre' => 'Tintoreria',
             'dias' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'],
             'hora_inicio' => '08:00:00',
             'hora_final' => '17:00:00',
+            'centro_costo_id' => $centroCostoTintoreria->id,
         ]);
 
         $turnoLavanderia = Turno::create([
@@ -25,6 +30,7 @@ class UserSeeder extends Seeder
             'dias' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
             'hora_inicio' => '00:00:00',
             'hora_final' => '23:59:59',
+            'centro_costo_id' => $centroCostoLavanderia->id,
         ]);
 
         $turnos = [$turnoTintoreria->id, $turnoLavanderia->id];
