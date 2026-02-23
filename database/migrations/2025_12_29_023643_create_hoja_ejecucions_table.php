@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('nombre_operador')->nullable();
             $table->string('firma_operador')->nullable();
             $table->string('firma_supervisor')->nullable();
-            $table->string('observaciones')->nullable();
+            $table->longText('observaciones')->nullable();
             $table->timestamp('finalizado_en')->nullable()->index();
             $table->timestamps();
 

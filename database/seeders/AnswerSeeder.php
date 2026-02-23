@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\AnswerOption;
 use App\Models\AnswerType;
 use Illuminate\Database\Seeder;
 
@@ -12,7 +13,7 @@ class AnswerSeeder extends Seeder
      */
     public function run(): void
     {
-        AnswerType::create([
+        $iconType = AnswerType::create([
             'key' => 'icon_set',
             'label' => 'Estado visual',
             'behavior' => 'enum',
@@ -25,5 +26,38 @@ class AnswerSeeder extends Seeder
             'behavior' => 'numeric',
             'aggregable' => true,
         ]);
+
+        $realizado = AnswerOption::create([
+            'answer_type_id' => $iconType->id,
+            'key' => 'realizado',
+            'label' => 'REALIZADO Y ESTA BIEN',
+            'icon' => 'heroicon-o-check',
+            'color' => 'green',
+        ]);
+
+        $realizadoMal = AnswerOption::create([
+            'answer_type_id' => $iconType->id,
+            'key' => 'realizado_mal',
+            'label' => 'REALIZADO Y ESTA MAL',
+            'icon' => 'heroicon-o-x-mark',
+            'color' => 'red',
+        ]);
+
+        $noRealizado = AnswerOption::create([
+            'answer_type_id' => $iconType->id,
+            'key' => 'no_realizado',
+            'label' => 'NO REALIZADO',
+            'icon' => 'heroicon-o-no-symbol',
+            'color' => 'yellow',
+        ]);
+
+        $noAplica = AnswerOption::create([
+            'answer_type_id' => $iconType->id,
+            'key' => 'no_aplica',
+            'label' => 'NO APLICA',
+            'icon' => 'heroicon-o-minus-circle',
+            'color' => 'gray',
+        ]);
+
     }
 }

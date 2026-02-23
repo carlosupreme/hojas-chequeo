@@ -9,5 +9,6 @@ artisan import:equipos --database hojaschequeo --username carlos --password carl
 artisan import:tarjetons --database hojaschequeo --username carlos --password carlos1030 && \
 artisan import:reportes --database hojaschequeo --username carlos --password carlos1030 && \
 artisan db:seed --class=AnswerSeeder && \
-artisan import:hoja-chequeos --database hojaschequeo --username carlos --password carlos1030 \
+artisan import:hoja-chequeos --database hojaschequeo --username carlos --password carlos1030 && \
+artisan import:chequeos-diarios --database hojaschequeo --username carlos --password carlos1030 \
 ```
