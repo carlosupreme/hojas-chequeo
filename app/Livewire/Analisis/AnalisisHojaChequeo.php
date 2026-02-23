@@ -27,7 +27,6 @@ class AnalisisHojaChequeo extends Component
     {
         $this->startDate = $startDate ? Carbon::parse($startDate)->format('Y-m-d') : now()->subMonth()->format('Y-m-d');
         $this->endDate = $endDate ? Carbon::parse($endDate)->format('Y-m-d') : now()->format('Y-m-d');
-        $this->yearsSelected = Carbon::getYears($this->startDate, $this->endDate);
     }
 
     public function handleDateRangeUpdate($data)

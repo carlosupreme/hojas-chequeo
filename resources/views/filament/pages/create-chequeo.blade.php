@@ -1,22 +1,16 @@
 <x-filament-panels::page class="p-0! max-w-none!">
-    {{-- We use a full-width container to break out of default Filament padding if needed --}}
-
     @if($hojaChequeo && $this->hasItems())
         <div data-animate="chequeo-items" class="min-h-screen pb-20">
 
-            {{-- 1. STICKY HEADER BAR --}}
-            <div
-                class=" border-b border-gray-200 dark:border-gray-800 transition-all ">
+            <div class=" border-b border-gray-200 dark:border-gray-800 transition-all ">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
 
                         {{-- Left: Back & Title --}}
                         <div class="flex items-center gap-4">
-                            <button
-                                wire:click="resetState"
+                            <button wire:click="resetState"
                                 class="group flex items-center justify-center h-10 w-10 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                title="Volver al listado"
-                            >
+                                title="Volver al listado">
                                 @svg('heroicon-o-arrow-left', 'w-5 h-5 transform group-hover:-translate-x-0.5 transition-transform')
                             </button>
 
@@ -30,21 +24,21 @@
                                         {{ $this->hojaChequeo->equipo->tag }}
                                     </span>
                                 </div>
-                                <div
-                                    class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 font-medium">
+                                <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 font-medium">
                                     <span class="flex items-center gap-1">
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
                                         {{ $user->turno->nombre }}
                                     </span>
                                     @if($this->hojaEjecucion)
                                         <span class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
                                         <span class="text-amber-600 dark:text-amber-500 flex items-center gap-1">
-                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
-                                                 stroke="currentColor"><path stroke-linecap="round"
-                                                                             stroke-linejoin="round" stroke-width="2"
-                                                                             d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                            </svg>
                                             Reanudando
                                         </span>
                                     @endif
@@ -71,27 +65,29 @@
                         <h3 class="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                             </svg>
                             Items de Control
                         </h3>
 
                         {{-- Live Saving Indicator (Moved here for better visibility) --}}
-                        <div
-                            x-data="{ saving: false, init() { window.addEventListener('chequeo-form-updated', () => { this.saving = true; setTimeout(() => this.saving = false, 1000); }) } }"
+                        <div x-data="{ saving: false, init() { window.addEventListener('chequeo-form-updated', () => { this.saving = true; setTimeout(() => this.saving = false, 1000); }) } }"
                             class="h-6">
                             <span x-show="saving" x-transition
-                                  class="text-xs font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1.5 animate-pulse">
-                                <svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24"><circle
-                                        class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                        stroke-width="4"></circle><path class="opacity-75" fill="currentColor"
-                                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                class="text-xs font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1.5 animate-pulse">
+                                <svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                    </path>
+                                </svg>
                                 Guardando...
                             </span>
                         </div>
                     </div>
 
-                    <livewire:chequeo-items :hoja="$hojaChequeo" :ejecucion="$hojaEjecucion"/>
+                    <livewire:chequeo-items :hoja="$hojaChequeo" :ejecucion="$hojaEjecucion" />
                 </div>
 
                 {{-- Section B: Finalization (Observations & Signature) --}}
@@ -102,10 +98,11 @@
                         <div class="lg:col-span-1 space-y-6 animate-in slide-in-from-left-4 duration-500">
                             <div
                                 class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-5 border border-amber-100 dark:border-amber-800/50 sticky top-24">
-                                <h4 class="text-sm font-bold text-amber-800 dark:text-amber-500 uppercase tracking-wide mb-3 flex items-center gap-2">
+                                <h4
+                                    class="text-sm font-bold text-amber-800 dark:text-amber-500 uppercase tracking-wide mb-3 flex items-center gap-2">
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                     Instrucciones
                                 </h4>
@@ -137,7 +134,7 @@
                                 <div class="hidden sm:block p-2 bg-gray-50 dark:bg-gray-800 rounded-lg text-gray-400">
                                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 </div>
                             @endif
@@ -153,36 +150,37 @@
 
                                 {{-- Status Message (Optional) --}}
                                 <div x-data="{ shown: false }"
-                                     x-init="@this.on('chequeo-saved', () => { shown = true; setTimeout(() => shown = false, 2000) })"
-                                     x-show="shown" x-transition
-                                     class="text-green-600 dark:text-green-400 text-sm font-medium flex items-center gap-1">
+                                    x-init="@this.on('chequeo-saved', () => { shown = true; setTimeout(() => shown = false, 2000) })"
+                                    x-show="shown" x-transition
+                                    class="text-green-600 dark:text-green-400 text-sm font-medium flex items-center gap-1">
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                              d="M5 13l4 4L19 7"/>
+                                            d="M5 13l4 4L19 7" />
                                     </svg>
                                     Guardado correctamente
                                 </div>
 
                                 {{ $this->reportAction }}
 
-                                <button type="submit"
-                                        wire:loading.attr="disabled"
-                                        class="w-full sm:w-auto inline-flex items-center justify-center rounded-lg bg-blue-600 px-8 py-3 text-sm font-semibold text-white shadow-md shadow-blue-500/20 hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-500/30 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-all hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none">
+                                <button type="submit" wire:loading.attr="disabled"
+                                    class="w-full sm:w-auto inline-flex items-center justify-center rounded-lg bg-blue-600 px-8 py-3 text-sm font-semibold text-white shadow-md shadow-blue-500/20 hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-500/30 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-all hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none">
 
-                                    {{-- Loading State --}}
                                     <span wire:loading class="flex items-center gap-2">
-                                        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle
-                                                class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                                stroke-width="4"></circle><path class="opacity-75" fill="currentColor"
-                                                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                                stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor"
+                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                            </path>
+                                        </svg>
                                         Procesando...
                                     </span>
 
-                                    {{-- Default State --}}
                                     <span wire:loading.remove class="flex items-center gap-2">
-                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path
-                                                stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                        </svg>
                                         Guardar
                                     </span>
                                 </button>
@@ -193,6 +191,6 @@
             </div>
         </div>
     @else
-        <livewire:select-hoja-chequeo/>
+        <livewire:select-hoja-chequeo />
     @endif
 </x-filament-panels::page>

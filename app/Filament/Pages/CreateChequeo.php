@@ -43,6 +43,7 @@ class CreateChequeo extends Page
 
     #[Url(as: 'h', except: null)]
     public null|string|int $hojaId = null;
+    public null|string|int $centroCostoId = null;
 
     public ?HojaChequeo $hojaChequeo = null;
 
@@ -74,16 +75,18 @@ class CreateChequeo extends Page
     }
 
     #[On('hojaChequeoSelected')]
-    public function setHojaChequeo(int $hojaId): void
+    public function setHojaChequeo(array $data): void
     {
-        $this->hojaId = $hojaId;
+        $this->hojaId = $data['id'];
+        $this->centroCostoId = $data['centro_costo'];
         $this->loadHojaChequeo();
     }
 
     #[On('hojaEjecucionSelected')]
-    public function setHojaEjecucion(int $ejecucionId): void
+    public function setHojaEjecucion(array $data): void
     {
-        $this->ejecucionId = $ejecucionId;
+        $this->ejecucionId = $data['id'];
+        $this->centroCostoId = $data['centro_costo'];
         $this->loadEjecucion();
     }
 
@@ -119,6 +122,7 @@ class CreateChequeo extends Page
     public function resetState(): void
     {
         $this->hojaId = null;
+        $this->centroCostoId = null;
         $this->hojaChequeo = null;
         $this->ejecucionId = null;
         $this->hojaEjecucion = null;
@@ -212,6 +216,7 @@ class CreateChequeo extends Page
             ...$this->form->getState(),
             'user_id' => $this->user->id,
             'turno_id' => $this->user->turno_id,
+            'centro_costo_id' => $this->centroCostoId,
             'created_at' => $this->dateSelected,
             'hoja_chequeo_id' => $this->hojaChequeo->id,
         ];

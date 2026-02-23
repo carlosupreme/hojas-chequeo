@@ -2,9 +2,6 @@
 
 <div
     class="relative flex flex-col h-[calc(100vh-1rem)] sm:h-[calc(100vh-2rem)] space-y-4 font-sans">
-
-    {{-- ✨ BEAUTIFUL LOADING OVERLAY ✨ --}}
-    {{-- This only shows when 'selectHojaChequeo' or 'selectHojaEjecucion' are running --}}
     <div
         wire:loading.delay
         wire:target="selectHojaChequeo, selectHojaEjecucion, loadMore"
@@ -12,15 +9,11 @@
     >
         <div class="flex flex-col items-center gap-3 p-4 rounded-2xl bg-white dark:bg-gray-800 shadow-xl border border-gray-100 dark:border-gray-700 transform scale-100 animate-in fade-in zoom-in-95 duration-200">
 
-            {{-- Modern Spinner --}}
             <div class="relative w-12 h-12">
-                {{-- Outer Ring --}}
                 <div class="absolute inset-0 rounded-full border-[3px] border-gray-100 dark:border-gray-700"></div>
-                {{-- Spinning Inner Ring --}}
                 <div class="absolute inset-0 rounded-full border-[3px] border-t-blue-600 border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
             </div>
 
-            {{-- Loading Text --}}
             <div class="flex flex-col items-center">
                 <span class="text-sm font-bold text-gray-900 dark:text-white tracking-wide">
                     Cargando equipo
@@ -46,7 +39,7 @@
                 </p>
             </div>
 
-            {{-- Turno Widget (Right Side) --}}
+            {{-- Centro de costo Widget --}}
             <div data-animate="turno-card"
                  class="w-full lg:w-auto bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-2 pr-4 flex items-center gap-3">
                 <div
@@ -56,17 +49,17 @@
                               d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
                     </svg>
                 </div>
-                <div>
-                    <div class="text-[10px] uppercase tracking-wider font-bold text-gray-400">Turno Actual</div>
-                    <div class="font-bold text-gray-900 dark:text-white leading-none">
-                        {{ $turno->nombre ?? 'General' }}
-                    </div>
+                <div class="z-99">
+                    <div class="text-[10px] uppercase tracking-wider font-bold text-gray-400">Centro de costo</div>
+                    {{ $this->form }}
+                    <x-filament-actions::modals />
                 </div>
                 <div
                     class="ml-auto text-xs font-medium text-gray-400 border-l border-gray-200 dark:border-gray-600 pl-3">
                     {{ now()->format('H:i') }}
                 </div>
             </div>
+
         </div>
     </div>
 

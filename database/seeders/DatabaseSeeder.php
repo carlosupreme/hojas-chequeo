@@ -183,6 +183,7 @@ class DatabaseSeeder extends Seeder
                     'hoja_chequeo_id' => $hoja->id,
                     'user_id' => $user->id,
                     'turno_id' => $turnoId,
+                    'centro_costo_id' => $user->centroCosto->id,
                     'nombre_operador' => $user->name,
                     'firma_operador' => 'firmas/firma.svg',
                     'firma_supervisor' => 'firmas/firma.svg',

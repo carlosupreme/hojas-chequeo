@@ -3,15 +3,24 @@
 namespace App\Livewire;
 
 use App\Area;
+use App\Models\CentroCosto;
 use App\Models\HojaChequeo;
 use App\Models\User;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
+use Filament\Schemas\Contracts\HasSchemas;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
-class SelectHojaChequeo extends Component
+class SelectHojaChequeo extends Component implements HasSchemas
 {
+    use InteractsWithSchemas;
+
+    public ?array $data = [];
+
     public string $search = '';
 
     public int $perPage = 12;
@@ -22,9 +31,24 @@ class SelectHojaChequeo extends Component
 
     protected $queryString = ['search' => ['except' => '']];
 
-    public function mount(): void
+    public function mount()
     {
-        // No heavy lifting here anymore to ensure filters apply dynamically
+        $this->form->fill([
+            'centro_costo' => Auth::user()->turno?->centro_costo_id,
+        ]);
+    }
+
+    public function form(Schema $schema): Schema
+    {
+        return $schema->components([
+            Select::make('centro_costo')
+                ->options(CentroCosto::query()->pluck(column: 'nombre', key: 'id'))
+                ->native(false)
+                ->preload()
+                ->live()
+                ->required()
+                ->hiddenLabel(),
+        ])->statePath('data');
     }
 
     public function toggleFilter(?string $filter = null): void
@@ -56,21 +80,24 @@ class SelectHojaChequeo extends Component
 
     public function selectHojaChequeo($id): void
     {
-        $this->dispatch('hojaChequeoSelected', $id);
+        $this->dispatch('hojaChequeoSelected', [
+            'id' => $id,
+            'centro_costo' => $this->data['centro_costo'],
+        ]);
     }
 
     public function selectHojaEjecucion($chequeoId): void
     {
-        // Assuming you need the Chequeo ID to continue
-        $this->dispatch('hojaEjecucionSelected', $chequeoId);
+        $this->dispatch('hojaEjecucionSelected', [
+            'id' => $chequeoId,
+            'centro_costo' => $this->data['centro_costo'],
+        ]);
     }
 
     public function render(): View
     {
         $user = Auth::user();
 
-        // 1. Shared Filter Logic (Closure)
-        // This ensures the exact same logic applies to all 3 lists
         $applyFilters = function (Builder $query) {
             $query->whereHas('hojaChequeo', function ($q) {
                 $q->inArea($this->activeFilter?->value)
@@ -78,14 +105,11 @@ class SelectHojaChequeo extends Component
             });
         };
 
-        // 2. Fetch Pending (Filtered)
         $chequeosPendientes = $user->chequeosPendientes()
             ->tap($applyFilters)
             ->with(['hojaChequeo.equipo'])
             ->get();
 
-        // 3. Fetch Completed Today (Filtered)
-        // We use the relation query but add our filters before getting results
         $chequeosCompletados = $user->chequeosCompletadosHoy()
             ->tap($applyFilters)
             ->with(['hojaChequeo.equipo'])
@@ -108,7 +132,6 @@ class SelectHojaChequeo extends Component
 
     protected function buildCacheKey(int $userId): string
     {
-        // Added userId to params to ensure purity if method is moved later
         $user = User::find($userId);
         $idsHash = md5(implode(',', $user->perfil->hoja_ids ?? []));
         $filter = $this->activeFilter?->value ?? 'all';
