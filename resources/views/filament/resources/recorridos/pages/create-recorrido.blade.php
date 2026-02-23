@@ -36,7 +36,9 @@
                             <h1 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate">
                                 {{ $formulario->nombre }}
                             </h1>
-                            <x-filament::badge color="warning">EDITANDO EXISTENTE</x-filament::badge>
+                            @if($this->recorrido)
+                                <x-filament::badge color="warning">EDITANDO EXISTENTE</x-filament::badge>
+                            @endif
                         </div>
 
                         <div class="shrink-0 text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400"
@@ -143,10 +145,22 @@
                                 </div>
                             </section>
                         @endforeach
+
+                        {{-- Entrega de Turno Section --}}
+                        <section class="bg-gray-50 dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
+                            <div class="px-4 py-3 sticky bg-indigo-100 dark:bg-indigo-900/30 border-b border-indigo-200 dark:border-indigo-800">
+                                <h2 class="text-sm font-semibold text-indigo-900 dark:text-indigo-100 uppercase tracking-wide">
+                                    Entrega de Turno
+                                </h2>
+                            </div>
+                            <div class="px-4 py-5 sm:px-6">
+                                {{ $this->entregaForm }}
+                            </div>
+                        </section>
                     </div>
                 </div>
 
-                {{-- Fixed Bottom Action --}}
+                {{-- Save Button --}}
                 <div class="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
                     <button
                         type="button"

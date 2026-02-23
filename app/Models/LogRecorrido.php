@@ -21,6 +21,10 @@ class LogRecorrido extends Model
         'firma_supervisor',
         'firmado_operador_at',
         'firmado_supervisor_at',
+        'equipos_funcionando',
+        'observaciones_equipos',
+        'servicios_funcionando',
+        'observaciones_servicios',
     ];
 
     protected $casts = [

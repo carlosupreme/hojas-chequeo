@@ -7,10 +7,12 @@ use App\Models\LogRecorrido;
 use App\Models\Turno;
 use App\Models\User;
 use App\Models\ValorRecorrido;
+use App\WithImageService;
 use BackedEnum;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Grid;
@@ -21,9 +23,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Url;
+use Saade\FilamentAutograph\Forms\Components\SignaturePad;
 
 class CreateRecorrido extends Page
 {
+    use WithImageService;
+
     protected string $view = 'filament.resources.recorridos.pages.create-recorrido';
 
     protected static string|null|BackedEnum $navigationIcon = Heroicon::OutlinedPencil;
@@ -57,6 +62,8 @@ class CreateRecorrido extends Page
     public User $user;
 
     public ?LogRecorrido $recorrido = null;
+
+    public array $entregaData = [];
 
     private const SESSION_KEY = 'recorrido_progress';
 
@@ -93,6 +100,19 @@ class CreateRecorrido extends Page
         $this->fecha = $this->recorrido->fecha;
         $this->turno_id = $this->recorrido->turno_id;
         $this->loadRespuestas();
+
+        $this->entregaData = [
+            'equipos_funcionando'     => $this->recorrido->equipos_funcionando,
+            'observaciones_equipos'   => $this->recorrido->observaciones_equipos,
+            'servicios_funcionando'   => $this->recorrido->servicios_funcionando,
+            'observaciones_servicios' => $this->recorrido->observaciones_servicios,
+            'firma_operador'          => $this->recorrido->firma_operador
+                ? $this->imageService()->getAsBase64($this->recorrido->firma_operador)
+                : null,
+            'firma_supervisor'        => $this->recorrido->firma_supervisor
+                ? $this->imageService()->getAsBase64($this->recorrido->firma_supervisor)
+                : null,
+        ];
     }
 
     public function form(Schema $schema): Schema
@@ -118,6 +138,44 @@ class CreateRecorrido extends Page
         ]);
     }
 
+    public function entregaForm(Schema $schema): Schema
+    {
+        return $schema
+            ->statePath('entregaData')
+            ->components([
+                Grid::make()
+                    ->columns(['default' => 1, 'md' => 2])
+                    ->schema([
+                        Textarea::make('equipos_funcionando')
+                            ->label('Equipos funcionando')
+                            ->rows(3),
+                        Textarea::make('observaciones_equipos')
+                            ->label('Observaciones equipos')
+                            ->rows(3),
+                        Textarea::make('servicios_funcionando')
+                            ->label('Servicios funcionando')
+                            ->rows(3),
+                        Textarea::make('observaciones_servicios')
+                            ->label('Observaciones servicios')
+                            ->rows(3),
+                    ]),
+                Grid::make()
+                    ->columns(['default' => 1, 'md' => 2])
+                    ->schema([
+                        SignaturePad::make('firma_operador')
+                            ->label('Firma Operador')
+                            ->penColor('blue')
+                            ->penColorOnDark('blue')
+                            ->live(),
+                        SignaturePad::make('firma_supervisor')
+                            ->label('Firma Supervisor')
+                            ->penColor('blue')
+                            ->penColorOnDark('blue')
+                            ->live(),
+                    ]),
+            ]);
+    }
+
     public function selectFormulario(int $id): void
     {
         $this->formularioId = $id;
@@ -130,6 +188,7 @@ class CreateRecorrido extends Page
         $this->formulario = null;
         $this->formularioId = null;
         $this->respuestas = [];
+        $this->entregaData = [];
 
         $this->clearSession();
         if (! is_null($this->backUrl)) {
@@ -140,14 +199,34 @@ class CreateRecorrido extends Page
     public function guardar(): void
     {
         $validated = $this->form->getState();
+        $entregaValidated = $this->entregaForm->getState();
 
         try {
             DB::beginTransaction();
 
+            if (! empty($entregaValidated['firma_operador'])) {
+                $entregaValidated['firma_operador'] = $this->imageService()
+                    ->storeBase64('firmas', $entregaValidated['firma_operador']);
+            } else {
+                unset($entregaValidated['firma_operador']);
+            }
+
+            if (! empty($entregaValidated['firma_supervisor'])) {
+                $entregaValidated['firma_supervisor'] = $this->imageService()
+                    ->storeBase64('firmas', $entregaValidated['firma_supervisor']);
+            } else {
+                unset($entregaValidated['firma_supervisor']);
+            }
+
             $log = $this->recorrido
-                ? tap($this->recorrido)->update([...$validated, 'fecha' => $this->fecha])
+                ? tap($this->recorrido)->update([
+                    ...$validated,
+                    ...$entregaValidated,
+                    'fecha' => $this->fecha,
+                ])
                 : LogRecorrido::create([
                     ...$validated,
+                    ...$entregaValidated,
                     'formulario_recorrido_id' => $this->formularioId,
                     'user_id' => $this->user->id,
                     'fecha' => $this->fecha,
