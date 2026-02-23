@@ -36,4 +36,9 @@ class Turno extends Model
     {
         return $this->hasMany(HojaEjecucion::class);
     }
+
+    public function offDays(): HasMany
+    {
+        return $this->hasMany(OffDay::class)->orderBy('fecha');
+    }
 }

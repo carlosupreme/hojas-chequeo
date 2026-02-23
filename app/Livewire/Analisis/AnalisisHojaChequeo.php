@@ -203,10 +203,9 @@ class AnalisisHojaChequeo extends Component
                 ->whereBetween('finalizado_en', [
                     Carbon::parse($this->startDate)->startOfDay(),
                     Carbon::parse($this->endDate)->endOfDay(),
-                ])
-                ;
+                ]);
 
-                // if*$this->conDFiasFEstivos ->except(turno->diasFestivos->whereIn('year', $this->yearsSelected))
+            // if*$this->conDFiasFEstivos ->except(turno->diasFestivos->whereIn('year', $this->yearsSelected))
 
             // Filter by HojaChequeo if specified
             if ($this->hojaChequeoId) {

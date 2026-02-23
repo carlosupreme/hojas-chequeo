@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Turnos;
 
 use App\Filament\Resources\Turnos\Pages\ManageTurnos;
-use App\Models\CentroCosto;
 use App\Models\Turno;
 use BackedEnum;
 use Filament\Actions\ActionGroup;
@@ -13,13 +12,19 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\Toggle;
-use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Wizard;
+use Filament\Schemas\Components\Wizard\Step;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
@@ -42,54 +47,105 @@ class TurnoResource extends Resource
     {
         return $schema
             ->components([
-                Select::make('centro_costo_id')
-                    ->label('Centro de Costo')
-                    ->relationship('centroCosto', 'nombre')
-                    ->required()
-                    ->searchable()
-                    ->preload(),
+                Wizard::make([
+                    Step::make('Información General')
+                        ->icon('heroicon-o-building-office')
+                        ->columns(2)
+                        ->schema([
+                            Select::make('centro_costo_id')
+                                ->label('Centro de Costo')
+                                ->relationship('centroCosto', 'nombre')
+                                ->required()
+                                ->searchable()
+                                ->preload(),
 
-                TextInput::make('nombre')
-                    ->label('Nombre del Turno')
-                    ->required()
-                    ->placeholder('Ej: Tintoreria')
-                    ->maxLength(255),
+                            TextInput::make('nombre')
+                                ->label('Nombre del Turno')
+                                ->required()
+                                ->placeholder('Ej: Tintorería Mañana')
+                                ->maxLength(255),
+                        ]),
 
-                CheckboxList::make('dias')
-                    ->label('Días de trabajo')
-                    ->required()
-                    ->options([
-                        'monday' => 'Lunes',
-                        'tuesday' => 'Martes',
-                        'wednesday' => 'Miércoles',
-                        'thursday' => 'Jueves',
-                        'friday' => 'Viernes',
-                        'saturday' => 'Sábado',
-                        'sunday' => 'Domingo',
-                    ])
-                    ->columns(3)
-                    ->gridDirection('row'),
+                    Step::make('Programación')
+                        ->icon('heroicon-o-clock')
+                        ->schema([
+                            CheckboxList::make('dias')
+                                ->label('Días de trabajo')
+                                ->required()
+                                ->options([
+                                    'monday' => 'Lunes',
+                                    'tuesday' => 'Martes',
+                                    'wednesday' => 'Miércoles',
+                                    'thursday' => 'Jueves',
+                                    'friday' => 'Viernes',
+                                    'saturday' => 'Sábado',
+                                    'sunday' => 'Domingo',
+                                ])
+                                ->columns(4)
+                                ->gridDirection('row')
+                                ->columnSpanFull(),
 
-                TimePicker::make('hora_inicio')
-                    ->label('Hora de Entrada')
-                    ->native(false)
-                    ->format('H:i')
-                    ->displayFormat('H:i')
-                    ->helperText('Hora en que inicia el turno'),
+                            Grid::make(2)
+                                ->schema([
+                                    TimePicker::make('hora_inicio')
+                                        ->label('Hora de Entrada')
+                                        ->native(false)
+                                        ->format('H:i')
+                                        ->displayFormat('H:i')
+                                        ->prefixIcon('heroicon-o-sun')
+                                        ->helperText('Hora en que inicia el turno'),
 
-                TimePicker::make('hora_final')
-                    ->label('Hora de Salida')
-                    ->native(false)
-                    ->format('H:i')
-                    ->displayFormat('H:i')
-                    ->after('hora_inicio')
-                    ->helperText('Hora en que termina el turno'),
+                                    TimePicker::make('hora_final')
+                                        ->label('Hora de Salida')
+                                        ->native(false)
+                                        ->format('H:i')
+                                        ->displayFormat('H:i')
+                                        ->prefixIcon('heroicon-o-moon')
+                                        ->helperText('Hora en que termina el turno'),
+                                ]),
+                        ]),
 
-                Toggle::make('activo')
-                    ->label('Turno Activo')->visibleOn('edit')
-                    ->helperText('Desactivar si el turno no está en uso')
-                    ->default(true)
-                    ->required(),
+                    Step::make('Días Festivos')
+                        ->icon('heroicon-o-calendar-days')
+                        ->schema([
+                            Repeater::make('offDays')
+                                ->relationship('offDays')
+                                ->label('Dias Festivos')
+                                ->schema([
+                                    DatePicker::make('fecha')
+                                        ->label('Fecha')
+                                        ->required()
+                                        ->native(false)
+                                        ->displayFormat('D d/m/Y')
+                                        ->format('Y-m-d')
+                                        ->prefixIcon('heroicon-o-calendar'),
+
+                                    TextInput::make('motivo')
+                                        ->label('Motivo (opcional)')
+                                        ->placeholder('Ej: Año Nuevo, Navidad...')
+                                        ->maxLength(100),
+                                ])
+                                ->addActionLabel('+ Agregar día festivo')
+                                ->reorderable(false)
+                                ->columns(2)
+                                ->defaultItems(0)
+                                ->columnSpanFull(),
+                        ]),
+
+                    Step::make('Estado')->visibleOn('edit')
+                        ->description('Activa o desactiva el turno en el sistema')
+                        ->icon('heroicon-o-power')
+                        ->schema([
+                            Toggle::make('activo')
+                                ->label('Turno Activo')
+                                ->visibleOn('edit')
+                                ->helperText('Desactivar si el turno no está en uso')
+                                ->default(true)
+                                ->required(),
+                        ]),
+                ])
+                    ->skippable()
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -97,77 +153,92 @@ class TurnoResource extends Resource
     {
         return $schema
             ->components([
-                TextEntry::make('nombre')
-                    ->label('Nombre del Turno')
-                    ->size('lg')
-                    ->weight('bold'),
+                Section::make('Información General')
+                    ->icon('heroicon-o-building-office')
+                    ->columns(2)
+                    ->schema([
+                        TextEntry::make('nombre')
+                            ->label('Nombre del Turno')
+                            ->size('lg')
+                            ->weight('bold'),
 
-                TextEntry::make('dias')
-                    ->label('Días de Trabajo')
-                    ->formatStateUsing(function ($state) {
-                        if (is_string($state)) {
-                            $days = explode(',', $state);
-                        } elseif (is_array($state)) {
-                            $days = $state;
-                        } else {
-                            return 'No especificado';
-                        }
+                        TextEntry::make('centroCosto.nombre')
+                            ->label('Centro de Costo')
+                            ->badge()
+                            ->color('primary'),
+                    ])
+                    ->columnSpanFull(),
 
-                        $dayMap = [
-                            'monday' => 'Lunes',
-                            'tuesday' => 'Martes',
-                            'wednesday' => 'Miércoles',
-                            'thursday' => 'Jueves',
-                            'friday' => 'Viernes',
-                            'saturday' => 'Sábado',
-                            'sunday' => 'Domingo',
-                        ];
-
-                        $dayNames = collect($days)
-                            ->map(fn ($day) => trim($day))
-                            ->map(fn ($day) => $dayMap[$day] ?? ucfirst($day))
-                            ->filter()
-                            ->join(', ');
-
-                        return $dayNames ?: 'No especificado';
-                    })
-                    ->badge()
-                    ->separator(),
-
-                TextEntry::make('hora_inicio')
-                    ->label('Hora de Entrada')
-                    ->time('H:i')
-                    ->placeholder('No especificada')
+                Section::make('Programación')
                     ->icon('heroicon-o-clock')
-                    ->color('success'),
+                    ->columns(2)->columnSpanFull()
+                    ->schema([
+                        TextEntry::make('dias')
+                            ->label('Días de Trabajo')
+                            ->formatStateUsing(function ($state) {
+                                if (is_string($state)) {
+                                    $days = explode(',', $state);
+                                } elseif (is_array($state)) {
+                                    $days = $state;
+                                } else {
+                                    return 'No especificado';
+                                }
 
-                TextEntry::make('hora_final')
-                    ->label('Hora de Salida')
-                    ->time('H:i')
-                    ->placeholder('No especificada')
-                    ->icon('heroicon-o-clock')
-                    ->color('danger'),
+                                $dayMap = [
+                                    'monday' => 'Lunes',
+                                    'tuesday' => 'Martes',
+                                    'wednesday' => 'Miércoles',
+                                    'thursday' => 'Jueves',
+                                    'friday' => 'Viernes',
+                                    'saturday' => 'Sábado',
+                                    'sunday' => 'Domingo',
+                                ];
 
-                IconEntry::make('activo')
-                    ->label('Estado')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-check-circle')
-                    ->falseIcon('heroicon-o-x-circle')
-                    ->trueColor('success')
-                    ->falseColor('danger'),
+                                return collect($days)
+                                    ->map(fn ($day) => $dayMap[trim($day)] ?? ucfirst($day))
+                                    ->filter()
+                                    ->join(', ') ?: 'No especificado';
+                            })
+                            ->badge()
+                            ->separator()
+                            ->columnSpanFull(),
 
-                TextEntry::make('created_at')
-                    ->label('Fecha de Creación')
-                    ->dateTime('d/m/Y H:i')
-                    ->placeholder('No disponible')
-                    ->icon('heroicon-o-calendar'),
+                        TextEntry::make('hora_inicio')
+                            ->label('Hora de Entrada')
+                            ->time('H:i')
+                            ->placeholder('No especificada')
+                            ->icon('heroicon-o-sun')
+                            ->color('success'),
 
-                TextEntry::make('updated_at')
-                    ->label('Última Modificación')
-                    ->dateTime('d/m/Y H:i')
-                    ->placeholder('No disponible')
-                    ->icon('heroicon-o-calendar')
-                    ->since(),
+                        TextEntry::make('hora_final')
+                            ->label('Hora de Salida')
+                            ->time('H:i')
+                            ->placeholder('No especificada')
+                            ->icon('heroicon-o-moon')
+                            ->color('danger'),
+                    ]),
+
+                Section::make('Días Festivos')
+                    ->icon('heroicon-o-calendar-days')
+                    ->columnSpanFull()
+                    ->schema([
+                        RepeatableEntry::make('offDays')
+                            ->label('Dias Festivos')
+                            ->schema([
+                                TextEntry::make('fecha')
+                                    ->label('Fecha')
+                                    ->date('D d/m/Y')
+                                    ->icon('heroicon-o-calendar')
+                                    ->color('warning'),
+
+                                TextEntry::make('motivo')
+                                    ->label('Motivo')
+                                    ->placeholder('Sin motivo especificado')
+                                    ->icon('heroicon-o-tag'),
+                            ])
+                            ->columns(2)
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -205,13 +276,10 @@ class TurnoResource extends Resource
                         'sunday' => 'Dom',
                     ];
 
-                    $dayNames = collect($days)
-                        ->map(fn ($day) => trim($day))
-                        ->map(fn ($day) => $dayMap[$day] ?? ucfirst($day))
+                    return collect($days)
+                        ->map(fn ($day) => $dayMap[trim($day)] ?? ucfirst($day))
                         ->filter()
-                        ->join(', ');
-
-                    return $dayNames ?: 'No especificado';
+                        ->join(', ') ?: 'No especificado';
                 })->label('Días')->badge()->separator(),
             ])
             ->filters([
