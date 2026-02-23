@@ -15,6 +15,11 @@ class CentroCosto extends Model
         return $this->hasMany(Turno::class);
     }
 
+    public function offDays(): HasMany
+    {
+        return $this->hasMany(OffDay::class)->orderBy('fecha');
+    }
+
     public function users(): HasManyThrough
     {
         return $this->hasManyThrough(User::class, Turno::class);

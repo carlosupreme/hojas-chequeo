@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class OffDay extends Model
 {
     protected $fillable = [
-        'turno_id',
+        'centro_costo_id',
         'fecha',
         'motivo',
     ];
@@ -17,8 +17,8 @@ class OffDay extends Model
         'fecha' => 'date',
     ];
 
-    public function turno(): BelongsTo
+    public function centroCosto(): BelongsTo
     {
-        return $this->belongsTo(Turno::class);
+        return $this->belongsTo(CentroCosto::class);
     }
 }

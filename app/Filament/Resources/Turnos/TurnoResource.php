@@ -12,13 +12,10 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\Toggle;
-use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -105,33 +102,6 @@ class TurnoResource extends Resource
                                 ]),
                         ]),
 
-                    Step::make('Días Festivos')
-                        ->icon('heroicon-o-calendar-days')
-                        ->schema([
-                            Repeater::make('offDays')
-                                ->relationship('offDays')
-                                ->label('Dias Festivos')
-                                ->schema([
-                                    DatePicker::make('fecha')
-                                        ->label('Fecha')
-                                        ->required()
-                                        ->native(false)
-                                        ->displayFormat('D d/m/Y')
-                                        ->format('Y-m-d')
-                                        ->prefixIcon('heroicon-o-calendar'),
-
-                                    TextInput::make('motivo')
-                                        ->label('Motivo (opcional)')
-                                        ->placeholder('Ej: Año Nuevo, Navidad...')
-                                        ->maxLength(100),
-                                ])
-                                ->addActionLabel('+ Agregar día festivo')
-                                ->reorderable(false)
-                                ->columns(2)
-                                ->defaultItems(0)
-                                ->columnSpanFull(),
-                        ]),
-
                     Step::make('Estado')->visibleOn('edit')
                         ->description('Activa o desactiva el turno en el sistema')
                         ->icon('heroicon-o-power')
@@ -216,28 +186,6 @@ class TurnoResource extends Resource
                             ->placeholder('No especificada')
                             ->icon('heroicon-o-moon')
                             ->color('danger'),
-                    ]),
-
-                Section::make('Días Festivos')
-                    ->icon('heroicon-o-calendar-days')
-                    ->columnSpanFull()
-                    ->schema([
-                        RepeatableEntry::make('offDays')
-                            ->label('Dias Festivos')
-                            ->schema([
-                                TextEntry::make('fecha')
-                                    ->label('Fecha')
-                                    ->date('D d/m/Y')
-                                    ->icon('heroicon-o-calendar')
-                                    ->color('warning'),
-
-                                TextEntry::make('motivo')
-                                    ->label('Motivo')
-                                    ->placeholder('Sin motivo especificado')
-                                    ->icon('heroicon-o-tag'),
-                            ])
-                            ->columns(2)
-                            ->columnSpanFull(),
                     ]),
             ]);
     }
