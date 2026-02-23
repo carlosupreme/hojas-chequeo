@@ -8,6 +8,7 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/js/app.js',
+                'resources/js/alpine.js',
                 'resources/css/filament/admin/theme.css',
                 'resources/css/filament/operador/theme.css',
                 'resources/css/filament/supervisor/theme.css',
