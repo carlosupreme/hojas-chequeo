@@ -30,7 +30,7 @@ class ChequeosTable
             })
             // 1. PERFORMANCE: Eager load relationships to fix N+1
             ->modifyQueryUsing(function (Builder $query) {
-                $query->with(['hojaChequeo.equipo', 'user', 'turno']);
+                $query->with(['hojaChequeo.equipo', 'user', 'centroCosto']);
 
                 // Role Logic
                 if (Auth::user()->hasRole(['Administrador', 'Supervisor'])) {
@@ -39,26 +39,17 @@ class ChequeosTable
 
                 return $query->where('user_id', Auth::id())->orderByDesc('created_at');
             })
-            // 2. QUICK FILTERS (Tabs at top)
-            ->filtersTriggerAction(fn ($action) => $action->button()->label('Filtros Avanzados'))
+            // 2. FILTERS: CentroCosto handled by tabs; status + area + dates in a clean modal
+            ->filtersTriggerAction(
+                fn ($action) => $action
+                    ->button()
+                    ->label('Filtros')
+                    ->icon('heroicon-m-funnel')
+            )
             ->filters([
-                // Filter by Area (Crucial for Supervisors)
-                SelectFilter::make('area')
-                    ->label('Área')
-                    ->options(fn () => Equipo::distinct()->pluck('area', 'area')->toArray())
-                    ->query(fn (Builder $query, array $data) => $query->when(
-                        $data['value'],
-                        fn ($q) => $q->whereHas('hojaChequeo.equipo', fn ($eq) => $eq->where('area', $data['value']))
-                    )),
-
-                // Filter by Shift
-                SelectFilter::make('turno')
-                    ->relationship('turno', 'nombre')
-                    ->label('Turno'),
-
-                // Filter by Status (Classic)
                 SelectFilter::make('status')
                     ->label('Estado')
+                    ->placeholder('Todos')
                     ->options([
                         'pending' => 'En Proceso',
                         'finished' => 'Finalizado',
@@ -68,19 +59,28 @@ class ChequeosTable
                         ->when($data['value'] === 'finished', fn ($q) => $q->whereNotNull('finalizado_en'))
                     ),
 
-                // Date Range
+                SelectFilter::make('area')
+                    ->label('Área')
+                    ->placeholder('Todas')
+                    ->options(fn () => Equipo::distinct()->pluck('area', 'area')->toArray())
+                    ->query(fn (Builder $query, array $data) => $query->when(
+                        $data['value'],
+                        fn ($q) => $q->whereHas('hojaChequeo.equipo', fn ($eq) => $eq->where('area', $data['value']))
+                    )),
+
                 Filter::make('created_at')
                     ->label('Fecha de Ejecución')
                     ->schema([
-                        DatePicker::make('desde')->label('Desde'),
-                        DatePicker::make('hasta')->label('Hasta'),
+                        DatePicker::make('desde')->label('Desde')->native(false),
+                        DatePicker::make('hasta')->label('Hasta')->native(false),
                     ])
+                    ->columns(2)
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
                             ->when($data['desde'], fn ($q, $date) => $q->whereDate('created_at', '>=', $date))
                             ->when($data['hasta'], fn ($q, $date) => $q->whereDate('created_at', '<=', $date));
                     }),
-            ], layout: FiltersLayout::Modal) // Clean Modal layout for filters
+            ], layout: FiltersLayout::Modal)
             ->columns([
                 // COLUMN 5: DATE
                 TextColumn::make('created_at')
@@ -117,7 +117,7 @@ class ChequeosTable
                 // COLUMN 4: OPERATOR & SHIFT (Stacked)
                 TextColumn::make('nombre_operador')
                     ->label('Operador')
-                    ->description(fn (HojaEjecucion $record) => $record->turno->nombre ?? 'Sin turno')
+                    ->description(fn (HojaEjecucion $record) => $record->centroCosto->nombre ?? 'Sin centro de costo')
                     ->searchable()
                     ->icon('heroicon-m-user'),
                 // COLUMN 3: STATUS & DURATION

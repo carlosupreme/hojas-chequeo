@@ -4,7 +4,7 @@ namespace App\Filament\Resources\Chequeos\Pages;
 
 use App\Filament\Pages\CreateChequeo;
 use App\Filament\Resources\Chequeos\ChequeosResource;
-use App\Models\HojaEjecucion;
+use App\Models\CentroCosto;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -18,23 +18,18 @@ class ListChequeos extends ListRecords
 
     public function getTabs(): array
     {
-        return [
+        $tabs = [
             'all' => Tab::make('Todos')
                 ->icon('heroicon-m-list-bullet'),
-
-            'pending' => Tab::make('En Proceso')
-                ->icon('heroicon-m-clock')
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereNull('finalizado_en'))
-                ->badge(fn () => HojaEjecucion::whereNull('finalizado_en')->count())
-                ->badgeColor('warning'),
-
-            'today' => Tab::make('Finalizados Hoy')
-                ->icon('heroicon-m-check-circle')
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereNotNull('finalizado_en')->whereDate('finalizado_en', today())),
-
-            'week' => Tab::make('Esta Semana')
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereNotNull('finalizado_en')->whereBetween('finalizado_en', [now()->startOfWeek(), now()->endOfWeek()])),
         ];
+
+        foreach (CentroCosto::orderBy('nombre')->get() as $cc) {
+            $tabs['cc_'.$cc->id] = Tab::make($cc->nombre)
+                ->icon('heroicon-m-building-office')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('centro_costo_id', $cc->id));
+        }
+
+        return $tabs;
     }
 
     protected function getHeaderActions(): array
