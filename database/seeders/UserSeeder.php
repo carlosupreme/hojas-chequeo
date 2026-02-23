@@ -16,24 +16,48 @@ class UserSeeder extends Seeder
     {
         $centroCostoTintoreria = CentroCosto::create(['nombre' => 'Tintoreria']);
         $centroCostoLavanderia = CentroCosto::create(['nombre' => 'Lavanderia']);
+        $centroCostoMantenimiento = CentroCosto::create(['nombre' => 'Mantenimiento']);
 
         $turnoTintoreria = Turno::create([
             'nombre' => 'Tintoreria',
             'dias' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'],
-            'hora_inicio' => '08:00:00',
-            'hora_final' => '17:00:00',
+            'hora_inicio' => '06:00:00',
+            'hora_final' => '14:00:00',
             'centro_costo_id' => $centroCostoTintoreria->id,
         ]);
+
+        $turnoTintoreria->equipos()->sync([20, 21, 22, 24, 23, 25, 26, 27, 28, 29, 30, 31, 11, 10, 12, 13, 14, 15, 16, 17, 18, 19]);
 
         $turnoLavanderia = Turno::create([
             'nombre' => 'Lavanderia',
             'dias' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
-            'hora_inicio' => '00:00:00',
-            'hora_final' => '23:59:59',
+            'hora_inicio' => '14:00:00',
+            'hora_final' => '22:00:00',
             'centro_costo_id' => $centroCostoLavanderia->id,
         ]);
 
-        $turnos = [$turnoTintoreria->id, $turnoLavanderia->id];
+        $turnoLavanderia->equipos()->sync([20, 21, 22, 24, 23, 26, 27, 28, 29, 30, 31]);
+
+        $turnoLavanderiaL2 = Turno::create([
+            'centro_costo_id' => 1,
+            'nombre' => 'Lavenderia 2',
+            'dias' => ['monday', 'friday', 'saturday', 'tuesday', 'wednesday', 'sunday', 'thursday'],
+            'hora_inicio' => '22:00:00',
+            'hora_final' => '06:00:00',
+            'activo' => true,
+        ]);
+
+        $turnoLavanderiaL2->equipos()->sync([21, 20, 22, 24, 23, 26, 31, 30, 28, 29, 27, 33, 34, 12, 13, 14, 15, 16, 17, 18, 19, 3]);
+
+        $turnoMantenimiento = Turno::create([
+            'nombre' => 'Mantenimiento',
+            'dias' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'],
+            'hora_inicio' => '08:00:00',
+            'hora_final' => '17:00:00',
+            'centro_costo_id' => $centroCostoMantenimiento->id,
+        ]);
+
+        $turnoMantenimiento->equipos()->sync([2, 4, 5, 6, 7, 8, 9]);
 
         $perfil = Perfil::firstOrCreate(
             [
@@ -59,7 +83,7 @@ class UserSeeder extends Seeder
                 'name' => 'Administrador',
                 'password' => bcrypt('password'),
                 'perfil_id' => $perfil->id,
-                'turno_id' => $turnos[array_rand($turnos)],
+                'turno_id' => $turnoMantenimiento->id,
             ]
         );
 

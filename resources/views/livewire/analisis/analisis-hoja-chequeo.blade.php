@@ -149,6 +149,88 @@
         </div>
     </div>
 
+    {{-- CUMPLIMIENTO POR CENTRO DE COSTO --}}
+    <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <x-heroicon-o-building-office class="w-5 h-5 text-indigo-500" />
+                Cumplimiento de Chequeos por Centro de Costo
+            </h3>
+            <p class="text-sm text-gray-500 mt-1">Ejecuciones realizadas vs. esperadas (días laborales × equipos por turno)</p>
+        </div>
+
+        <div class="p-6 space-y-6">
+            @forelse($this->cumplimientoPorCentroCosto as $cc)
+                <div class="space-y-3">
+                    {{-- CC Header with global progress --}}
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <h4 class="text-base font-bold text-gray-900 dark:text-white">{{ $cc['centro_costo'] }}</h4>
+                        <div class="flex items-center gap-3">
+                            @if($cc['off_days_count'] > 0)
+                                <span class="text-xs text-gray-500 bg-gray-100 dark:bg-gray-800 dark:text-gray-400 px-2 py-1 rounded-full">
+                                    {{ $cc['off_days_count'] }} día(s) inhábil(es)
+                                </span>
+                            @endif
+                            <span class="text-sm font-semibold">
+                                <span class="text-gray-600 dark:text-gray-400">{{ $cc['total_actual'] }}</span>
+                                <span class="text-gray-400">/</span>
+                                <span class="text-gray-500">{{ $cc['total_expected'] }}</span>
+                            </span>
+                            @php
+                                $pct = $cc['percentage'];
+                                $pctColor = $pct >= 90 ? 'text-green-600 dark:text-green-400' : ($pct >= 70 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400');
+                                $barColor = $pct >= 90 ? 'bg-green-500' : ($pct >= 70 ? 'bg-yellow-500' : 'bg-red-500');
+                            @endphp
+                            <span class="text-lg font-bold {{ $pctColor }}">{{ $pct }}%</span>
+                        </div>
+                    </div>
+
+                    {{-- Global progress bar --}}
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                        <div class="{{ $barColor }} h-2.5 rounded-full transition-all duration-500" style="width: {{ min($pct, 100) }}%"></div>
+                    </div>
+
+                    {{-- Turnos breakdown --}}
+                    @if(count($cc['turnos']) > 0)
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
+                            @foreach($cc['turnos'] as $turno)
+                                @php
+                                    $tPct = $turno['percentage'];
+                                    $tColor = $tPct >= 90 ? 'border-green-200 dark:border-green-800' : ($tPct >= 70 ? 'border-yellow-200 dark:border-yellow-800' : 'border-red-200 dark:border-red-800');
+                                    $tBg = $tPct >= 90 ? 'bg-green-50 dark:bg-green-950/30' : ($tPct >= 70 ? 'bg-yellow-50 dark:bg-yellow-950/30' : 'bg-red-50 dark:bg-red-950/30');
+                                    $tBarColor = $tPct >= 90 ? 'bg-green-500' : ($tPct >= 70 ? 'bg-yellow-500' : 'bg-red-500');
+                                    $tTextColor = $tPct >= 90 ? 'text-green-700 dark:text-green-400' : ($tPct >= 70 ? 'text-yellow-700 dark:text-yellow-400' : 'text-red-700 dark:text-red-400');
+                                @endphp
+                                <div class="{{ $tBg }} {{ $tColor }} border rounded-lg p-3 space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ $turno['turno'] }}</span>
+                                        <span class="text-sm font-bold {{ $tTextColor }}">{{ $tPct }}%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                                        <div class="{{ $tBarColor }} h-1.5 rounded-full transition-all duration-500" style="width: {{ min($tPct, 100) }}%"></div>
+                                    </div>
+                                    <div class="flex justify-between text-[11px] text-gray-500 dark:text-gray-400">
+                                        <span>{{ $turno['actual'] }} / {{ $turno['expected'] }} ejecuciones</span>
+                                        <span>{{ $turno['equipos'] }} eq. × {{ $turno['working_days'] }} días</span>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+
+                @if(! $loop->last)
+                    <hr class="border-gray-200 dark:border-gray-700" />
+                @endif
+            @empty
+                <div class="text-center py-8 text-gray-500">
+                    <x-heroicon-o-building-office class="w-10 h-10 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
+                    <p>No hay centros de costo configurados.</p>
+                </div>
+            @endforelse
+        </div>
+    </div>
+
     {{-- CALDERAS SECTION --}}
     <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
         <div class="p-6 border-b border-gray-200 dark:border-gray-700">

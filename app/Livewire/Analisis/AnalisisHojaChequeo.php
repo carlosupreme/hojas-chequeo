@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Analisis;
 
+use App\Models\CentroCosto;
 use App\Models\Equipo;
 use App\Models\HojaChequeo;
 use App\Models\HojaEjecucion;
@@ -10,6 +11,7 @@ use App\Models\HojaFilaRespuesta;
 use App\Models\Tarjeton;
 use App\Models\Turno;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -53,6 +55,99 @@ class AnalisisHojaChequeo extends Component
     public function render()
     {
         return view('livewire.analisis.analisis-hoja-chequeo');
+    }
+
+    /**
+     * Cumplimiento de HojaEjecuciones por Centro de Costo.
+     *
+     * For each CentroCosto:
+     *   - Sum the expected ejecuciones across all its Turnos
+     *   - Expected per Turno = (scheduled working days in range - off days) × equipos count
+     *   - Actual = finished HojaEjecucion count in range for that turno
+     *   - % = actual / expected × 100
+     */
+    public function getCumplimientoPorCentroCostoProperty(): array
+    {
+        $startDate = Carbon::parse($this->startDate)->startOfDay();
+        $endDate = Carbon::parse($this->endDate)->endOfDay();
+
+        $centrosCosto = CentroCosto::with(['turnos.equipos', 'offDays'])->get();
+        $result = [];
+
+        foreach ($centrosCosto as $cc) {
+            // Off day dates for this CC in the range
+            $offDates = $cc->offDays
+                ->filter(fn ($od) => $od->fecha->between($startDate, $endDate))
+                ->map(fn ($od) => $od->fecha->format('Y-m-d'))
+                ->toArray();
+
+            $totalExpected = 0;
+            $totalActual = 0;
+            $turnosBreakdown = [];
+
+            foreach ($cc->turnos as $turno) {
+                if (! $turno->activo) {
+                    continue;
+                }
+
+                $scheduledDays = $turno->dias ?? []; // e.g. ['monday', 'tuesday', ...]
+                $equiposCount = $turno->equipos->count();
+
+                if ($equiposCount === 0 || empty($scheduledDays)) {
+                    continue;
+                }
+
+                // Count working days in range for this turno
+                $workingDays = 0;
+                $period = CarbonPeriod::create($startDate->copy()->startOfDay(), $endDate->copy()->startOfDay());
+
+                foreach ($period as $day) {
+                    $dayName = strtolower($day->englishDayOfWeek);
+                    $dateStr = $day->format('Y-m-d');
+
+                    // Day must be in turno schedule AND not an off day
+                    if (in_array($dayName, $scheduledDays) && ! in_array($dateStr, $offDates)) {
+                        $workingDays++;
+                    }
+                }
+
+                $expected = $workingDays * $equiposCount;
+
+                // Actual finished ejecuciones for this turno in range
+                $actualQuery = HojaEjecucion::where('turno_id', $turno->id)
+                    ->whereNotNull('finalizado_en')
+                    ->whereBetween('finalizado_en', [$startDate, $endDate]);
+
+                if ($this->hojaChequeoId) {
+                    $actualQuery->where('hoja_chequeo_id', $this->hojaChequeoId);
+                }
+
+                $actual = $actualQuery->count();
+
+                $totalExpected += $expected;
+                $totalActual += $actual;
+
+                $turnosBreakdown[] = [
+                    'turno' => $turno->nombre,
+                    'equipos' => $equiposCount,
+                    'working_days' => $workingDays,
+                    'expected' => $expected,
+                    'actual' => $actual,
+                    'percentage' => $expected > 0 ? round(($actual / $expected) * 100, 1) : 0,
+                ];
+            }
+
+            $result[] = [
+                'centro_costo' => $cc->nombre,
+                'total_expected' => $totalExpected,
+                'total_actual' => $totalActual,
+                'percentage' => $totalExpected > 0 ? round(($totalActual / $totalExpected) * 100, 1) : 0,
+                'off_days_count' => count($offDates),
+                'turnos' => $turnosBreakdown,
+            ];
+        }
+
+        return $result;
     }
 
     /**

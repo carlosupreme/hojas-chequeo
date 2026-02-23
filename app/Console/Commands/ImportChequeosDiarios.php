@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Services\ImageService;
 use App\Models\Turno;
+use App\Services\ImageService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -29,16 +29,16 @@ class ImportChequeosDiarios extends Command
         }
 
         config()->set('database.connections.mysql_v1', [
-            'driver'    => 'mysql',
-            'host'      => $this->option('host'),
-            'port'      => $this->option('port'),
-            'database'  => $this->option('database'),
-            'username'  => $this->option('username'),
-            'password'  => $this->option('password'),
-            'charset'   => 'utf8mb4',
+            'driver' => 'mysql',
+            'host' => $this->option('host'),
+            'port' => $this->option('port'),
+            'database' => $this->option('database'),
+            'username' => $this->option('username'),
+            'password' => $this->option('password'),
+            'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
-            'prefix'    => '',
-            'strict'    => true,
+            'prefix' => '',
+            'strict' => true,
         ]);
 
         DB::purge('mysql_v1');
@@ -93,9 +93,9 @@ class ImportChequeosDiarios extends Command
         $bar = $this->output->createProgressBar($rows->count());
         $bar->start();
 
-        $imported        = 0;
-        $turnoNotFound   = 0;
-        $firmaErrors     = 0;
+        $imported = 0;
+        $turnoNotFound = 0;
+        $firmaErrors = 0;
         $totalRespuestas = 0;
 
         foreach ($rows as $row) {
@@ -103,6 +103,7 @@ class ImportChequeosDiarios extends Command
 
             if (! $v2HojaId) {
                 $bar->advance();
+
                 continue; // hoja_chequeo wasn't imported; skip
             }
 
@@ -140,18 +141,18 @@ class ImportChequeosDiarios extends Command
             // sends a Filament notification to all admins for every finalizado record
             DB::table('hoja_ejecucions')->upsert(
                 [
-                    'id'               => $row->id,
-                    'hoja_chequeo_id'  => $v2HojaId,
-                    'user_id'          => $row->operador_id,  // v1: operador_id → v2: user_id
-                    'turno_id'         => $turno?->id,
-                    'centro_costo_id'  => $turno?->centro_costo_id,
-                    'nombre_operador'  => $row->nombre_operador,
-                    'firma_operador'   => $firmaOperador,
+                    'id' => $row->id,
+                    'hoja_chequeo_id' => $v2HojaId,
+                    'user_id' => $row->operador_id,  // v1: operador_id → v2: user_id
+                    'turno_id' => $turno?->id,
+                    'centro_costo_id' => $turno?->centro_costo_id,
+                    'nombre_operador' => $row->nombre_operador,
+                    'firma_operador' => $firmaOperador,
                     'firma_supervisor' => $firmaSupervisor,
-                    'observaciones'    => $row->observaciones,
-                    'finalizado_en'    => $row->created_at,   // v1 has no finalizado_en; use created_at
-                    'created_at'       => $row->created_at,
-                    'updated_at'       => $row->updated_at,
+                    'observaciones' => $row->observaciones,
+                    'finalizado_en' => $row->created_at,   // v1 has no finalizado_en; use created_at
+                    'created_at' => $row->created_at,
+                    'updated_at' => $row->updated_at,
                 ],
                 ['id'],
                 ['hoja_chequeo_id', 'user_id', 'turno_id', 'centro_costo_id', 'nombre_operador', 'firma_operador', 'firma_supervisor', 'observaciones', 'finalizado_en', 'updated_at']
@@ -167,13 +168,13 @@ class ImportChequeosDiarios extends Command
                 DB::table('hoja_fila_respuestas')->upsert(
                     [
                         'hoja_ejecucion_id' => $row->id,
-                        'hoja_fila_id'      => $item->item_id,      // v1 item.id was preserved as hoja_fila.id
-                        'answer_option_id'  => $item->simbologia_id ?? null,
-                        'numeric_value'     => null,
-                        'text_value'        => $item->valor ?? null,
-                        'boolean_value'     => null,
-                        'created_at'        => $item->created_at,
-                        'updated_at'        => $item->updated_at,
+                        'hoja_fila_id' => $item->item_id,      // v1 item.id was preserved as hoja_fila.id
+                        'answer_option_id' => $item->simbologia_id ?? null,
+                        'numeric_value' => null,
+                        'text_value' => $item->valor ?? null,
+                        'boolean_value' => null,
+                        'created_at' => $item->created_at,
+                        'updated_at' => $item->updated_at,
                     ],
                     ['hoja_ejecucion_id', 'hoja_fila_id'],
                     ['answer_option_id', 'numeric_value', 'text_value', 'boolean_value', 'updated_at']
