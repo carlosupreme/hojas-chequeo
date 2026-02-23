@@ -146,7 +146,7 @@ class AnalisisReportes extends Component
 
         // Calculate status counts
         $pendientes = $reportes->where('estado', 'pendiente')->count();
-        $realizadas = $reportes->where('estado', 'realizada')->count();
+        $realizadas = $reportes->where('estado', 'realizado')->count();
 
         return [
             'history_labels' => $history_labels,
