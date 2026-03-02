@@ -43,6 +43,10 @@ class SupervisorPanelProvider extends PanelProvider
             ->databaseNotifications()
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
+                fn (): string => Blade::render("@vite('resources/js/app.js')")
+            )
+            ->renderHook(
+                PanelsRenderHook::HEAD_END,
                 fn (): string => Blade::render("<script src='https://cdn.jsdelivr.net/npm/apexcharts'></script>")
             )
             ->renderHook(

@@ -13,6 +13,7 @@ use BackedEnum;
 use Carbon\Carbon;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
+use Livewire\Attributes\On;
 
 class ControlPanel extends Page
 {
@@ -116,6 +117,15 @@ class ControlPanel extends Page
      * Alertas visuales: equipos sin chequeo hoy, reportes pendientes de alta prioridad,
      * y equipos con reportes sin resolver.
      */
+    /**
+     * Refresh the panel in real time when any chequeo is auto-saved via Reverb.
+     */
+    #[On('echo:chequeos,.saved')]
+    public function refreshOnChequeoSaved(): void
+    {
+        // Triggers a Livewire re-render — all computed getters re-run automatically.
+    }
+
     public function getAlertsProperty(): array
     {
         $today = Carbon::today();

@@ -63,11 +63,19 @@
                             Items de Control
                         </h3>
 
-                        {{-- Live Saving Indicator (Moved here for better visibility) --}}
-                        <div x-data="{ saving: false, init() { window.addEventListener('chequeo-form-updated', () => { this.saving = true; setTimeout(() => this.saving = false, 1000); }) } }"
-                            class="h-6">
-                            <span x-show="saving" x-transition
-                                class="text-xs font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1.5 animate-pulse">
+                        {{-- Auto-save Indicator --}}
+                        <div x-data="{
+                                    state: 'idle',
+                                    init() {
+                                        $wire.on('chequeo-autosave-saving', () => { this.state = 'saving'; });
+                                        $wire.on('chequeo-autosave-saved',  () => {
+                                            this.state = 'saved';
+                                            setTimeout(() => this.state = 'idle', 2500);
+                                        });
+                                    }
+                                }" class="h-6 flex items-center">
+                            <span x-show="state === 'saving'" x-transition
+                                class="text-xs font-medium text-blue-500 dark:text-blue-400 flex items-center gap-1.5">
                                 <svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
                                         stroke-width="4"></circle>
@@ -76,6 +84,14 @@
                                     </path>
                                 </svg>
                                 Guardando...
+                            </span>
+                            <span x-show="state === 'saved'" x-transition
+                                class="text-xs font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                    stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Guardado
                             </span>
                         </div>
                     </div>

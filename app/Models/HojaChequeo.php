@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 #[ObservedBy(HojaChequeoObserver::class)]
 class HojaChequeo extends Model
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+
     protected $fillable = [
         'equipo_id',
         'observaciones',

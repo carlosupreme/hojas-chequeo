@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Area;
+use App\Events\ChequeoAutoSaved;
 use App\Filament\Resources\Chequeos\Schemas\ChequeosForm;
 use App\Models\Equipo;
 use App\Models\HojaChequeo;
@@ -53,6 +54,8 @@ class CreateChequeo extends Page
     public $dateSelected;
 
     public $user;
+
+    public bool $autoSaving = false;
 
     #[Url(as: 'e', except: null)]
     public null|string|int $ejecucionId = null;
@@ -139,6 +142,74 @@ class CreateChequeo extends Page
     public function hasItems(): bool
     {
         return $this->hojaChequeo?->hasItems();
+    }
+
+    public function updated(string $name): void
+    {
+        // Save Filament form fields (nombre_operador, observaciones, etc.)
+        if (str_starts_with($name, 'data.') && $this->hojaChequeo) {
+            $this->autoSave();
+        }
+    }
+
+    /**
+     * Triggered when a checklist item inside ChequeoItems changes.
+     * Ensures the HojaEjecucion exists, then dispatches back so
+     * ChequeoItems can persist the individual HojaFilaRespuesta.
+     */
+    #[On('chequeo-item-changed')]
+    public function handleItemChanged(int $filaId, mixed $value): void
+    {
+        if (! $this->hojaChequeo) {
+            return;
+        }
+
+        $this->autoSave();
+
+        if ($this->hojaEjecucion) {
+            $this->dispatch('chequeo-ejecucion-ensured',
+                ejecucionId: $this->hojaEjecucion->id,
+                filaId: $filaId,
+                value: $value,
+            );
+        }
+    }
+
+    protected function autoSave(): void
+    {
+        // $this->data is the raw form state — no validation triggered
+        $state = $this->data;
+
+        // Ensure nombre_operador is always populated (pre-filled via loadFormData)
+        $state['nombre_operador'] ??= $this->user->name;
+        if (empty($state['nombre_operador'])) {
+            return;
+        }
+
+        $this->dispatch('chequeo-autosave-saving');
+
+        $data = [
+            ...$state,
+            'user_id' => $this->user->id,
+            'turno_id' => $this->user->turno_id,
+            'centro_costo_id' => $this->centroCostoId,
+            'created_at' => $this->dateSelected,
+            'hoja_chequeo_id' => $this->hojaChequeo->id,
+        ];
+
+        // Firma is handled only on final submit to avoid repeated file writes
+        unset($data['firma_operador']);
+
+        if ($this->hojaEjecucion) {
+            $this->hojaEjecucion->update($data);
+        } else {
+            $this->hojaEjecucion = HojaEjecucion::create($data);
+            $this->ejecucionId = $this->hojaEjecucion->id;
+        }
+
+        broadcast(new ChequeoAutoSaved($this->hojaEjecucion))->toOthers();
+
+        $this->dispatch('chequeo-autosave-saved');
     }
 
     public function reportAction(): Action

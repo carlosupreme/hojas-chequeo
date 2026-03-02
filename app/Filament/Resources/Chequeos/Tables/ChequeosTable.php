@@ -79,7 +79,7 @@ class ChequeosTable
                         fn ($q) => $q->whereHas('hojaChequeo.equipo', fn ($eq) => $eq->whereRaw('LOWER(area) = ?', [strtolower($data['value'])]))
                     )),
 
-                Filter::make('finalizado_en')
+                Filter::make('created_at')
                     ->label('Fecha de Ejecución')
                     ->schema([
                         Select::make('preset')
@@ -113,8 +113,8 @@ class ChequeosTable
                     ->columns(2)
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
-                            ->when($data['desde'], fn ($q, $date) => $q->whereDate('finalizado_en', '>=', $date))
-                            ->when($data['hasta'], fn ($q, $date) => $q->whereDate('finalizado_en', '<=', $date));
+                            ->when($data['desde'], fn ($q, $date) => $q->whereDate('created_at', '>=', $date))
+                            ->when($data['hasta'], fn ($q, $date) => $q->whereDate('created_at', '<=', $date));
                     })
                     ->indicateUsing(function (array $data): ?string {
                         if (! $data['desde'] && ! $data['hasta']) {
@@ -127,12 +127,22 @@ class ChequeosTable
                     }),
             ], layout: FiltersLayout::Modal)
             ->columns([
-                // COLUMN 5: DATE
-                TextColumn::make('finalizado_en')
-                    ->label('Fecha')
-                    ->dateTime('d M, Y H:i')
+                // COLUMN 5: DATES (created + finalized)
+                TextColumn::make('created_at')
+                    ->label('Fechas')
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable()
+                    ->state(fn (HojaEjecucion $record) => $record->created_at->isoFormat('D MMM YYYY, HH:mm'))
+                    ->description(fn (HojaEjecucion $record) => $record->finalizado_en
+                        ? '✓ '.$record->finalizado_en->isoFormat('D MMM YYYY, HH:mm')
+                        : '⏳ En curso'
+                    )
+                    ->tooltip(fn (HojaEjecucion $record) => implode("\n", [
+                        'Creado: '.$record->created_at->isoFormat('D MMM YYYY, HH:mm'),
+                        $record->finalizado_en
+                            ? 'Finalizado: '.$record->finalizado_en->isoFormat('D MMM YYYY, HH:mm')
+                            : 'Sin finalizar',
+                    ])),
                 // COLUMN 1: EQUIPMENT INFO (Stacked)
                 TextColumn::make('hojaChequeo.equipo.tag')
                     ->label('Equipo')

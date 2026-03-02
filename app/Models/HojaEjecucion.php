@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[ObservedBy(HojaEjecucionObserver::class)]
 class HojaEjecucion extends Model
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+
     protected $fillable = [
         'hoja_chequeo_id',
         'user_id',

@@ -22,10 +22,13 @@ class ChequeoItems extends Component
 
     public bool $readOnly = false;
 
+    public ?int $ejecucionId = null;
+
     public function mount(HojaChequeo $hoja, ?HojaEjecucion $ejecucion = null, bool $readOnly = false): void
     {
         $this->readOnly = $readOnly;
         $this->hojaId = $hoja->id;
+        $this->ejecucionId = $ejecucion?->id;
         $hoja->load([
             'columnas',
             'filas.answerType.answerOptions',
@@ -115,12 +118,47 @@ class ChequeoItems extends Component
     }
 
     /**
-     * Whenever any nested key in `form` changes (e.g. form.123), dispatch a browser event
-     * so the Blade/JS side can show feedback + animations.
+     * Whenever a checklist item changes, notify the parent CreateChequeo component
+     * so it can ensure a HojaEjecucion exists (autoSave) and get back the ID
+     * to persist this specific respuesta.
      */
     public function updatedForm($value, $key): void
     {
-        $this->dispatch('chequeo-form-updated', key: $key, value: $value);
+        $this->dispatch('chequeo-item-changed', filaId: (int) $key, value: $value);
+    }
+
+    /**
+     * Called by the parent after it has autoSaved and confirmed the HojaEjecucion ID.
+     * Saves (or updates) the specific fila respuesta.
+     */
+    #[On('chequeo-ejecucion-ensured')]
+    public function onEjecucionEnsured(int $ejecucionId, int $filaId, mixed $value): void
+    {
+        $this->ejecucionId = $ejecucionId;
+        $this->saveFilaRespuesta($ejecucionId, $filaId, $value);
+    }
+
+    private function saveFilaRespuesta(int $ejecucionId, int $filaId, mixed $value): void
+    {
+        $fila = $this->filas->find($filaId);
+        if (! $fila) {
+            return;
+        }
+
+        $type = $fila->answerType?->key;
+
+        HojaFilaRespuesta::updateOrCreate(
+            [
+                'hoja_ejecucion_id' => $ejecucionId,
+                'hoja_fila_id' => $filaId,
+            ],
+            [
+                'answer_option_id' => $type === 'icon_set' ? $value : null,
+                'numeric_value' => $type === 'number' && is_numeric($value) ? floatval($value) : null,
+                'text_value' => $type === 'text' ? $value : null,
+                'boolean_value' => $type === 'boolean' ? (bool) $value : null,
+            ]
+        );
     }
 
     public function render()
