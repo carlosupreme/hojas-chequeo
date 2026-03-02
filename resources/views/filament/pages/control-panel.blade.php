@@ -34,7 +34,7 @@
                     };
                 @endphp
                 <div class="{{ $colors['bg'] }} {{ $colors['border'] }} border rounded-xl p-4 flex items-start gap-4">
-                    <div class="flex-shrink-0">
+                    <div class="shrink-0">
                         <div class="p-2.5 rounded-lg {{ $colors['icon_bg'] }} relative">
                             @if($alert['type'] === 'danger')
                                 <span class="absolute inset-0 rounded-lg animate-ping bg-red-400/20"></span>
@@ -64,11 +64,34 @@
                         <p class="text-sm font-semibold {{ $colors['title'] }}">{{ $alert['title'] }}</p>
                         <p class="text-xs {{ $colors['desc'] }} mt-0.5">{{ $alert['description'] }}</p>
                     </div>
-                    @if($alert['type'] === 'danger')
-                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-300 uppercase tracking-wider flex-shrink-0 self-center">
-                            Urgente
-                        </span>
-                    @endif
+                    <div class="flex items-center gap-2 shrink-0 self-center">
+                        @if(!empty($alert['link']))
+                            <a
+                                href="{{ $alert['link'] }}"
+                                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors
+                                    {{ $alert['type'] === 'danger'
+                                        ? 'bg-red-100 border-red-300 text-red-700 hover:bg-red-200 dark:bg-red-900/40 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/70'
+                                        : ($alert['type'] === 'warning'
+                                            ? 'bg-amber-100 border-amber-300 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/40 dark:border-amber-700 dark:text-amber-300 dark:hover:bg-amber-900/70'
+                                            : ($alert['type'] === 'info'
+                                                ? 'bg-blue-100 border-blue-300 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/40 dark:border-blue-700 dark:text-blue-300 dark:hover:bg-blue-900/70'
+                                                : 'bg-green-100 border-green-300 text-green-700 hover:bg-green-200 dark:bg-green-900/40 dark:border-green-700 dark:text-green-300 dark:hover:bg-green-900/70'
+                                            )
+                                        )
+                                    }}"
+                            >
+                                {{ $alert['link_label'] }}
+                                <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                        @endif
+                        @if($alert['type'] === 'danger')
+                            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-300 uppercase tracking-wider">
+                                Urgente
+                            </span>
+                        @endif
+                    </div>
                 </div>
             @endforeach
         </div>
@@ -210,15 +233,20 @@
                                     <p class="text-lg font-bold {{ $equipo['reportes_pendientes'] > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-400' }}">
                                         {{ $equipo['reportes_pendientes'] }}
                                     </p>
-                                    <p class="text-[10px] text-gray-500 dark:text-gray-400 leading-tight">Pendientes</p>
+                                    <p class="text-[10px] text-gray-500 dark:text-gray-400 leading-tight">Reportes pendientes</p>
                                 </div>
                             </div>
 
                             {{-- Last check time --}}
                             @if($equipo['ultimo_chequeo'])
-                                <div class="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1">
-                                    <x-heroicon-m-clock class="w-3 h-3" />
+                                <div class="text-xs flex items-center gap-1.5 {{ $equipo['ultimo_chequeo_viejo'] ? 'text-red-500 dark:text-red-400 font-medium' : 'text-gray-400 dark:text-gray-500' }}">
+                                    <x-heroicon-m-clock class="w-3 h-3 shrink-0" />
                                     Último chequeo: {{ $equipo['ultimo_chequeo'] }}
+                                    @if($equipo['ultimo_chequeo_viejo'])
+                                        <span class="inline-flex items-center rounded-full bg-red-100 dark:bg-red-900/40 px-1.5 py-0.5 text-[10px] font-semibold text-red-600 dark:text-red-400 uppercase tracking-wide">
+                                            Vencido
+                                        </span>
+                                    @endif
                                 </div>
                             @endif
                         </div>

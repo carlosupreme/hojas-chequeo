@@ -2,7 +2,8 @@
 
 namespace App\Filament\Pages;
 
-use App\Area;
+use App\Filament\Resources\Chequeos\ChequeosResource;
+use App\Filament\Resources\Reportes\ReporteResource;
 use App\Models\Equipo;
 use App\Models\HojaChequeo;
 use App\Models\HojaEjecucion;
@@ -53,107 +54,57 @@ class ControlPanel extends Page
     public function getEquiposByAreaProperty(): array
     {
         $today = Carbon::today();
-        $areas = Area::cases();
-        $result = [];
 
-        foreach ($areas as $area) {
-            $equipos = Equipo::where('area', $area->value)
-                ->orderBy('nombre')
-                ->get()
-                ->map(function (Equipo $equipo) use ($today) {
-                    $hojaChequeoIds = $equipo->hojaChequeos()->pluck('id');
+        $mapEquipo = function (Equipo $equipo) use ($today) {
+            $hojaChequeoIds = $equipo->hojaChequeos()->pluck('id');
 
-                    $chequeosHoy = HojaEjecucion::finished()
-                        ->whereIn('hoja_chequeo_id', $hojaChequeoIds)
-                        ->whereDate('finalizado_en', $today)
-                        ->count();
+            $chequeosHoy = HojaEjecucion::finished()
+                ->whereIn('hoja_chequeo_id', $hojaChequeoIds)
+                ->whereDate('finalizado_en', $today)
+                ->count();
 
-                    $reportesHoy = $equipo->reportes()
-                        ->whereDate('fecha', $today)
-                        ->count();
+            $reportesHoy = $equipo->reportes()
+                ->whereDate('fecha', $today)
+                ->count();
 
-                    $reportesPendientes = $equipo->reportes()
-                        ->where('estado', 'pendiente')
-                        ->count();
+            $reportesPendientes = $equipo->reportes()
+                ->where('estado', 'pendiente')
+                ->count();
 
-                    $ultimoChequeo = HojaEjecucion::finished()
-                        ->whereIn('hoja_chequeo_id', $hojaChequeoIds)
-                        ->orderByDesc('finalizado_en')
-                        ->first();
+            $ultimoChequeo = HojaEjecucion::finished()
+                ->whereIn('hoja_chequeo_id', $hojaChequeoIds)
+                ->orderByDesc('finalizado_en')
+                ->first();
 
-                    return [
-                        'id' => $equipo->id,
-                        'nombre' => $equipo->nombre,
-                        'tag' => $equipo->tag,
-                        'foto' => $equipo->foto,
-                        'capacidad' => $equipo->capacidad(),
-                        'chequeos_hoy' => $chequeosHoy,
-                        'reportes_hoy' => $reportesHoy,
-                        'reportes_pendientes' => $reportesPendientes,
-                        'ultimo_chequeo' => $ultimoChequeo?->finalizado_en?->diffForHumans(),
-                        'tiene_chequeo_hoy' => $chequeosHoy > 0,
-                    ];
-                })
-                ->toArray();
+            return [
+                'id' => $equipo->id,
+                'nombre' => $equipo->nombre,
+                'tag' => $equipo->tag,
+                'foto' => $equipo->foto,
+                'capacidad' => $equipo->capacidad(),
+                'chequeos_hoy' => $chequeosHoy,
+                'reportes_hoy' => $reportesHoy,
+                'reportes_pendientes' => $reportesPendientes,
+                'ultimo_chequeo' => $ultimoChequeo?->finalizado_en?->diffForHumans(),
+                'tiene_chequeo_hoy' => $chequeosHoy > 0,
+                'ultimo_chequeo_viejo' => $ultimoChequeo
+                    ? $ultimoChequeo->finalizado_en->lt(Carbon::now()->subDay())
+                    : false,
+            ];
+        };
 
-            if (! empty($equipos)) {
-                $result[] = [
-                    'area' => $area->label(),
-                    'equipos' => $equipos,
-                ];
-            }
-        }
-
-        // Also include equipos without a recognized area
-        $knownAreas = collect($areas)->map(fn ($a) => $a->value)->toArray();
-        $otherEquipos = Equipo::whereNotIn('area', $knownAreas)
-            ->orWhereNull('area')
+        return Equipo::orderBy('area')
             ->orderBy('nombre')
             ->get()
-            ->map(function (Equipo $equipo) use ($today) {
-                $hojaChequeoIds = $equipo->hojaChequeos()->pluck('id');
-
-                $chequeosHoy = HojaEjecucion::finished()
-                    ->whereIn('hoja_chequeo_id', $hojaChequeoIds)
-                    ->whereDate('finalizado_en', $today)
-                    ->count();
-
-                $reportesHoy = $equipo->reportes()
-                    ->whereDate('fecha', $today)
-                    ->count();
-
-                $reportesPendientes = $equipo->reportes()
-                    ->where('estado', 'pendiente')
-                    ->count();
-
-                $ultimoChequeo = HojaEjecucion::finished()
-                    ->whereIn('hoja_chequeo_id', $hojaChequeoIds)
-                    ->orderByDesc('finalizado_en')
-                    ->first();
-
-                return [
-                    'id' => $equipo->id,
-                    'nombre' => $equipo->nombre,
-                    'tag' => $equipo->tag,
-                    'foto' => $equipo->foto,
-                    'capacidad' => $equipo->capacidad(),
-                    'chequeos_hoy' => $chequeosHoy,
-                    'reportes_hoy' => $reportesHoy,
-                    'reportes_pendientes' => $reportesPendientes,
-                    'ultimo_chequeo' => $ultimoChequeo?->finalizado_en?->diffForHumans(),
-                    'tiene_chequeo_hoy' => $chequeosHoy > 0,
-                ];
-            })
+            ->groupBy(fn (Equipo $e) => $e->area
+                ? ucwords(mb_strtolower($e->area))
+                : 'Sin Área')
+            ->map(fn ($equipos, $area) => [
+                'area' => $area,
+                'equipos' => $equipos->map($mapEquipo)->toArray(),
+            ])
+            ->values()
             ->toArray();
-
-        if (! empty($otherEquipos)) {
-            $result[] = [
-                'area' => 'Otras Áreas',
-                'equipos' => $otherEquipos,
-            ];
-        }
-
-        return $result;
     }
 
     public function getRecorridosHoyProperty(): int
@@ -192,6 +143,8 @@ class ControlPanel extends Page
                 'title' => count($equiposSinChequeo).' equipo(s) sin chequeo hoy',
                 'description' => implode(', ', array_slice(array_values($equiposSinChequeo), 0, 5))
                     .(count($equiposSinChequeo) > 5 ? ' y '.(count($equiposSinChequeo) - 5).' más...' : ''),
+                'link' => ChequeosResource::getUrl('index'),
+                'link_label' => 'Ver chequeos',
             ];
         }
 
@@ -209,6 +162,8 @@ class ControlPanel extends Page
                 'title' => $reportesAlta->count().' reporte(s) ALTA prioridad pendientes',
                 'description' => 'Equipos: '.$nombres
                     .($reportesAlta->count() > 5 ? ' y más...' : ''),
+                'link' => ReporteResource::getUrl('index'),
+                'link_label' => 'Ver reportes',
             ];
         }
 
@@ -223,6 +178,8 @@ class ControlPanel extends Page
                 'icon' => 'exclamation-triangle',
                 'title' => $reportesMedia.' reporte(s) de prioridad MEDIA pendientes',
                 'description' => 'Requieren atención pronto.',
+                'link' => ReporteResource::getUrl('index'),
+                'link_label' => 'Ver reportes',
             ];
         }
 
@@ -234,6 +191,8 @@ class ControlPanel extends Page
                 'icon' => 'information-circle',
                 'title' => $reportesHoy.' reporte(s) nuevo(s) hoy',
                 'description' => 'Se generaron nuevos reportes durante el día.',
+                'link' => ReporteResource::getUrl('index'),
+                'link_label' => 'Ver reportes',
             ];
         }
 
@@ -244,6 +203,8 @@ class ControlPanel extends Page
                 'icon' => 'check-circle',
                 'title' => 'Todo en orden',
                 'description' => 'No hay alertas pendientes. Todos los equipos están al día.',
+                'link' => null,
+                'link_label' => null,
             ];
         }
 
