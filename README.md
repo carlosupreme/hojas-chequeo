@@ -9,4 +9,8 @@ artisan import:users --database hojaschequeo --username carlos --password carlos
 artisan import:tarjetons --database hojaschequeo --username carlos --password carlos1030 && \
 artisan import:reportes --database hojaschequeo --username carlos --password carlos1030 && \
 artisan import:hojas --database hojaschequeo --username carlos --password carlos1030 && \
+artisan db:seed --class=RecorridoTintoreriaSeeder && \
+artisan db:seed --class=RecorridoLavanderiaSeeder && \
+artisan db:seed --class=RecorridoGerentesSeeder && \
+artisan db:seed --class=RecorridoGeneralSeeder
 ```
