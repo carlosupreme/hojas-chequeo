@@ -6,10 +6,13 @@ use App\Filament\Pages\CreateChequeo;
 use App\Filament\Resources\Chequeos\ChequeosResource;
 use App\Models\Equipo;
 use App\Models\HojaEjecucion;
+use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Support\Enums\FontWeight;
 use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
@@ -79,6 +82,31 @@ class ChequeosTable
                 Filter::make('finalizado_en')
                     ->label('Fecha de Ejecución')
                     ->schema([
+                        Select::make('preset')
+                            ->label('Período rápido')
+                            ->placeholder('Rango personalizado')
+                            ->options([
+                                'today' => 'Hoy',
+                                'yesterday' => 'Ayer',
+                                'this_week' => 'Esta semana',
+                                'this_fortnight' => 'Esta quincena',
+                                'this_month' => 'Este mes',
+                            ])
+                            ->live()
+                            ->afterStateUpdated(function (?string $state, Set $set) {
+                                [$desde, $hasta] = match ($state) {
+                                    'today' => [now()->toDateString(), now()->toDateString()],
+                                    'yesterday' => [now()->subDay()->toDateString(), now()->subDay()->toDateString()],
+                                    'this_week' => [now()->startOfWeek()->toDateString(), now()->endOfWeek()->toDateString()],
+                                    'this_fortnight' => now()->day <= 15
+                                        ? [now()->startOfMonth()->toDateString(), now()->startOfMonth()->addDays(14)->toDateString()]
+                                        : [now()->startOfMonth()->addDays(15)->toDateString(), now()->endOfMonth()->toDateString()],
+                                    'this_month' => [now()->startOfMonth()->toDateString(), now()->endOfMonth()->toDateString()],
+                                    default => [null, null],
+                                };
+                                $set('desde', $desde);
+                                $set('hasta', $hasta);
+                            }),
                         DatePicker::make('desde')->label('Desde')->native(false),
                         DatePicker::make('hasta')->label('Hasta')->native(false),
                     ])
@@ -87,6 +115,15 @@ class ChequeosTable
                         return $query
                             ->when($data['desde'], fn ($q, $date) => $q->whereDate('finalizado_en', '>=', $date))
                             ->when($data['hasta'], fn ($q, $date) => $q->whereDate('finalizado_en', '<=', $date));
+                    })
+                    ->indicateUsing(function (array $data): ?string {
+                        if (! $data['desde'] && ! $data['hasta']) {
+                            return null;
+                        }
+                        $desde = $data['desde'] ? Carbon::parse($data['desde'])->isoFormat('D MMM YYYY') : '…';
+                        $hasta = $data['hasta'] ? Carbon::parse($data['hasta'])->isoFormat('D MMM YYYY') : '…';
+
+                        return "Fecha: {$desde} — {$hasta}";
                     }),
             ], layout: FiltersLayout::Modal)
             ->columns([
