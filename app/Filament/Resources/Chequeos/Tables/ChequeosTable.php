@@ -62,10 +62,18 @@ class ChequeosTable
                 SelectFilter::make('area')
                     ->label('Área')
                     ->placeholder('Todas')
-                    ->options(fn () => Equipo::distinct()->pluck('area', 'area')->toArray())
+                    ->options(fn () => Equipo::distinct()->orderBy('area')->pluck('area')
+                        ->filter()
+                        ->map(fn (string $a) => ucwords(mb_strtolower($a)))
+                        ->unique()
+                        ->sort()
+                        ->values()
+                        ->mapWithKeys(fn (string $a) => [$a => $a])
+                        ->toArray()
+                    )
                     ->query(fn (Builder $query, array $data) => $query->when(
                         $data['value'],
-                        fn ($q) => $q->whereHas('hojaChequeo.equipo', fn ($eq) => $eq->where('area', $data['value']))
+                        fn ($q) => $q->whereHas('hojaChequeo.equipo', fn ($eq) => $eq->whereRaw('LOWER(area) = ?', [strtolower($data['value'])]))
                     )),
 
                 Filter::make('finalizado_en')
