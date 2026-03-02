@@ -25,13 +25,6 @@
                                     </span>
                                 </div>
                                 <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 font-medium">
-                                    <span class="flex items-center gap-1">
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        {{ $user->turno->nombre }}
-                                    </span>
                                     @if($this->hojaEjecucion)
                                         <span class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
                                         <span class="text-amber-600 dark:text-amber-500 flex items-center gap-1">

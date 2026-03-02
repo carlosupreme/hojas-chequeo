@@ -48,7 +48,7 @@ class HojaChequeo extends Model
 
     public function scopeInArea(Builder $query, ?string $area): Builder
     {
-        return $query->when($area, fn (Builder $q) => $q->whereHas('equipo', fn (Builder $eq) => $eq->where('area', $area)));
+        return $query->when($area, fn (Builder $q) => $q->whereHas('equipo', fn (Builder $eq) => $eq->whereRaw('LOWER(area) = ?', [strtolower($area)])));
     }
 
     public function scopeSearch(Builder $query, ?string $term): Builder

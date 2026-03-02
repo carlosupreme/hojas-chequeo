@@ -2,8 +2,8 @@
 
 namespace App\Livewire;
 
-use App\Area;
 use App\Models\CentroCosto;
+use App\Models\Equipo;
 use App\Models\HojaChequeo;
 use App\Models\User;
 use Filament\Forms\Components\Select;
@@ -27,7 +27,7 @@ class SelectHojaChequeo extends Component implements HasSchemas
 
     public int $page = 1;
 
-    public ?Area $activeFilter = null;
+    public ?string $activeFilter = null;
 
     protected $queryString = ['search' => ['except' => '']];
 
@@ -53,13 +53,7 @@ class SelectHojaChequeo extends Component implements HasSchemas
 
     public function toggleFilter(?string $filter = null): void
     {
-        $area = null;
-
-        if (! is_null($filter) && $filter !== '') {
-            $area = Area::tryFrom($filter);
-        }
-
-        $this->activeFilter = ($this->activeFilter === $area) ? null : $area;
+        $this->activeFilter = ($this->activeFilter === $filter) ? null : $filter;
         $this->resetPagination();
     }
 
@@ -100,7 +94,7 @@ class SelectHojaChequeo extends Component implements HasSchemas
 
         $applyFilters = function (Builder $query) {
             $query->whereHas('hojaChequeo', function ($q) {
-                $q->inArea($this->activeFilter?->value)
+                $q->inArea($this->activeFilter)
                     ->search($this->search);
             });
         };
@@ -124,7 +118,12 @@ class SelectHojaChequeo extends Component implements HasSchemas
             'chequeosPendientes' => $chequeosPendientes,
             'chequeosCompletados' => $chequeosCompletados,
             'hasMore' => $hasMore,
-            'areas' => Area::cases(),
+            'areas' => Equipo::distinct()->orderBy('area')->pluck('area')
+                ->filter()
+                ->map(fn (string $a) => ucwords(mb_strtolower($a)))
+                ->unique()
+                ->sort()
+                ->values(),
             'user' => $user,
             'turno' => $user->turno,
         ]);
@@ -134,7 +133,7 @@ class SelectHojaChequeo extends Component implements HasSchemas
     {
         $user = User::find($userId);
         $idsHash = md5(implode(',', $user->perfil->hoja_ids ?? []));
-        $filter = $this->activeFilter?->value ?? 'all';
+        $filter = $this->activeFilter ?? 'all';
         $search = $this->search ? md5(strtolower($this->search)) : 'none';
 
         return "hojas:list:{$userId}:{$idsHash}:{$filter}:{$search}:page{$this->page}";
@@ -146,8 +145,9 @@ class SelectHojaChequeo extends Component implements HasSchemas
             ->select(['id', 'equipo_id', 'encendido', 'version'])
             ->availableTo($user->perfil)
             ->encendidas()
-            ->inArea($this->activeFilter?->value)
+            ->inArea($this->activeFilter)
             ->search($this->search)
+            ->orderByRaw('(SELECT MAX(finalizado_en) FROM hoja_ejecucions WHERE hoja_chequeo_id = hoja_chequeos.id AND finalizado_en IS NOT NULL) ASC NULLS FIRST')
             ->limit($this->perPage * $this->page)
             ->get();
     }
