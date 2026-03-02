@@ -9,8 +9,19 @@ artisan import:users --database hojaschequeo --username carlos --password carlos
 artisan import:tarjetons --database hojaschequeo --username carlos --password carlos1030 && \
 artisan import:reportes --database hojaschequeo --username carlos --password carlos1030 && \
 artisan import:hojas --database hojaschequeo --username carlos --password carlos1030 && \
-artisan db:seed --class=RecorridoTintoreriaSeeder && \
-artisan db:seed --class=RecorridoLavanderiaSeeder && \
-artisan db:seed --class=RecorridoGerentesSeeder && \
-artisan db:seed --class=RecorridoGeneralSeeder
+php artisan db:seed --class=RecorridoTintoreriaSeeder && \
+php artisan db:seed --class=RecorridoLavanderiaSeeder && \
+php artisan db:seed --class=RecorridoGerentesSeeder && \
+php artisan db:seed --class=RecorridoGeneralSeeder
+
+php artisan config:clear && \
+php artisan cache:clear && \
+php artisan route:clear && \
+php artisan view:clear && \
+php artisan optimize:clear && \
+php artisan optimize && \
+sudo rm -rf /var/lib/php/opcache/* && \
+sudo systemctl restart php8.4-fpm && \
+sudo systemctl reload nginx
+
 ```
