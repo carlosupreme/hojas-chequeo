@@ -99,6 +99,10 @@ class HojaChequeosTable
                     )),
             ])
             ->recordActions([
+                Action::make('Versiones')
+                    ->url(fn (HojaChequeo $record): string => HojaChequeoResource::getUrl('versions', ['record' => $record]))
+                    ->icon('heroicon-o-document-duplicate')
+                    ->visible(fn (HojaChequeo $record): bool => HojaChequeo::where('equipo_id', $record->equipo_id)->count() > 1),
                 Action::make('Historial')
                     ->url(fn (HojaChequeo $record): string => HojaChequeoResource::getUrl('history', ['record' => $record]))
                     ->icon('heroicon-o-calendar'),

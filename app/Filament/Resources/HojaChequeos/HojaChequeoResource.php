@@ -6,6 +6,7 @@ use App\Filament\Resources\HojaChequeos\Pages\CreateHojaChequeo;
 use App\Filament\Resources\HojaChequeos\Pages\EditHojaChequeo;
 use App\Filament\Resources\HojaChequeos\Pages\HistoryHojaChequeo;
 use App\Filament\Resources\HojaChequeos\Pages\ListHojaChequeos;
+use App\Filament\Resources\HojaChequeos\Pages\VersionsHojaChequeo;
 use App\Filament\Resources\HojaChequeos\Schemas\HojaChequeoForm;
 use App\Filament\Resources\HojaChequeos\Schemas\HojaChequeoInfolist;
 use App\Filament\Resources\HojaChequeos\Tables\HojaChequeosTable;
@@ -58,6 +59,7 @@ class HojaChequeoResource extends Resource
             'create' => CreateHojaChequeo::route('/crear'),
             'edit' => EditHojaChequeo::route('/{record}/editar'),
             'history' => HistoryHojaChequeo::route('/{record}/historial'),
+            'versions' => VersionsHojaChequeo::route('/{record}/versiones'),
         ];
     }
 }
