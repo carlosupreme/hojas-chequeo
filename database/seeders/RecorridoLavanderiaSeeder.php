@@ -13,7 +13,7 @@ class RecorridoLavanderiaSeeder extends Seeder
     {
         // 1. Crear el Formulario Principal
         $formulario = FormularioRecorrido::create([
-            'nombre' => 'RECORRIDO GENERAL PLANTA SANTA ROSA-LAVANDERÍA',
+            'nombre' => 'RECORRIDO GENERAL PLANTA SANTA ROSA - LAVANDERÍA',
             'descripcion' => 'Supervisión de áreas de lavandería al inicio y final de la jornada',
         ]);
 

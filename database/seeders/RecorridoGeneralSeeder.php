@@ -13,7 +13,7 @@ class RecorridoGeneralSeeder extends Seeder
     {
         // 1. Crear el Formulario Principal
         $formulario = FormularioRecorrido::create([
-            'nombre' => 'RECORRIDO GENERAL DE LA PLANTA SANTA ROSA',
+            'nombre' => 'RECORRIDO GENERAL DE LA PLANTA SANTA ROSA - MANTENIMEINTO',
             'descripcion' => 'Chequeo diario de equipos y áreas de producción',
         ]);
 

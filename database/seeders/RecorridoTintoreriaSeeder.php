@@ -13,7 +13,7 @@ class RecorridoTintoreriaSeeder extends Seeder
     {
         // 1. Crear el Formulario Principal
         $formulario = FormularioRecorrido::create([
-            'nombre' => 'RECORRIDO GENERAL PLANTA SANTA ROSA-TINTORERÍA',
+            'nombre' => 'RECORRIDO GENERAL PLANTA SANTA ROSA - TINTORERÍA',
             'descripcion' => 'Supervisión de áreas de tintorería al inicio y final de la jornada',
         ]);
 
