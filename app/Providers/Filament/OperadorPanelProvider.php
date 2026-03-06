@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Pages\CreateChequeo;
 use App\Filament\Pages\CreateRecorrido;
+use App\Filament\Pages\RegistroCargas;
 use App\Filament\Resources\Chequeos\ChequeosResource;
 use App\Filament\Resources\Recorridos\RecorridoResource;
 use App\Filament\Resources\Reportes\ReporteResource;
@@ -65,6 +66,7 @@ class OperadorPanelProvider extends PanelProvider
                 Dashboard::class,
                 CreateChequeo::class,
                 CreateRecorrido::class,
+                RegistroCargas::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Operador/Widgets'), for: 'App\Filament\Operador\Widgets')
             ->widgets([

@@ -20,6 +20,11 @@ class Equipo extends Model
         'revision',
     ];
 
+    public function registroCargas(): HasMany
+    {
+        return $this->hasMany(RegistroCarga::class);
+    }
+
     public function capacidad(): string
     {
         $capacidad = $this->specs()->where('tipo', 'like', '%Capacidad%')->first();
