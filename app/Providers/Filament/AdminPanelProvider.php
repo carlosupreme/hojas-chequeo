@@ -33,6 +33,7 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Blue,
             ])
             ->databaseNotifications()
+            ->databaseNotificationsPolling(null)
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
                 fn (): string => Blade::render("@vite('resources/js/app.js')")

@@ -85,16 +85,15 @@ class ChequeoItems extends Component
     #[On('hoja-ejecucion-saved')]
     public function save($hojaEjecucionId): void
     {
-        $filaIds = array_keys($this->form);
-        $markAsCompleted = true;
-
-        foreach ($filaIds as $filaId) {
+        foreach (array_keys($this->form) as $filaId) {
             $fila = $this->filas->find($filaId);
             $type = $fila->answerType?->key;
             $value = $this->form[$filaId];
 
+            // Skip nulls — real-time saves already persisted these values.
+            // Overwriting with null would corrupt the autosaved state.
             if (is_null($value)) {
-                $markAsCompleted = false;
+                continue;
             }
 
             HojaFilaRespuesta::updateOrCreate([
@@ -104,14 +103,24 @@ class ChequeoItems extends Component
                 'answer_option_id' => $type === 'icon_set' ? $value : null,
                 'numeric_value' => $type === 'number' && is_numeric($value) ? floatval($value) : null,
                 'text_value' => $type === 'text' ? $value : null,
-                'boolean_value' => $type === 'boolean' && is_bool($value) ? $value : null,
+                'boolean_value' => $type === 'boolean' ? (bool) $value : null,
             ]);
         }
 
-        if ($markAsCompleted) {
-            HojaEjecucion::find($hojaEjecucionId)->update([
-                'finalizado_en' => now(),
-            ]);
+        // Use the DB as source of truth — $this->form can have stale nulls
+        // for wire:model.blur inputs that weren't synced before submit.
+        $totalFilas = $this->filas->count();
+        $answeredCount = HojaFilaRespuesta::where('hoja_ejecucion_id', $hojaEjecucionId)
+            ->where(function ($q) {
+                $q->whereNotNull('answer_option_id')
+                    ->orWhereNotNull('numeric_value')
+                    ->orWhereNotNull('text_value')
+                    ->orWhereNotNull('boolean_value');
+            })
+            ->count();
+
+        if ($totalFilas > 0 && $answeredCount >= $totalFilas) {
+            HojaEjecucion::find($hojaEjecucionId)->update(['finalizado_en' => now()]);
         }
 
         $this->dispatch('hoja-fila-respuesta-items-created');

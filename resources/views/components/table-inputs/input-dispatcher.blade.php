@@ -14,11 +14,11 @@
         <x-table-inputs.icon-select :options="$item['options']" :wire:model.live="$model" :readOnly="$readOnly"/>
     @elseif($item['type_key'] === 'number')
         <x-filament::input.wrapper>
-            <x-filament::input type="number" :wire:model.blur="$model" :readonly="$readOnly"/>
+            <x-filament::input type="number" :wire:model.live.debounce.500ms="$model" :readonly="$readOnly"/>
         </x-filament::input.wrapper>
     @elseif($item['type_key'] === 'text')
         <x-filament::input.wrapper>
-            <x-filament::input type="text" :wire:model.blur="$model" :readonly="$readOnly"/>
+            <x-filament::input type="text" :wire:model.live.debounce.500ms="$model" :readonly="$readOnly"/>
         </x-filament::input.wrapper>
     @elseif($item['type_key'] === 'boolean')
         @if($readOnly)

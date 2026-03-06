@@ -33,8 +33,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rules\Unique;
 
 class TarjetonResource extends Resource
 {
@@ -80,7 +78,7 @@ class TarjetonResource extends Resource
 
                             if (! $equipoId || ! $value) {
                                 return; // Evita fallos si aún no se seleccionó un valor
-                            } 
+                            }
                         },
                     ]),
 
