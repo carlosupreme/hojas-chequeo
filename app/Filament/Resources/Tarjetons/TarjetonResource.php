@@ -69,11 +69,6 @@ class TarjetonResource extends Resource
                             $set('estado', 'encendido');
                         }
                     })
-                    ->unique(ignoreRecord: true, modifyRuleUsing: function (Unique $rule, callable $get) {
-                        return $rule
-                            ->where('fecha', $get('fecha'))
-                            ->where('equipo_id', $get('equipo_id'));
-                    })
                     ->required(),
                 DatePicker::make('fecha')
                     ->default(now())
@@ -81,22 +76,11 @@ class TarjetonResource extends Resource
                     ->live()
                     ->rules([
                         fn (Get $get): Closure => function (string $attribute, $value, Closure $fail) use ($get) {
-                            $recordId = $get('id') ?? null;
                             $equipoId = $get('equipo_id');
 
                             if (! $equipoId || ! $value) {
                                 return; // Evita fallos si aún no se seleccionó un valor
-                            }
-
-                            $exists = DB::table('tarjetons')
-                                ->where('equipo_id', $equipoId)
-                                ->whereDate('fecha', $value)
-                                ->when($recordId, fn ($query) => $query->where('id', '!=', $recordId))
-                                ->exists();
-
-                            if ($exists) {
-                                $fail('Esta fecha ya esta registrada para este equipo.');
-                            }
+                            } 
                         },
                     ]),
 

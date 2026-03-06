@@ -12,12 +12,12 @@ class EquipoFactory extends Factory
     public function definition(): array
     {
         return [
-            'nombre'        => fake()->words(2, true),
-            'tag'           => strtoupper(fake()->lexify('???-###')),
-            'area'          => 'LAVADO EN AGUA',
-            'foto'          => null,
+            'nombre' => fake()->words(2, true),
+            'tag' => strtoupper(fake()->lexify('???-###')),
+            'area' => 'LAVADO EN AGUA',
+            'foto' => null,
             'numeroControl' => null,
-            'revision'      => null,
+            'revision' => null,
         ];
     }
 }
