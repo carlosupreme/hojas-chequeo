@@ -142,6 +142,11 @@ class MergeWizard extends Component
         $this->rowDiff = $rows;
     }
 
+    public function useVersionLabel(int $colIndex, string $label): void
+    {
+        $this->columnDiff[$colIndex]['label'] = $label;
+    }
+
     public function goToStep(int $step): void
     {
         if ($step === 3) {

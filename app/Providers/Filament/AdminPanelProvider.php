@@ -702,10 +702,6 @@ class AdminPanelProvider extends PanelProvider
                 </script>
                 ")
             )
-            ->renderHook(
-                PanelsRenderHook::HEAD_END,
-                fn (): string => Blade::render("@vite('resources/js/app.js')")
-            )
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->font('Poppins')
             ->passwordReset()

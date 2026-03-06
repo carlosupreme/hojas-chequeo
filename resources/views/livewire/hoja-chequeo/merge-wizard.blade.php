@@ -150,7 +150,7 @@
                                                 <td class="px-4 py-3">
                                                     @if(isset($col['versions'][$v->id]))
                                                         <button
-                                                            wire:click="$set('columnDiff.{{ $i }}.label', '{{ addslashes($col['versions'][$v->id]) }}')"
+                                                            wire:click="useVersionLabel({{ $i }}, @js($col['versions'][$v->id]))"
                                                             type="button"
                                                             class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline"
                                                         >

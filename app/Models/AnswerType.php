@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class AnswerType extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'key',
         'label',

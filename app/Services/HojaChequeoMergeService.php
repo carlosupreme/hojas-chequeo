@@ -15,10 +15,9 @@ class HojaChequeoMergeService
     /**
      * Merge multiple HojaChequeo versions into a new v1.
      *
-     * @param  int  $equipoId
      * @param  int[]  $sourceHojaIds  IDs of versions to merge (must belong to equipoId)
      * @param  array  $columnSpec  Array of ['key', 'label', 'is_fixed', 'order', 'included']
-     * @param  array  $rowSpec     Array of ['order', 'included', 'source_hoja_id', 'answer_type_id', 'categoria', 'valores' => [colKey => valor]]
+     * @param  array  $rowSpec  Array of ['order', 'included', 'source_hoja_id', 'answer_type_id', 'categoria', 'valores' => [colKey => valor]]
      */
     public function merge(int $equipoId, array $sourceHojaIds, array $columnSpec, array $rowSpec): HojaChequeo
     {
@@ -114,10 +113,11 @@ class HojaChequeoMergeService
      */
     public function updatePerfilAccess(array $oldHojaIds, int $newHojaId): void
     {
+        $oldHojaIds = array_map('intval', $oldHojaIds);
         $perfiles = Perfil::where('acceso_total', false)->get();
 
         foreach ($perfiles as $perfil) {
-            $currentIds = $perfil->hoja_ids ?? [];
+            $currentIds = array_map('intval', $perfil->hoja_ids ?? []);
             $hadAccess = count(array_intersect($currentIds, $oldHojaIds)) > 0;
 
             if (! $hadAccess) {

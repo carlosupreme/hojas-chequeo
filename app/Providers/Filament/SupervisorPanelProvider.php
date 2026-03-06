@@ -710,10 +710,6 @@ class SupervisorPanelProvider extends PanelProvider
                 </script>
                 ")
             )
-            ->renderHook(
-                PanelsRenderHook::HEAD_END,
-                fn (): string => Blade::render("@vite('resources/js/app.js')")
-            )
             ->viteTheme('resources/css/filament/supervisor/theme.css')
             ->favicon(asset('/logo.png'))
             ->brandLogo(asset('logo.png'))
