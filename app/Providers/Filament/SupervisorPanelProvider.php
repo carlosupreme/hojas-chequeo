@@ -3,9 +3,11 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Analisis;
+use App\Filament\Pages\ControlPanel;
 use App\Filament\Pages\CreateChequeo;
 use App\Filament\Pages\CreateRecorrido;
 use App\Filament\Pages\Dashboard;
+use App\Filament\Pages\RegistroCargas;
 use App\Filament\Resources\Chequeos\ChequeosResource;
 use App\Filament\Resources\Recorridos\RecorridoResource;
 use App\Filament\Resources\Reportes\ReporteResource;
@@ -19,7 +21,6 @@ use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -839,11 +840,12 @@ class SupervisorPanelProvider extends PanelProvider
                 CreateChequeo::class,
                 CreateRecorrido::class,
                 Analisis::class,
+                ControlPanel::class,
+                RegistroCargas::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 AccountWidget::class,
-                FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
