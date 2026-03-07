@@ -7,12 +7,21 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class ReportesTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query) {
+                if (Auth::user()->hasRole(['Administrador', 'Supervisor'])) {
+                    return $query->orderByDesc('fecha');
+                }
+
+                return $query->where('user_id', Auth::id())->orderByDesc('fecha');
+            })
             ->columns([
                 TextColumn::make('fecha')
                     ->label('Reportado el:')
@@ -33,11 +42,11 @@ class ReportesTable
                     ->label('Area'),
                 textColumn::make('prioridad')
                     ->label('Prioridad')
-                    ->badge() // Convierte el texto en una etiqueta (tag)
+                    ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'alta' => 'danger',   // Rojo
-                        'media' => 'warning', // Amarillo/Naranja
-                        'baja' => 'success',  // Verde
+                        'alta' => 'danger',
+                        'media' => 'warning',
+                        'baja' => 'success',
                     }),
                 SelectColumn::make('estado')
                     ->label('Estado')
@@ -45,6 +54,7 @@ class ReportesTable
                         'pendiente' => 'Pendiente',
                         'realizado' => 'Realizado',
                     ])
+                    ->disabled(fn () => ! Auth::user()->hasRole(['Administrador', 'Supervisor']))
                     ->selectablePlaceholder(false)
                     ->default('Pendiente'),
             ])
@@ -52,9 +62,8 @@ class ReportesTable
                 //
             ])
             ->recordActions([
-                DeleteAction::make(),
-                EditAction::make(),
-
+                DeleteAction::make()->visible(fn () => Auth::user()->hasRole(['Administrador', 'Supervisor'])),
+                EditAction::make()->visible(fn () => Auth::user()->hasRole(['Administrador', 'Supervisor'])),
             ]);
     }
 }
