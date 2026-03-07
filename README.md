@@ -14,14 +14,4 @@ php artisan db:seed --class=RecorridoLavanderiaSeeder && \
 php artisan db:seed --class=RecorridoGerentesSeeder && \
 php artisan db:seed --class=RecorridoGeneralSeeder
 
-php artisan config:clear && \
-php artisan cache:clear && \
-php artisan route:clear && \
-php artisan view:clear && \
-php artisan optimize:clear && \
-php artisan optimize && \
-sudo rm -rf /var/lib/php/opcache/* && \
-sudo systemctl restart php8.4-fpm && \
-sudo systemctl reload nginx
-
 ```
