@@ -693,6 +693,109 @@ class SupervisorPanelProvider extends PanelProvider
                             }
                         }
                     }));
+
+                    // Tombolas Daily Trend Chart (Area) - Global Definition
+                    Alpine.data('tombolasDailyChart', () => ({
+                        chart: null,
+
+                        initChart(config) {
+                            const isDark = document.documentElement.classList.contains('dark');
+                            const options = {
+                                series: [{ name: 'Cargas', data: config.data || [] }],
+                                chart: {
+                                    type: 'area',
+                                    height: '100%',
+                                    fontFamily: 'inherit',
+                                    toolbar: { show: false },
+                                    background: 'transparent',
+                                    animations: { enabled: true, easing: 'easeinout', speed: 600 }
+                                },
+                                xaxis: {
+                                    categories: config.labels || [],
+                                    labels: { style: { colors: isDark ? '#9ca3af' : '#6b7280' }, rotate: -45 },
+                                    axisBorder: { show: false },
+                                    axisTicks: { show: false }
+                                },
+                                yaxis: {
+                                    min: 0,
+                                    labels: { style: { colors: isDark ? '#9ca3af' : '#6b7280' } }
+                                },
+                                colors: ['#3b82f6'],
+                                fill: {
+                                    type: 'gradient',
+                                    gradient: { shadeIntensity: 1, opacityFrom: 0.6, opacityTo: 0.1, stops: [0, 90, 100] }
+                                },
+                                stroke: { curve: 'smooth', width: 2 },
+                                grid: { borderColor: isDark ? '#374151' : '#e5e7eb', strokeDashArray: 4 },
+                                dataLabels: { enabled: false },
+                                theme: { mode: isDark ? 'dark' : 'light' },
+                                tooltip: { theme: isDark ? 'dark' : 'light' }
+                            };
+                            this.chart = new ApexCharts(this.\$el, options);
+                            this.chart.render();
+                        },
+
+                        updateChart(config) {
+                            if (this.chart) {
+                                this.chart.updateSeries([{ name: 'Cargas', data: config.data || [] }], true);
+                                this.chart.updateOptions({ xaxis: { categories: config.labels || [] } }, false, true);
+                            }
+                        }
+                    }));
+
+                    // Tombolas Per-Equipo Bar Chart - Global Definition
+                    Alpine.data('tombolasEquipoChart', () => ({
+                        chart: null,
+
+                        initChart(config) {
+                            const isDark = document.documentElement.classList.contains('dark');
+                            const options = {
+                                series: [{ name: 'Cargas', data: config.data || [] }],
+                                chart: {
+                                    type: 'bar',
+                                    height: '100%',
+                                    fontFamily: 'inherit',
+                                    toolbar: { show: false },
+                                    background: 'transparent',
+                                    animations: { enabled: true, easing: 'easeinout', speed: 600 }
+                                },
+                                plotOptions: {
+                                    bar: {
+                                        horizontal: true,
+                                        borderRadius: 4,
+                                        distributed: true,
+                                        dataLabels: { position: 'top' }
+                                    }
+                                },
+                                colors: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#ec4899'],
+                                xaxis: {
+                                    categories: config.labels || [],
+                                    labels: { style: { colors: isDark ? '#9ca3af' : '#6b7280' } }
+                                },
+                                yaxis: {
+                                    labels: { style: { colors: isDark ? '#9ca3af' : '#6b7280' } }
+                                },
+                                grid: { borderColor: isDark ? '#374151' : '#e5e7eb', strokeDashArray: 4 },
+                                dataLabels: {
+                                    enabled: true,
+                                    formatter: val => val,
+                                    style: { fontSize: '12px', colors: [isDark ? '#fff' : '#333'] }
+                                },
+                                legend: { show: false },
+                                theme: { mode: isDark ? 'dark' : 'light' },
+                                tooltip: { theme: isDark ? 'dark' : 'light' }
+                            };
+                            this.chart = new ApexCharts(this.\$el, options);
+                            this.chart.render();
+                        },
+
+                        updateChart(config) {
+                            if (this.chart) {
+                                this.chart.updateSeries([{ name: 'Cargas', data: config.data || [] }], true);
+                                this.chart.updateOptions({ xaxis: { categories: config.labels || [] } }, false, true);
+                            }
+                        }
+                    }));
                 });
 
                 // Listen for Livewire events

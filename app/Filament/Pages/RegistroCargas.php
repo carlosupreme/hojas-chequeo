@@ -6,9 +6,12 @@ use App\Models\CentroCosto;
 use App\Models\Equipo;
 use App\Models\RegistroCarga;
 use BackedEnum;
+use Carbon\Carbon;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
@@ -29,12 +32,19 @@ class RegistroCargas extends Page
 
     public ?int $equipoId = null;
 
+    public ?array $historialFilter = [];
+
     public function mount(): void
     {
         $user = Auth::user();
 
         $this->form->fill([
             'centro_costo_id' => $user->turno?->centro_costo_id,
+        ]);
+
+        $this->historialFilterForm->fill([
+            'desde' => now()->startOfDay()->toDateString(),
+            'hasta' => now()->toDateString(),
         ]);
     }
 
@@ -51,6 +61,36 @@ class RegistroCargas extends Page
                     ->live()
                     ->columnSpanFull()
                     ->required(),
+            ]);
+    }
+
+    public function historialFilterForm(Schema $schema): Schema
+    {
+        return $schema
+            ->statePath('historialFilter')
+            ->extraAttributes(['class' => 'w-full'])
+            ->components([
+                Grid::make()
+                    ->columns(2)
+                    ->columnSpanFull()
+                    ->components([
+                        DatePicker::make('desde')
+                            ->label('Desde')
+                            ->native(false)
+                            ->displayFormat('d/m/Y')
+                            ->locale('es')
+                            ->closeOnDateSelection()
+                            ->live()
+                            ->maxDate(now()),
+                        DatePicker::make('hasta')
+                            ->label('Hasta')
+                            ->native(false)
+                            ->displayFormat('d/m/Y')
+                            ->locale('es')
+                            ->closeOnDateSelection()
+                            ->live()
+                            ->maxDate(now()),
+                    ]),
             ]);
     }
 
@@ -115,7 +155,21 @@ class RegistroCargas extends Page
             ];
         }
 
-        return compact('tombolas', 'equipo', 'cargasHoy', 'stats');
+        $historial = collect();
+        $canSeeHistorial = Auth::user()->hasRole(['Administrador', 'Supervisor']);
+
+        if ($canSeeHistorial) {
+            $desde = Carbon::parse($this->historialFilter['desde'] ?? today())->startOfDay();
+            $hasta = Carbon::parse($this->historialFilter['hasta'] ?? today())->endOfDay();
+
+            $historial = RegistroCarga::with(['equipo', 'user', 'turno', 'centroCosto'])
+                ->whereHas('equipo', fn ($q) => $q->where('tag', 'like', '%-TOM-%'))
+                ->whereBetween('registrado_en', [$desde, $hasta])
+                ->latest('registrado_en')
+                ->get();
+        }
+
+        return compact('tombolas', 'equipo', 'cargasHoy', 'stats', 'historial', 'canSeeHistorial');
     }
 
     public static function getNavigationGroup(): ?string

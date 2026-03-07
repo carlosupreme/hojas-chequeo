@@ -17,7 +17,7 @@
     {{-- TABS NAVIGATION --}}
     <div class="border-b border-gray-200 dark:border-gray-800">
         <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-            @foreach(['recorridos' => 'Recorridos', 'mantenimiento' => 'Mantenimiento', 'reportes' => 'Reportes'] as $key => $label)
+            @foreach(['recorridos' => 'Recorridos', 'mantenimiento' => 'Mantenimiento', 'reportes' => 'Reportes', 'tombolas' => 'Tombolas'] as $key => $label)
                 <button
                     wire:click="setTab('{{ $key }}')"
                     class="{{ $activeTab === $key
@@ -165,6 +165,13 @@
             <livewire:analisis.analisis-reportes :start-date="$this->dateRange['inicio']"
                                                  :end-date="$this->dateRange['final']"
                                                  :key="'reportes-'.md5($this->dateRange['inicio'].$this->dateRange['final'])"/>
+        @endif
+
+        {{-- ================= TAB: TOMBOLAS ================= --}}
+        @if($activeTab === 'tombolas')
+            <livewire:analisis.analisis-tombolas :start-date="$this->dateRange['inicio']"
+                                                 :end-date="$this->dateRange['final']"
+                                                 :key="'tombolas-'.md5($this->dateRange['inicio'].$this->dateRange['final'])"/>
         @endif
     </div>
 </x-filament-panels::page>
