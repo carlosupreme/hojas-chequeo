@@ -2,11 +2,8 @@
     <div class="space-y-4 pb-8">
 
         {{-- ─── 1. Context bar: turno + centro_costo ────────────────────────────── --}}
-        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4">
-            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Contexto del turno</p>
-            <div class="grid grid-cols-2 gap-3">
-                {{ $this->form }}
-            </div>
+        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4 w-full">
+            {{ $this->form }}
         </div>
 
         {{-- ─── 2. Tombola selector ─────────────────────────────────────────────── --}}

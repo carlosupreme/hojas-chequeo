@@ -5,12 +5,12 @@ namespace App\Filament\Pages;
 use App\Models\CentroCosto;
 use App\Models\Equipo;
 use App\Models\RegistroCarga;
-use App\Models\Turno;
 use BackedEnum;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,7 +22,7 @@ class RegistroCargas extends Page
 
     public static function getNavigationLabel(): string
     {
-        return 'Registro Cargas';
+        return 'Registro Tombolas';
     }
 
     public ?array $data = [];
@@ -34,33 +34,22 @@ class RegistroCargas extends Page
         $user = Auth::user();
 
         $this->form->fill([
-            'turno_id' => $user->turno_id,
             'centro_costo_id' => $user->turno?->centro_costo_id,
         ]);
     }
 
-    /**
-     * Context selectors — pre-filled from the user's assigned turno/centro_costo
-     * but freely changeable during operation (e.g. operator covers two shifts).
-     */
     public function form(Schema $schema): Schema
     {
         return $schema
             ->statePath('data')
             ->components([
-                Select::make('turno_id')
-                    ->label('Turno')
-                    ->options(Turno::where('activo', true)->pluck('nombre', 'id'))
-                    ->native(false)
-                    ->preload()
-                    ->live()
-                    ->required(),
                 Select::make('centro_costo_id')
                     ->label('Centro de costo')
                     ->options(CentroCosto::pluck('nombre', 'id'))
                     ->native(false)
                     ->preload()
                     ->live()
+                    ->columnSpanFull()
                     ->required(),
             ]);
     }
@@ -81,7 +70,7 @@ class RegistroCargas extends Page
         RegistroCarga::create([
             'equipo_id' => $this->equipoId,
             'user_id' => Auth::id(),
-            'turno_id' => $state['turno_id'] ?? null,
+            'turno_id' => Auth::user()->turno_id,
             'centro_costo_id' => $state['centro_costo_id'] ?? null,
             'registrado_en' => now(),
         ]);
@@ -127,5 +116,15 @@ class RegistroCargas extends Page
         }
 
         return compact('tombolas', 'equipo', 'cargasHoy', 'stats');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Produccion';
+    }
+
+    public function getMaxContentWidth(): Width
+    {
+        return Width::Full;
     }
 }
