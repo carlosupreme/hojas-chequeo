@@ -229,7 +229,7 @@
                         </td>
                         <td class="operacion-col encendido">ENCENDIDO</td>
                         <td class="responsable-col">{{ $registro->encendido_por ?? 'N/A' }}</td>
-                        <td class="hora-col">{{ $registro->hora_encendido ?? 'N/A' }}</td>
+                        <td class="hora-col">{{ $registro->hora_encendido?->format('H:i') ?? 'N/A' }}</td>
                         <td rowspan="2" class="tiempo-col">
                             {{ $registro->tiempo_operacion_formateado }}
                         </td>
@@ -237,7 +237,7 @@
                     <tr>
                         <td class="operacion-col apagado">APAGADO</td>
                         <td class="responsable-col">{{ $registro->apagado_por ?? 'N/A' }}</td>
-                        <td class="hora-col">{{ $registro->hora_apagado ?? 'N/A' }}</td>
+                        <td class="hora-col">{{ $registro->hora_apagado?->format('H:i') ?? 'N/A' }}</td>
                     </tr>
                     @if($registro->observaciones)
                         <tr>

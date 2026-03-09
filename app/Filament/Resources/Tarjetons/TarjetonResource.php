@@ -5,10 +5,9 @@ namespace App\Filament\Resources\Tarjetons;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Utilities\Set;
-use Filament\Forms\Components\DatePicker;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\TimePicker;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Placeholder;
@@ -17,6 +16,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DatePicker;
 use Filament\Actions\ViewAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\Action;
@@ -25,22 +25,14 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\BulkAction;
 use App\Filament\Resources\Tarjetons\Pages\ManageTarjetons;
 use App\Filament\Resources\Tarjetons\Pages\BitacoraReporte;
-use App\Filament\Resources\TarjetonResource\Pages;
-use App\Filament\Resources\TarjetonResource\RelationManagers;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\Tarjeton;
-use Filament\Forms;
 use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Table;
 use Carbon\Carbon;
-use Illuminate\Validation\Rule;
 use Filament\Notifications\Notification;
 use Illuminate\Validation\Rules\Unique;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Closure;
-use Illuminate\Support\Facades\DB;
 
 class TarjetonResource extends Resource
 {
@@ -65,59 +57,37 @@ class TarjetonResource extends Resource
                     ->searchable()
                     ->preload()
                     ->live()
-                    ->afterStateUpdated(function (Set $set, $state) {
+                    ->afterStateUpdated(function (Set $set, $state): void {
                         if ($state) {
-                            $set('fecha', now()->format('Y-m-d'));
-                            $set('hora_encendido', now()->format('H:i'));
+                            $set('hora_encendido', now()->format('Y-m-d H:i:s'));
                             $set('encendido_por', auth()->user()->name);
                             $set('estado', 'encendido');
                         }
                     })
-                    ->unique(ignoreRecord: true, modifyRuleUsing: function (Unique $rule, callable $get) {
+                    ->unique(ignoreRecord: true, modifyRuleUsing: function (Unique $rule, callable $get): Unique {
+                        $horaEncendido = $get('hora_encendido');
+                        $fechaBase = $horaEncendido ? Carbon::parse($horaEncendido)->toDateString() : now()->toDateString();
+
                         return $rule
-                        ->where('fecha', $get('fecha'))
-                        ->where('equipo_id', $get('equipo_id'));
+                            ->where('fecha', $fechaBase)
+                            ->where('equipo_id', $get('equipo_id'));
                     })
                     ->required(),
-        DatePicker::make('fecha')
-            ->default(now())
-            ->required()
-            ->live()
-            ->rules([
-                fn (Get $get): Closure => function (string $attribute, $value, Closure $fail) use ($get) {
-                    $recordId = $get('id') ?? null;
-                    $equipoId = $get('equipo_id');
-
-                    if (!$equipoId || !$value) {
-                        return; // Evita fallos si aún no se seleccionó un valor
-                    }
-
-                    $exists = DB::table('tarjetons')
-                        ->where('equipo_id', $equipoId)
-                        ->whereDate('fecha', $value)
-                        ->when($recordId, fn ($query) => $query->where('id', '!=', $recordId))
-                        ->exists();
-
-                    if ($exists) {
-                        $fail("Esta fecha ya esta registrada para este equipo.");
-                    }
-                },
-            ]),
 
         // Sección de Encendido
         Section::make('Registro de Encendido')
             ->schema([
-                TimePicker::make('hora_encendido')
-                    ->default(now()->format('H:i'))
+                DateTimePicker::make('hora_encendido')
+                    ->default(now())
                     ->seconds(false)
-                    ->label('Hora de Encendido')
+                    ->label('Fecha y Hora de Encendido')
                     ->live()
-                    ->afterStateUpdated(function (Set $set) {
+                    ->afterStateUpdated(function (Set $set): void {
                         $set('encendido_por', auth()->user()->name);
                     }),
 
                 TextInput::make('encendido_por')
-                    ->default(fn() => auth()->user()->name)
+                    ->default(fn (): string => auth()->user()->name)
                     ->label('Encendido por')
                     ->required()
                     ->maxLength(255),
@@ -127,22 +97,21 @@ class TarjetonResource extends Resource
         // Sección de Apagado
         Section::make('Registro de Apagado')
             ->schema([
-                TimePicker::make('hora_apagado')
+                DateTimePicker::make('hora_apagado')
                     ->seconds(false)
-                    ->label('Hora de Apagado')
+                    ->label('Fecha y Hora de Apagado')
                     ->live()
-                    ->afterStateUpdated(function (Set $set, $state, Get $get) {
+                    ->afterStateUpdated(function (Set $set, $state, Get $get): void {
                         if ($state) {
                             $set('apagado_por', auth()->user()->name);
                             $set('estado', 'apagado');
 
-                            // Validar que la hora de apagado sea posterior a la de encendido
                             $horaEncendido = $get('hora_encendido');
-                            if ($horaEncendido && $state <= $horaEncendido) {
+                            if ($horaEncendido && Carbon::parse($state)->lessThanOrEqualTo(Carbon::parse($horaEncendido))) {
                                 Notification::make()
                                     ->warning()
                                     ->title('Atención')
-                                    ->body('La hora de apagado debe ser posterior a la de encendido')
+                                    ->body('La fecha/hora de apagado debe ser posterior a la de encendido')
                                     ->send();
                             }
                         }
@@ -184,15 +153,18 @@ class TarjetonResource extends Resource
 
                         if ($horaEncendido && $horaApagado) {
                             try {
-                                $inicio = Carbon::createFromFormat('H:i', $horaEncendido);
-                                $fin = Carbon::createFromFormat('H:i', $horaApagado);
+                                $inicio = Carbon::parse($horaEncendido);
+                                $fin = Carbon::parse($horaApagado);
 
                                 if ($fin->greaterThan($inicio)) {
-                                    $diff = $fin->diff($inicio);
-                                    return $diff->format('%h horas y %i minutos');
-                                } else {
-                                    return 'Verificar horarios';
+                                    $totalMinutos = $inicio->diffInMinutes($fin);
+                                    $horas = intval($totalMinutos / 60);
+                                    $minutos = $totalMinutos % 60;
+
+                                    return "{$horas} horas y {$minutos} minutos";
                                 }
+
+                                return 'Verificar horarios';
                             } catch (Exception $e) {
                                 return 'Formato de hora inválido';
                             }
@@ -227,14 +199,13 @@ class TarjetonResource extends Resource
                 ->label('Encendido')
                 ->badge()
                 ->color('success')
-                ->formatStateUsing(fn (string $state): string => $state ?: 'N/A'),
+                ->formatStateUsing(fn ($state): string => $state?->format('H:i') ?? 'N/A'),
 
             TextColumn::make('hora_apagado')
                 ->label('Apagado')
                 ->badge()
                 ->color('danger')
-                ->formatStateUsing(fn (?string $state): string => $state ?: 'En operación')
-                ->placeholder('En operación'),
+                ->formatStateUsing(fn ($state): string => $state?->format('H:i') ?? 'En operación'),
 
             TextColumn::make('tiempo_operacion_formateado')
                 ->label('Tiempo Total')
@@ -325,12 +296,12 @@ class TarjetonResource extends Resource
                 ->label(fn (Tarjeton $record) => $record->estado === 'encendido' ? 'Apagar' : 'Encender')
                 ->icon(fn (Tarjeton $record) => $record->estado === 'encendido' ? 'heroicon-o-stop' : 'heroicon-o-play')
                 ->color(fn (Tarjeton $record) => $record->estado === 'encendido' ? 'danger' : 'success')
-                ->action(function (Tarjeton $record) {
+                ->action(function (Tarjeton $record): void {
                     if ($record->estado === 'encendido') {
                         $record->update([
-                            'hora_apagado' => now()->format('H:i'),
+                            'hora_apagado' => now(),
                             'apagado_por' => auth()->user()->name,
-                            'estado' => 'apagado'
+                            'estado' => 'apagado',
                         ]);
 
                         Notification::make()
@@ -340,9 +311,9 @@ class TarjetonResource extends Resource
                             ->send();
                     } else {
                         $record->update([
-                            'hora_encendido' => now()->format('H:i'),
+                            'hora_encendido' => now(),
                             'encendido_por' => auth()->user()->name,
-                            'estado' => 'encendido'
+                            'estado' => 'encendido',
                         ]);
 
                         Notification::make()
@@ -360,11 +331,11 @@ class TarjetonResource extends Resource
                 ->label('Mantenimiento')
                 ->icon('heroicon-o-wrench-screwdriver')
                 ->color('warning')
-                ->action(function (Tarjeton $record) {
+                ->action(function (Tarjeton $record): void {
                     $record->update([
                         'estado' => 'mantenimiento',
                         'apagado_por' => auth()->user()->name,
-                        'hora_apagado' => now()->format('H:i'),
+                        'hora_apagado' => now(),
                     ]);
                 })
                 ->visible(fn (Tarjeton $record) => $record->estado !== 'mantenimiento'),

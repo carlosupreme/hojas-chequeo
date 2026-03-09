@@ -79,7 +79,7 @@
                                             {{ $registro->encendido_por ?? 'N/A' }}
                                         </td>
                                         <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-sm text-gray-900 dark:text-white font-mono">
-                                            {{ $registro->hora_encendido ?? 'N/A' }}
+                                            {{ $registro->hora_encendido?->format('H:i') ?? 'N/A' }}
                                         </td>
                                         <td rowspan="2" class="border border-gray-300 dark:border-gray-600 px-4 py-3 text-sm text-gray-900 dark:text-white font-medium text-center align-middle">
                                             <x-filament::badge color="info">
@@ -97,7 +97,7 @@
                                             {{ $registro->apagado_por ?? 'N/A' }}
                                         </td>
                                         <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-sm text-gray-900 dark:text-white font-mono">
-                                            {{ $registro->hora_apagado ?? 'N/A' }}
+                                            {{ $registro->hora_apagado?->format('H:i') ?? 'N/A' }}
                                         </td>
                                     </tr>
                                     @if($registro->observaciones)
