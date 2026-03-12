@@ -48,12 +48,14 @@ class ReportesChart extends ChartWidget
 
             $weekLabel = $currentDate->isoFormat('D MMM').' - '.$weekEnd->isoFormat('D MMM');
 
-            $pendientesCount = Reporte::whereBetween('fecha', [$currentDate, $weekEnd])
+            $weeklyQuery = Reporte::query()->whereBetween('fecha', [$currentDate, $weekEnd]);
+
+            $pendientesCount = (clone $weeklyQuery)
                 ->where('estado', 'pendiente')
                 ->count();
 
-            $realizadosCount = Reporte::whereBetween('fecha', [$currentDate, $weekEnd])
-                ->where('estado', 'realizada')
+            $realizadosCount = (clone $weeklyQuery)
+                ->whereIn('estado', ['realizado', 'realizada'])
                 ->count();
 
             $labels[] = $weekLabel;
