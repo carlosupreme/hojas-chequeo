@@ -3,10 +3,10 @@
 namespace App\Filament\Resources\Tarjetons;
 
 use App\Filament\Resources\Tarjetons\Pages\ManageTarjetons;
+use App\Models\Equipo;
 use App\Models\Tarjeton;
 use BackedEnum;
 use Carbon\Carbon;
-use Closure;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -14,13 +14,16 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\TimePicker;
+use Filament\Forms\Components\ToggleButtons;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
@@ -33,6 +36,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class TarjetonResource extends Resource
 {
@@ -53,137 +57,183 @@ class TarjetonResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
+            ->columns(3)
             ->components([
-                Select::make('equipo_id')
-                    ->relationship('equipo', 'tag')
-                    ->searchable()
-                    ->preload()
-                    ->live()
-                    ->afterStateUpdated(function (Set $set, $state) {
-                        if ($state) {
-                            $set('fecha', now()->format('Y-m-d'));
-                            $set('hora_encendido', now()->format('H:i'));
-                            $set('encendido_por', auth()->user()->name);
-                            $set('estado', 'encendido');
-                        }
-                    })
-                    ->required(),
-                DatePicker::make('fecha')
-                    ->default(now())
-                    ->required()
-                    ->live()
-                    ->rules([
-                        fn (Get $get): Closure => function (string $attribute, $value, Closure $fail) use ($get) {
-                            $equipoId = $get('equipo_id');
-
-                            if (! $equipoId || ! $value) {
-                                return; // Evita fallos si aún no se seleccionó un valor
-                            }
-                        },
-                    ]),
-
-                // Sección de Encendido
-                Section::make('Registro de Encendido')
+                // ── Left column: equipo + time entries (spans 2 cols) ──
+                Grid::make(1)
+                    ->columnSpan(2)
                     ->schema([
-                        TimePicker::make('hora_encendido')
-                            ->default(now()->format('H:i'))
-                            ->seconds(false)
-                            ->label('Hora de Encendido')
-                            ->live()
-                            ->afterStateUpdated(function (Set $set) {
-                                $set('encendido_por', auth()->user()->name);
-                            }),
+                        Section::make('Equipo')
+                            ->icon('heroicon-o-cpu-chip')
+                            ->schema([
+                                Select::make('equipo_id')
+                                    ->options(Equipo::calderas()->pluck('tag', 'id'))
+                                    ->searchable()
+                                    ->preload()
+                                    ->live()
+                                    ->afterStateUpdated(function (Set $set, $state) {
+                                        if ($state) {
+                                            $set('hora_encendido', now());
+                                            $set('encendido_por', Auth::user()->name);
+                                            $set('estado', 'encendido');
+                                        }
+                                    })
+                                    ->required()
+                                    ->columnSpanFull(),
+                            ]),
 
-                        TextInput::make('encendido_por')
-                            ->default(fn () => auth()->user()->name)
-                            ->label('Encendido por')
-                            ->required()
-                            ->maxLength(255),
-                    ])
-                    ->columns(),
+                        Grid::make(2)
+                            ->schema([
+                                // Encendido
+                                Fieldset::make('Encendido')
+                                    ->columns(1)
+                                    ->schema([
+                                        DateTimePicker::make('hora_encendido')
+                                            ->default(now())
+                                            ->seconds(false)
+                                            ->label('Fecha / Hora')
+                                            ->prefixIcon('heroicon-o-play')
+                                            ->live()
+                                            ->afterStateUpdated(function (Set $set) {
+                                                $set('encendido_por', auth()->user()->name);
+                                            }),
 
-                // Sección de Apagado
-                Section::make('Registro de Apagado')
-                    ->schema([
-                        TimePicker::make('hora_apagado')
-                            ->seconds(false)
-                            ->label('Hora de Apagado')
-                            ->live()
-                            ->afterStateUpdated(function (Set $set, $state, Get $get) {
-                                if ($state) {
-                                    $set('apagado_por', auth()->user()->name);
-                                    $set('estado', 'apagado');
+                                        TextInput::make('encendido_por')
+                                            ->default(fn () => auth()->user()->name)
+                                            ->label('Responsable')
+                                            ->prefixIcon('heroicon-o-user')
+                                            ->required()
+                                            ->maxLength(255),
+                                    ]),
 
-                                    // Validar que la hora de apagado sea posterior a la de encendido
-                                    $horaEncendido = $get('hora_encendido');
-                                    if ($horaEncendido && $state <= $horaEncendido) {
-                                        Notification::make()
-                                            ->warning()
-                                            ->title('Atención')
-                                            ->body('La hora de apagado debe ser posterior a la de encendido')
-                                            ->send();
-                                    }
-                                }
-                            }),
+                                // Apagado
+                                Fieldset::make('Apagado')
+                                    ->columns(1)
+                                    ->schema([
+                                        DateTimePicker::make('hora_apagado')
+                                            ->seconds(false)
+                                            ->label('Fecha / Hora')
+                                            ->prefixIcon('heroicon-o-stop')
+                                            ->live()
+                                            ->afterStateUpdated(function (Set $set, $state, Get $get) {
+                                                if ($state) {
+                                                    $set('apagado_por', auth()->user()->name);
+                                                    $set('estado', 'apagado');
 
-                        TextInput::make('apagado_por')
-                            ->label('Apagado por')
-                            ->maxLength(255),
-                    ])
-                    ->columns()
-                    ->collapsed()
-                    ->collapsible(),
+                                                    $horaEncendido = $get('hora_encendido');
+                                                    if ($horaEncendido && $state <= $horaEncendido) {
+                                                        Notification::make()
+                                                            ->warning()
+                                                            ->title('Atención')
+                                                            ->body('La hora de apagado debe ser posterior a la de encendido')
+                                                            ->send();
+                                                    }
+                                                }
+                                            }),
 
-                // Sección adicional
-                Section::make('Información Adicional')
-                    ->schema([
-                        Select::make('estado')
-                            ->options([
-                                'encendido' => 'Encendido',
-                                'apagado' => 'Apagado',
-                                'mantenimiento' => 'Mantenimiento',
-                            ])
-                            ->default('encendido')
-                            ->required()
-                            ->live(),
+                                        TextInput::make('apagado_por')
+                                            ->label('Responsable')
+                                            ->prefixIcon('heroicon-o-user')
+                                            ->maxLength(255),
+                                    ]),
+                            ]),
 
-                        Textarea::make('observaciones')
-                            ->label('Observaciones')
-                            ->placeholder('Agregar notas sobre el funcionamiento del equipo...')
-                            ->rows(3)
-                            ->columnSpanFull(),
-
-                        // Campo calculado para mostrar tiempo total
+                        // Tiempo calculado — full width banner
                         TextEntry::make('tiempo_total')
                             ->label('Tiempo Total de Operación')
+                            ->icon('heroicon-o-clock')
                             ->state(function (Get $get): string {
                                 $horaEncendido = $get('hora_encendido');
                                 $horaApagado = $get('hora_apagado');
 
                                 if ($horaEncendido && $horaApagado) {
                                     try {
-                                        $inicio = Carbon::createFromFormat('H:i', $horaEncendido);
-                                        $fin = Carbon::createFromFormat('H:i', $horaApagado);
+                                        $inicio = Carbon::parse($horaEncendido);
+                                        $fin = Carbon::parse($horaApagado);
 
                                         if ($fin->greaterThan($inicio)) {
-                                            $diff = $fin->diff($inicio);
+                                            $totalMin = (int) $inicio->diffInMinutes($fin);
+                                            $h = intdiv($totalMin, 60);
+                                            $m = $totalMin % 60;
 
-                                            return $diff->format('%h horas y %i minutos');
-                                        } else {
-                                            return 'Verificar horarios';
+                                            return "{$h}h {$m}m";
                                         }
+
+                                        return 'Verificar horarios';
                                     } catch (\Exception $e) {
-                                        return 'Formato de hora inválido';
+                                        return 'Formato inválido';
                                     }
                                 }
 
                                 return 'Registra ambas horas para calcular';
                             })
                             ->live(),
-                    ])
-                    ->columns()
-                    ->collapsed()
-                    ->collapsible(),
+
+                        // Observaciones
+                        Textarea::make('observaciones')
+                            ->label('Observaciones')
+                            ->placeholder('Notas sobre el funcionamiento del equipo...')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ]),
+
+                // ── Right sidebar: estado + falla (spans 1 col) ──
+                Grid::make(1)
+                    ->columnSpan(1)
+                    ->schema([
+                        Section::make('Estado')
+                            ->icon('heroicon-o-signal')
+                            ->schema([
+                                ToggleButtons::make('estado')
+                                    ->options([
+                                        'encendido' => 'Encendido',
+                                        'apagado' => 'Apagado',
+                                        'mantenimiento' => 'Mantenimiento',
+                                    ])
+                                    ->icons([
+                                        'encendido' => 'heroicon-o-play',
+                                        'apagado' => 'heroicon-o-stop',
+                                        'mantenimiento' => 'heroicon-o-wrench-screwdriver',
+                                    ])
+                                    ->colors([
+                                        'encendido' => 'success',
+                                        'apagado' => 'danger',
+                                        'mantenimiento' => 'warning',
+                                    ])
+                                    ->default('encendido')
+                                    ->required()
+                                    ->inline()
+                                    ->live(),
+                            ]),
+
+                        Section::make('Falla de Vapor')
+                            ->icon('heroicon-o-fire')
+                            ->description('Reportar si el equipo presenta falla de vapor')
+                            ->collapsible()
+                            ->collapsed()
+                            ->schema([
+                                ToggleButtons::make('falla_vapor')
+                                    ->label('¿Falla detectada?')
+                                    ->boolean('Sí', 'No')
+                                    ->default(false)
+                                    ->icons([
+                                        true => 'heroicon-s-fire',
+                                        false => 'heroicon-o-check-circle',
+                                    ])
+                                    ->colors([
+                                        true => 'danger',
+                                        false => 'success',
+                                    ])
+                                    ->inline()
+                                    ->live(),
+
+                                Textarea::make('falla_vapor_descripcion')
+                                    ->label('Descripción de la falla')
+                                    ->placeholder('Describe la falla detectada...')
+                                    ->rows(3)
+                                    ->visible(fn (Get $get): bool => (bool) $get('falla_vapor')),
+                            ]),
+                    ]),
             ]);
     }
 
@@ -196,22 +246,24 @@ class TarjetonResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('fecha')
+                TextColumn::make('hora_encendido')
                     ->label('Fecha')
                     ->date('d/M/Y')
-                    ->sortable(),
+                    ->sortable()
+                    ->description(fn (Tarjeton $record): string => $record->hora_encendido?->locale('es')->translatedFormat('l') ?? ''),
 
                 TextColumn::make('hora_encendido')
                     ->label('Encendido')
                     ->badge()
                     ->color('success')
-                    ->formatStateUsing(fn (string $state): string => $state ?: 'N/A'),
+                    ->dateTime('d/M H:i')
+                    ->placeholder('N/A'),
 
                 TextColumn::make('hora_apagado')
                     ->label('Apagado')
                     ->badge()
                     ->color('danger')
-                    ->formatStateUsing(fn (?string $state): string => $state ?: 'En operación')
+                    ->dateTime('d/M H:i')
                     ->placeholder('En operación'),
 
                 TextColumn::make('tiempo_operacion_formateado')
@@ -277,11 +329,11 @@ class TarjetonResource extends Resource
                         return $query
                             ->when(
                                 $data['desde'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('fecha', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('hora_encendido', '>=', $date),
                             )
                             ->when(
                                 $data['hasta'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('fecha', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('hora_encendido', '<=', $date),
                             );
                     })
                     ->indicateUsing(function (array $data): array {
@@ -308,7 +360,7 @@ class TarjetonResource extends Resource
 
                 Filter::make('solo_hoy')
                     ->label('Solo Hoy')
-                    ->query(fn (Builder $query): Builder => $query->whereDate('fecha', today()))
+                    ->query(fn (Builder $query): Builder => $query->whereDate('hora_encendido', today()))
                     ->toggle(),
             ])
             ->recordActions([
@@ -321,7 +373,7 @@ class TarjetonResource extends Resource
                     ->action(function (Tarjeton $record) {
                         if ($record->estado === 'encendido') {
                             $record->update([
-                                'hora_apagado' => now()->format('H:i'),
+                                'hora_apagado' => now(),
                                 'apagado_por' => auth()->user()->name,
                                 'estado' => 'apagado',
                             ]);
@@ -333,7 +385,7 @@ class TarjetonResource extends Resource
                                 ->send();
                         } else {
                             $record->update([
-                                'hora_encendido' => now()->format('H:i'),
+                                'hora_encendido' => now(),
                                 'encendido_por' => auth()->user()->name,
                                 'estado' => 'encendido',
                             ]);
@@ -398,7 +450,7 @@ class TarjetonResource extends Resource
                         $record->update([
                             'estado' => 'mantenimiento',
                             'apagado_por' => auth()->user()->name,
-                            'hora_apagado' => now()->format('H:i'),
+                            'hora_apagado' => now(),
                         ]);
                     })
                     ->visible(fn (Tarjeton $record) => $record->estado !== 'mantenimiento'),
@@ -436,8 +488,7 @@ class TarjetonResource extends Resource
                         }),
                 ]),
             ])
-            ->defaultSort('fecha', 'desc')
-            ->defaultSort('created_at', 'desc')
+            ->defaultSort('hora_encendido', 'desc')
             ->poll('60s') // Auto-refresh cada minuto
             ->persistSortInSession()
             ->persistSearchInSession()

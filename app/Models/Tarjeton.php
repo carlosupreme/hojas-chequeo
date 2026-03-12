@@ -11,7 +11,6 @@ class Tarjeton extends Model
 {
     protected $fillable = [
         'equipo_id',
-        'fecha',
         'hora_encendido',
         'hora_apagado',
         'encendido_por',
@@ -23,10 +22,17 @@ class Tarjeton extends Model
         'falla_vapor_descripcion',
     ];
 
+    /**
+     * Derive fecha from hora_encendido for backward compatibility.
+     */
+    public function getFechaAttribute(): ?\Carbon\Carbon
+    {
+        return $this->hora_encendido?->copy()->startOfDay();
+    }
+
     protected $casts = [
-        'fecha' => 'date',
-        'hora_encendido' => 'string',
-        'hora_apagado' => 'string',
+        'hora_encendido' => 'datetime',
+        'hora_apagado' => 'datetime',
         'falla_vapor' => 'boolean',
     ];
 
@@ -48,15 +54,10 @@ class Tarjeton extends Model
     {
         if ($this->hora_encendido && $this->hora_apagado) {
             try {
-                $inicio = Carbon::createFromFormat('H:i', $this->hora_encendido);
-                $fin = Carbon::createFromFormat('H:i', $this->hora_apagado);
+                $inicio = Carbon::parse($this->hora_encendido);
+                $fin = Carbon::parse($this->hora_apagado);
 
-                if ($fin->lessThan($inicio)) {
-                    $fin->addDay();
-                    $this->tiempo_operacion_minutos = $inicio->diffInMinutes($fin);
-                } else {
-                    $this->tiempo_operacion_minutos = $inicio->diffInMinutes($fin);
-                }
+                $this->tiempo_operacion_minutos = (int) $inicio->diffInMinutes($fin);
             } catch (Exception $e) {
                 $this->tiempo_operacion_minutos = null;
             }
@@ -71,32 +72,22 @@ class Tarjeton extends Model
         }
 
         try {
-            $inicio = Carbon::createFromFormat('H:i', $this->hora_encendido);
-            $fin = Carbon::createFromFormat('H:i', $this->hora_apagado);
+            $inicio = Carbon::parse($this->hora_encendido);
+            $fin = Carbon::parse($this->hora_apagado);
 
-            if ($fin->lessThan($inicio)) {
-                $fin->addDay();
-            }
-
-            $totalMinutos = $inicio->diffInMinutes($fin);
-            $horas = intval($totalMinutos / 60);
+            $totalMinutos = (int) $inicio->diffInMinutes($fin);
+            $horas = intdiv($totalMinutos, 60);
             $minutos = $totalMinutos % 60;
 
-            if ($fin->day > $inicio->day) {
-                return "{$horas}h {$minutos}m (nocturno)";
-            }
-
             return "{$horas}h {$minutos}m";
-
         } catch (Exception $e) {
             return 'Error formato';
         }
     }
 
-    // Scopes útiles
     public function scopeHoy($query)
     {
-        return $query->whereDate('fecha', today());
+        return $query->whereDate('hora_encendido', Carbon::today());
     }
 
     public function scopeEncendidos($query)
@@ -111,11 +102,11 @@ class Tarjeton extends Model
 
     public function scopeEntreFechas($query, $fechaInicio, $fechaFin)
     {
-        return $query->whereBetween('fecha', [$fechaInicio, $fechaFin]);
+        return $query->whereBetween('hora_encendido', [$fechaInicio, $fechaFin]);
     }
 
     public function scopeUltimaSemana($query)
     {
-        return $query->whereDate('fecha', '>=', now()->subWeek());
+        return $query->whereDate('hora_encendido', '>=', now()->subWeek());
     }
 }

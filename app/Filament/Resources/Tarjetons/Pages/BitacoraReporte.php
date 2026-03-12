@@ -36,8 +36,8 @@ class BitacoraReporte extends Page
     public function mount(): void
     {
         $this->form->fill([
-            'fecha_inicio' => now()->subDays(7)->format('Y-m-d'),
-            'fecha_fin' => now()->format('Y-m-d'),
+            'fecha_inicio' => now()->subDays(7),
+            'fecha_fin' => now(),
         ]);
     }
 
@@ -47,7 +47,7 @@ class BitacoraReporte extends Page
             ->components([
                 Select::make('equipo_id')
                     ->label('Tag del Equipo')
-                    ->options(Equipo::orderBy('tag')->pluck('tag', 'id'))
+                    ->options(Equipo::calderas()->pluck('tag', 'id'))
                     ->searchable()
                     ->preload()
                     ->required(),
@@ -55,11 +55,19 @@ class BitacoraReporte extends Page
                 DatePicker::make('fecha_inicio')
                     ->label('Fecha Inicio')
                     ->required()
+                    ->displayFormat('D d/m/Y')
+                    ->native(false)
+                    ->locale('es')
+                    ->closeOnDateSelection()
                     ->default(now()->subDays(7)),
 
                 DatePicker::make('fecha_fin')
                     ->label('Fecha Fin')
                     ->required()
+                    ->displayFormat('D d/m/Y')
+                    ->native(false)
+                    ->locale('es')
+                    ->closeOnDateSelection()
                     ->default(now())
                     ->afterOrEqual('fecha_inicio'),
             ])
@@ -75,9 +83,9 @@ class BitacoraReporte extends Page
 
         $this->registros = Tarjeton::with('equipo')
             ->where('equipo_id', $data['equipo_id'])
-            ->whereDate('fecha', '>=', $data['fecha_inicio'])
-            ->whereDate('fecha', '<=', $data['fecha_fin'])
-            ->orderBy('fecha', 'asc')
+            ->whereDate('hora_encendido', '>=', $data['fecha_inicio'])
+            ->whereDate('hora_encendido', '<=', $data['fecha_fin'])
+            ->orderBy('hora_encendido', 'asc')
             ->get();
 
         $this->mostrarReporte = true;
@@ -108,8 +116,13 @@ class BitacoraReporte extends Page
 
         $data = $this->form->getState();
 
+        $registrosPorDia = $this->registros->groupBy(
+            fn (Tarjeton $t) => $t->hora_encendido?->format('Y-m-d') ?? 'sin-fecha'
+        );
+
         $pdf = PDF::loadView('bitacora-reporte-pdf', [
             'registros' => $this->registros,
+            'registrosPorDia' => $registrosPorDia,
             'equipo' => $this->equipo,
             'fecha_inicio' => $data['fecha_inicio'],
             'fecha_fin' => $data['fecha_fin'],
@@ -128,7 +141,7 @@ class BitacoraReporte extends Page
     public function limpiarReporte(): void
     {
         $this->mostrarReporte = false;
-        $this->registros = [];
+        $this->registros = collect();
         $this->equipo = null;
 
         Notification::make()
