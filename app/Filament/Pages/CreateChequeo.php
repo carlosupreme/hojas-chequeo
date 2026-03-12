@@ -9,6 +9,7 @@ use App\Models\Equipo;
 use App\Models\HojaChequeo;
 use App\Models\HojaEjecucion;
 use App\Models\Reporte;
+use App\Models\User;
 use App\WithImageService;
 use BackedEnum;
 use Carbon\Carbon;
@@ -56,6 +57,10 @@ class CreateChequeo extends Page
     public $user;
 
     public bool $autoSaving = false;
+
+    public bool $dateWasChanged = false;
+
+    protected ?string $originalDateSelected = null;
 
     #[Url(as: 'e', except: null)]
     public null|string|int $ejecucionId = null;
@@ -121,6 +126,21 @@ class CreateChequeo extends Page
         ]);
 
         $this->dateSelected = $this->hojaEjecucion?->created_at ?? Carbon::now();
+        $this->originalDateSelected = $this->normalizeDateForComparison($this->dateSelected);
+        $this->dateWasChanged = false;
+    }
+
+    public function updatedDateSelected(mixed $value): void
+    {
+        $currentDate = $this->normalizeDateForComparison($value);
+
+        if (! $this->canOverrideExecutionDates() || is_null($currentDate)) {
+            $this->dateWasChanged = false;
+
+            return;
+        }
+
+        $this->dateWasChanged = $currentDate !== $this->originalDateSelected;
     }
 
     public function resetState(): void
@@ -196,6 +216,10 @@ class CreateChequeo extends Page
             'created_at' => $this->dateSelected,
             'hoja_chequeo_id' => $this->hojaChequeo->id,
         ];
+
+        if ($this->shouldOverrideExecutionDates() && $this->hojaEjecucion?->finalizado_en) {
+            $data['finalizado_en'] = $this->dateSelected;
+        }
 
         // Firma is handled only on final submit to avoid repeated file writes
         unset($data['firma_operador']);
@@ -284,6 +308,8 @@ class CreateChequeo extends Page
 
     public function create(): void
     {
+        $forcedFinalizadoEn = $this->getForcedFinalizadoEnForSave();
+
         $data = [
             ...$this->form->getState(),
             'user_id' => $this->user->id,
@@ -293,19 +319,51 @@ class CreateChequeo extends Page
             'hoja_chequeo_id' => $this->hojaChequeo->id,
         ];
 
+        if ($forcedFinalizadoEn && $this->hojaEjecucion?->finalizado_en) {
+            $data['finalizado_en'] = $forcedFinalizadoEn;
+        }
+
         if ($data['firma_operador']) {
             $data['firma_operador'] = $this->imageService()->storeBase64('firmas', $data['firma_operador']);
         }
 
         if ($this->hojaEjecucion) {
             $this->hojaEjecucion->update($data);
-            $this->dispatch('hoja-ejecucion-saved', $this->ejecucionId);
+            $this->dispatch('hoja-ejecucion-saved', hojaEjecucionId: $this->ejecucionId, forcedFinalizadoEn: $forcedFinalizadoEn);
 
             return;
         }
 
         $hojaEjecucion = HojaEjecucion::create($data);
-        $this->dispatch('hoja-ejecucion-saved', $hojaEjecucion->id);
+        $this->dispatch('hoja-ejecucion-saved', hojaEjecucionId: $hojaEjecucion->id, forcedFinalizadoEn: $forcedFinalizadoEn);
+    }
+
+    protected function normalizeDateForComparison(mixed $value): ?string
+    {
+        if (blank($value)) {
+            return null;
+        }
+
+        return Carbon::parse($value)->toDateString();
+    }
+
+    protected function canOverrideExecutionDates(): bool
+    {
+        return $this->user?->can(User::$canEditDatesPermission) ?? false;
+    }
+
+    protected function shouldOverrideExecutionDates(): bool
+    {
+        return $this->canOverrideExecutionDates() && $this->dateWasChanged;
+    }
+
+    protected function getForcedFinalizadoEnForSave(): ?string
+    {
+        if (! $this->shouldOverrideExecutionDates() || blank($this->dateSelected)) {
+            return null;
+        }
+
+        return Carbon::parse($this->dateSelected)->toDateString();
     }
 
     #[On('hoja-fila-respuesta-items-created')]

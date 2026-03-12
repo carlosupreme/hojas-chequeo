@@ -194,10 +194,10 @@
                     @php
                         $turnCount = count($cc['turnos']);
                         $turnoGridClass = $turnCount >= 3
-                            ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3'
+                            ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4'
                             : ($turnCount === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1');
                     @endphp
-                    <div class="grid {{ $turnoGridClass }} gap-4 mt-4">
+                    <div class="grid {{ $turnoGridClass }} gap-3 mt-3">
                         @foreach($cc['turnos'] as $turno)
                             @php
                                 $tPct       = $turno['percentage'];
@@ -209,20 +209,20 @@
                                 $leftCol    = array_slice($eqList, 0, $half);
                                 $rightCol   = array_slice($eqList, $half);
                             @endphp
-                            <div class="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                            <div class="w-full rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
                                 {{-- Turno header --}}
-                                <div class="{{ $headerBg }} px-4 py-3 text-white">
+                                <div class="{{ $headerBg }} px-3 py-2 text-white">
                                     <h5 class="font-bold text-sm uppercase tracking-wide">{{ $turno['turno'] }}</h5>
                                     <p class="text-xs opacity-90">Días de operación: {{ $turno['working_days'] }}</p>
                                 </div>
 
                                 {{-- Dual-column header --}}
                                 <div class="flex divide-x divide-gray-200 dark:divide-gray-700 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                                    <div class="flex-1 px-3 py-2 flex justify-between">
+                                    <div class="flex-1 px-2.5 py-1.5 flex justify-between">
                                         <span class="text-xs font-semibold text-gray-600 dark:text-gray-400">Equipo</span>
                                         <span class="text-xs font-semibold text-gray-600 dark:text-gray-400">Días</span>
                                     </div>
-                                    <div class="flex-1 px-3 py-2 flex justify-between">
+                                    <div class="flex-1 px-2.5 py-1.5 flex justify-between">
                                         <span class="text-xs font-semibold text-gray-600 dark:text-gray-400">Equipo</span>
                                         <span class="text-xs font-semibold text-gray-600 dark:text-gray-400">Días</span>
                                     </div>
@@ -236,7 +236,7 @@
                                                 $eqPct   = $turno['working_days'] > 0 ? ($eq['dias_revisados'] / $turno['working_days']) * 100 : 0;
                                                 $eqColor = $eqPct >= 90 ? 'text-green-700 dark:text-green-400' : ($eqPct >= 70 ? 'text-yellow-700 dark:text-yellow-400' : 'text-red-700 dark:text-red-400');
                                             @endphp
-                                            <div class="px-3 py-1.5 flex items-center justify-between bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                            <div class="px-2.5 py-1 flex items-center justify-between bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                                                 <span class="font-mono text-xs text-gray-700 dark:text-gray-300">{{ $eq['tag'] }}</span>
                                                 <span class="font-semibold {{ $eqColor }} tabular-nums text-xs">{{ $eq['dias_revisados'] }}</span>
                                             </div>
@@ -248,7 +248,7 @@
                                                 $eqPct   = $turno['working_days'] > 0 ? ($eq['dias_revisados'] / $turno['working_days']) * 100 : 0;
                                                 $eqColor = $eqPct >= 90 ? 'text-green-700 dark:text-green-400' : ($eqPct >= 70 ? 'text-yellow-700 dark:text-yellow-400' : 'text-red-700 dark:text-red-400');
                                             @endphp
-                                            <div class="px-3 py-1.5 flex items-center justify-between bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                            <div class="px-2.5 py-1 flex items-center justify-between bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                                                 <span class="font-mono text-xs text-gray-700 dark:text-gray-300">{{ $eq['tag'] }}</span>
                                                 <span class="font-semibold {{ $eqColor }} tabular-nums text-xs">{{ $eq['dias_revisados'] }}</span>
                                             </div>
@@ -257,7 +257,7 @@
                                 </div>
 
                                 {{-- Compliance footer --}}
-                                <div class="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-2 flex justify-between items-center">
+                                <div class="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-3 py-1.5 flex justify-between items-center">
                                     <span class="text-xs font-bold text-gray-700 dark:text-gray-300">Cumplimiento</span>
                                     <span class="font-bold text-sm {{ $footColor }}">{{ $tPct }}%</span>
                                 </div>

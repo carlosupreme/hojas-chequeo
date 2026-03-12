@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\HojaChequeo;
 use App\Models\HojaEjecucion;
 use App\Models\HojaFilaRespuesta;
+use Carbon\Carbon;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -83,7 +84,7 @@ class ChequeoItems extends Component
     }
 
     #[On('hoja-ejecucion-saved')]
-    public function save($hojaEjecucionId): void
+    public function save(int $hojaEjecucionId, ?string $forcedFinalizadoEn = null): void
     {
         foreach (array_keys($this->form) as $filaId) {
             $fila = $this->filas->find($filaId);
@@ -120,7 +121,8 @@ class ChequeoItems extends Component
             ->count();
 
         if ($totalFilas > 0 && $answeredCount >= $totalFilas) {
-            HojaEjecucion::find($hojaEjecucionId)->update(['finalizado_en' => now()]);
+            $finalizadoEn = $forcedFinalizadoEn ? Carbon::parse($forcedFinalizadoEn) : now();
+            HojaEjecucion::find($hojaEjecucionId)->update(['finalizado_en' => $finalizadoEn]);
         }
 
         $this->dispatch('hoja-fila-respuesta-items-created');

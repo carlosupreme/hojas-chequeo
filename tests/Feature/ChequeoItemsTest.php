@@ -11,6 +11,7 @@ use App\Models\HojaEjecucion;
 use App\Models\HojaFila;
 use App\Models\Perfil;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -194,6 +195,19 @@ class ChequeoItemsTest extends TestCase
             ->dispatch('hoja-ejecucion-saved', $ejecucion->id);
 
         $this->assertNull($ejecucion->fresh()->finalizado_en);
+    }
+
+    public function test_save_uses_forced_finalizado_date_when_provided(): void
+    {
+        $fila = $this->filaOfType('number');
+        $ejecucion = HojaEjecucion::factory()->create(['hoja_chequeo_id' => $this->hoja->id, 'user_id' => $this->user->id]);
+        $forcedDate = Carbon::now()->subDays(2)->toDateString();
+
+        $this->mountFresh()
+            ->set("form.{$fila->id}", 10)
+            ->dispatch('hoja-ejecucion-saved', hojaEjecucionId: $ejecucion->id, forcedFinalizadoEn: $forcedDate);
+
+        $this->assertEquals($forcedDate, $ejecucion->fresh()->finalizado_en->toDateString());
     }
 
     // -------------------------------------------------------------------------

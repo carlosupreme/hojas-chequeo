@@ -11,8 +11,10 @@ use App\Models\HojaEjecucion;
 use App\Models\HojaFila;
 use App\Models\Perfil;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
 class CreateChequeoTest extends TestCase
@@ -34,6 +36,9 @@ class CreateChequeoTest extends TestCase
 
         // Give the user a role so Spatie doesn't complain
         $this->user->assignRole(\Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Operador', 'guard_name' => 'web']));
+
+        // HojaEjecucionObserver queries this role when finalizado_en is set
+        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Administrador', 'guard_name' => 'web']);
 
         $answerType = AnswerType::factory()->number()->create();
         $this->hoja = HojaChequeo::factory()
@@ -202,9 +207,38 @@ class CreateChequeoTest extends TestCase
             ->set('data.firma_operador', null)
             ->call('create');
 
-        $livewire->assertDispatched('hoja-ejecucion-saved', $ejecucion->id);
+        $livewire->assertDispatched('hoja-ejecucion-saved', hojaEjecucionId: $ejecucion->id);
 
         // Should not have created a second ejecucion
         $this->assertDatabaseCount('hoja_ejecucions', 1);
+    }
+
+    public function test_create_overrides_created_and_finalizado_dates_when_user_changes_date_with_permission(): void
+    {
+        $this->actingAs($this->user);
+
+        Permission::findOrCreate(User::$canEditDatesPermission, 'web');
+        $this->user->givePermissionTo(User::$canEditDatesPermission);
+
+        $ejecucion = HojaEjecucion::factory()->finalizado()->create([
+            'hoja_chequeo_id' => $this->hoja->id,
+            'user_id' => $this->user->id,
+            'created_at' => now(),
+        ]);
+
+        $selectedDate = Carbon::now()->subDays(4)->toDateString();
+
+        Livewire::withQueryParams(['e' => $ejecucion->id])
+            ->test(CreateChequeo::class)
+            ->set('dateSelected', $selectedDate)
+            ->set('data.firma_operador', null)
+            ->call('create')
+            ->assertSet('dateWasChanged', true)
+            ->assertDispatched('hoja-ejecucion-saved', forcedFinalizadoEn: $selectedDate);
+
+        $ejecucion->refresh();
+
+        $this->assertEquals($selectedDate, $ejecucion->created_at->toDateString());
+        $this->assertEquals($selectedDate, $ejecucion->finalizado_en->toDateString());
     }
 }

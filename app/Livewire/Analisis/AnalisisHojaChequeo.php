@@ -168,7 +168,7 @@ class AnalisisHojaChequeo extends Component
                     'working_days' => $workingDays,
                     'expected' => $expected,
                     'actual' => $actual,
-                    'percentage' => $expected > 0 ? round(($actual / $expected) * 100, 1) : 0,
+                    'percentage' => $expected > 0 ? min(100, round(($actual / $expected) * 100, 1)) : 0,
                     'equipos_detail' => $equiposBreakdown,
                 ];
             }
@@ -177,7 +177,7 @@ class AnalisisHojaChequeo extends Component
                 'centro_costo' => $cc->nombre,
                 'total_expected' => $totalExpected,
                 'total_actual' => $totalActual,
-                'percentage' => $totalExpected > 0 ? round(($totalActual / $totalExpected) * 100, 1) : 0,
+                'percentage' => $totalExpected > 0 ? min(100, round(($totalActual / $totalExpected) * 100, 1)) : 0,
                 'off_days_count' => count($offDates),
                 'turnos' => $turnosBreakdown,
             ];
