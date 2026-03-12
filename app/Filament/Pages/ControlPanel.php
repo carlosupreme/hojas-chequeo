@@ -13,6 +13,7 @@ use BackedEnum;
 use Carbon\Carbon;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\On;
 
 class ControlPanel extends Page
@@ -33,22 +34,11 @@ class ControlPanel extends Page
     {
         $today = Carbon::today();
 
-        $totalChequeos = HojaEjecucion::finished()
-            ->whereDate('finalizado_en', $today)
-            ->count();
-
-        $totalRecorridos = LogRecorrido::whereDate('fecha', $today)->count();
-
-        $totalReportes = Reporte::whereDate('fecha', $today)->count();
-        $reportesPendientes = Reporte::whereDate('fecha', $today)
-            ->where('estado', 'pendiente')
-            ->count();
-
         return [
-            'chequeos' => $totalChequeos,
-            'recorridos' => $totalRecorridos,
-            'reportes' => $totalReportes,
-            'reportes_pendientes' => $reportesPendientes,
+            'chequeos' => HojaEjecucion::finished()->whereDate('finalizado_en', $today)->count(),
+            'recorridos' => LogRecorrido::whereDate('fecha', $today)->count(),
+            'reportes' => Reporte::whereDate('fecha', $today)->count(),
+            'reportes_pendientes' => Reporte::whereDate('fecha', $today)->where('estado', 'pendiente')->count(),
         ];
     }
 
@@ -56,74 +46,83 @@ class ControlPanel extends Page
     {
         $today = Carbon::today();
 
-        $mapEquipo = function (Equipo $equipo) use ($today) {
-            $hojaChequeoIds = $equipo->hojaChequeos()->pluck('id');
-
-            $chequeosHoy = HojaEjecucion::finished()
-                ->whereIn('hoja_chequeo_id', $hojaChequeoIds)
-                ->whereDate('finalizado_en', $today)
-                ->count();
-
-            $reportesHoy = $equipo->reportes()
-                ->whereDate('fecha', $today)
-                ->count();
-
-            $reportesPendientes = $equipo->reportes()
-                ->where('estado', 'pendiente')
-                ->count();
-
-            $ultimoChequeo = HojaEjecucion::finished()
-                ->whereIn('hoja_chequeo_id', $hojaChequeoIds)
-                ->orderByDesc('finalizado_en')
-                ->first();
-
-            return [
-                'id' => $equipo->id,
-                'nombre' => $equipo->nombre,
-                'tag' => $equipo->tag,
-                'foto' => $equipo->foto,
-                'capacidad' => $equipo->capacidad(),
-                'chequeos_hoy' => $chequeosHoy,
-                'reportes_hoy' => $reportesHoy,
-                'reportes_pendientes' => $reportesPendientes,
-                'ultimo_chequeo' => $ultimoChequeo?->finalizado_en?->diffForHumans(),
-                'tiene_chequeo_hoy' => $chequeosHoy > 0,
-                'ultimo_chequeo_viejo' => $ultimoChequeo
-                    ? $ultimoChequeo->finalizado_en->lt(Carbon::now()->subDay())
-                    : false,
-            ];
-        };
-
-        return Equipo::orderBy('area')
+        // 1 query: all equipos with 3 report counts via withCount
+        $equipos = Equipo::orderBy('area')
             ->orderBy('nombre')
+            ->withCount([
+                'reportes as reportes_hoy' => fn ($q) => $q->whereDate('fecha', $today),
+                'reportes as reportes_pendientes' => fn ($q) => $q->where('estado', 'pendiente'),
+                'reportes as reportes_alta_prioridad' => fn ($q) => $q->where('estado', 'pendiente')->where('prioridad', 'alta'),
+            ])
+            ->with(['hojaChequeos:id,equipo_id', 'specs'])
+            ->get();
+
+        $allHojaIds = $equipos->flatMap(fn ($e) => $e->hojaChequeos->pluck('id'))->unique()->all();
+
+        // 1 query: which hoja_chequeo_ids were executed today
+        $hojasConChequeoHoy = empty($allHojaIds) ? [] : HojaEjecucion::finished()
+            ->whereDate('finalizado_en', $today)
+            ->whereIn('hoja_chequeo_id', $allHojaIds)
+            ->pluck('hoja_chequeo_id')
+            ->unique()
+            ->flip()
+            ->all();
+
+        // 1 query: latest execution per hoja_chequeo_id
+        $ultimosChequeos = empty($allHojaIds) ? collect() : HojaEjecucion::finished()
+            ->whereIn('hoja_chequeo_id', $allHojaIds)
+            ->select(['hoja_chequeo_id', 'finalizado_en'])
+            ->orderByDesc('finalizado_en')
             ->get()
+            ->unique('hoja_chequeo_id')
+            ->keyBy('hoja_chequeo_id');
+
+        return $equipos
             ->groupBy(fn (Equipo $e) => $e->area
                 ? ucwords(mb_strtolower($e->area))
                 : 'Sin Área')
-            ->map(fn ($equipos, $area) => [
+            ->map(fn ($group, $area) => [
                 'area' => $area,
-                'equipos' => $equipos->map($mapEquipo)->toArray(),
+                'equipos' => $group->map(function (Equipo $equipo) use ($hojasConChequeoHoy, $ultimosChequeos) {
+                    $hojaIds = $equipo->hojaChequeos->pluck('id')->all();
+                    $tieneChequeoHoy = collect($hojaIds)->some(fn ($id) => isset($hojasConChequeoHoy[$id]));
+
+                    $ultimoChequeo = collect($hojaIds)
+                        ->map(fn ($id) => $ultimosChequeos->get($id))
+                        ->filter()
+                        ->sortByDesc('finalizado_en')
+                        ->first();
+
+                    $capacidadSpec = $equipo->specs->first(
+                        fn ($s) => str_contains(strtolower($s->tipo), 'capacidad')
+                    );
+
+                    return [
+                        'id' => $equipo->id,
+                        'nombre' => $equipo->nombre,
+                        'tag' => $equipo->tag,
+                        'foto_url' => $equipo->foto ? Storage::url($equipo->foto) : null,
+                        'area' => $equipo->area ? ucwords(mb_strtolower($equipo->area)) : 'Sin Área',
+                        'capacidad' => $capacidadSpec ? ($capacidadSpec->optimo.$capacidadSpec->unidad) : '',
+                        'reportes_hoy' => $equipo->reportes_hoy,
+                        'reportes_pendientes' => $equipo->reportes_pendientes,
+                        'reportes_alta_prioridad' => $equipo->reportes_alta_prioridad,
+                        'tiene_chequeo_hoy' => $tieneChequeoHoy,
+                        'ultimo_chequeo' => $ultimoChequeo?->finalizado_en->diffForHumans(),
+                        'ultimo_chequeo_viejo' => $ultimoChequeo
+                            ? $ultimoChequeo->finalizado_en->lt(Carbon::now()->subDay())
+                            : false,
+                    ];
+                })->values()->all(),
             ])
             ->values()
-            ->toArray();
+            ->all();
     }
 
-    public function getRecorridosHoyProperty(): int
-    {
-        return LogRecorrido::whereDate('fecha', Carbon::today())->count();
-    }
-
-    /**
-     * Alertas visuales: equipos sin chequeo hoy, reportes pendientes de alta prioridad,
-     * y equipos con reportes sin resolver.
-     */
-    /**
-     * Refresh the panel in real time when any chequeo is auto-saved via Reverb.
-     */
     #[On('echo:chequeos,.saved')]
     public function refreshOnChequeoSaved(): void
     {
-        // Triggers a Livewire re-render — all computed getters re-run automatically.
+        // Triggers a Livewire re-render — computed getters re-run automatically.
     }
 
     public function getAlertsProperty(): array
@@ -131,7 +130,6 @@ class ControlPanel extends Page
         $today = Carbon::today();
         $alerts = [];
 
-        // 1. Equipos con hoja de chequeo activa que NO tienen chequeo hoy
         $hojaChequeos = HojaChequeo::where('encendido', true)->with('equipo')->get();
         $equiposSinChequeo = [];
 
@@ -149,72 +147,22 @@ class ControlPanel extends Page
         if (! empty($equiposSinChequeo)) {
             $alerts[] = [
                 'type' => 'warning',
-                'icon' => 'clipboard-document-check',
                 'title' => count($equiposSinChequeo).' equipo(s) sin chequeo hoy',
                 'description' => implode(', ', array_slice(array_values($equiposSinChequeo), 0, 5))
                     .(count($equiposSinChequeo) > 5 ? ' y '.(count($equiposSinChequeo) - 5).' más...' : ''),
                 'link' => ChequeosResource::getUrl('index'),
-                'link_label' => 'Ver chequeos',
             ];
         }
 
-        // 2. Reportes pendientes de alta prioridad
-        $reportesAlta = Reporte::where('estado', 'pendiente')
-            ->where('prioridad', 'alta')
-            ->with('equipo')
-            ->get();
+        $reportesAlta = Reporte::where('estado', 'pendiente')->where('prioridad', 'alta')->with('equipo')->get();
 
         if ($reportesAlta->isNotEmpty()) {
             $nombres = $reportesAlta->map(fn ($r) => $r->equipo?->nombre ?? 'N/A')->unique()->take(5)->implode(', ');
             $alerts[] = [
                 'type' => 'danger',
-                'icon' => 'fire',
-                'title' => $reportesAlta->count().' reporte(s) ALTA prioridad pendientes',
-                'description' => 'Equipos: '.$nombres
-                    .($reportesAlta->count() > 5 ? ' y más...' : ''),
+                'title' => $reportesAlta->count().' reporte(s) de ALTA prioridad pendientes',
+                'description' => 'Equipos: '.$nombres.($reportesAlta->count() > 5 ? ' y más...' : ''),
                 'link' => ReporteResource::getUrl('index'),
-                'link_label' => 'Ver reportes',
-            ];
-        }
-
-        // 3. Reportes pendientes de media prioridad
-        $reportesMedia = Reporte::where('estado', 'pendiente')
-            ->where('prioridad', 'media')
-            ->count();
-
-        if ($reportesMedia > 0) {
-            $alerts[] = [
-                'type' => 'warning',
-                'icon' => 'exclamation-triangle',
-                'title' => $reportesMedia.' reporte(s) de prioridad MEDIA pendientes',
-                'description' => 'Requieren atención pronto.',
-                'link' => ReporteResource::getUrl('index'),
-                'link_label' => 'Ver reportes',
-            ];
-        }
-
-        // 4. Reportes creados hoy
-        $reportesHoy = Reporte::whereDate('fecha', $today)->count();
-        if ($reportesHoy > 0) {
-            $alerts[] = [
-                'type' => 'info',
-                'icon' => 'information-circle',
-                'title' => $reportesHoy.' reporte(s) nuevo(s) hoy',
-                'description' => 'Se generaron nuevos reportes durante el día.',
-                'link' => ReporteResource::getUrl('index'),
-                'link_label' => 'Ver reportes',
-            ];
-        }
-
-        // 5. All good
-        if (empty($alerts)) {
-            $alerts[] = [
-                'type' => 'success',
-                'icon' => 'check-circle',
-                'title' => 'Todo en orden',
-                'description' => 'No hay alertas pendientes. Todos los equipos están al día.',
-                'link' => null,
-                'link_label' => null,
             ];
         }
 

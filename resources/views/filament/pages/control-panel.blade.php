@@ -1,268 +1,360 @@
-<x-filament-panels::page class="min-h-screen space-y-6">
+<x-filament-panels::page class="!p-0 !max-w-full">
+    {{-- Poll every 15s for reports/recorridos. Reverb handles chequeos instantly. --}}
+    <div wire:poll.15s class="sr-only"></div>
 
-    {{-- HEADER --}}
-    <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Estado Actual del Negocio</h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    Resumen en tiempo real &mdash; {{ now()->locale('es')->isoFormat('dddd D [de] MMMM [de] YYYY') }}
-                </p>
-            </div>
-            <div class="flex items-center gap-2 text-xs text-gray-400">
-                <span class="relative flex h-2 w-2">
+    <div x-data="{ selectedAreaName: null, selectedEquipo: null }" class="space-y-4 p-4 md:p-6">
+
+        {{-- ─── HEADER BAR ──────────────────────────────────────────────────────── --}}
+        <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3">
+            <div class="flex items-center gap-3">
+                <span class="relative flex h-2.5 w-2.5">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                    <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500"></span>
                 </span>
-                Actualizado: {{ now()->format('H:i') }}
+                <span class="font-semibold text-gray-800 dark:text-white">Panel de Control</span>
+                <span class="text-xs text-gray-400">{{ now()->format('d/m/Y · H:i') }}</span>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-5 text-sm">
+                <div>
+                    <span class="font-bold text-gray-900 dark:text-white">{{ $this->todayStats['chequeos'] }}</span>
+                    <span class="text-gray-400 ml-1">chequeos hoy</span>
+                </div>
+                <div>
+                    <span class="font-bold text-gray-900 dark:text-white">{{ $this->todayStats['recorridos'] }}</span>
+                    <span class="text-gray-400 ml-1">recorridos</span>
+                </div>
+                <div>
+                    <span class="font-bold text-gray-900 dark:text-white">{{ $this->todayStats['reportes'] }}</span>
+                    <span class="text-gray-400 ml-1">reportes hoy</span>
+                </div>
+                @php $totalAlta = collect($this->equiposByArea)->flatMap(fn($a) => $a['equipos'])->sum('reportes_alta_prioridad'); @endphp
+                @if($totalAlta > 0)
+                    <span class="font-bold text-red-600 dark:text-red-400 animate-pulse">⚠ {{ $totalAlta }} urgente{{ $totalAlta > 1 ? 's' : '' }}</span>
+                @else
+                    <span class="font-bold text-green-600 dark:text-green-400">✓ Sin alertas críticas</span>
+                @endif
             </div>
         </div>
-    </div>
 
-    {{-- ALERTS SECTION --}}
-    @php $alerts = $this->alerts; @endphp
-    @if(count($alerts) > 0)
-        <div class="space-y-3">
-            @foreach($alerts as $alert)
-                @php
-                    $colors = match($alert['type']) {
-                        'danger'  => ['bg' => 'bg-red-50 dark:bg-red-950/40', 'border' => 'border-red-200 dark:border-red-800', 'icon_bg' => 'bg-red-100 dark:bg-red-900/50', 'icon' => 'text-red-600 dark:text-red-400', 'title' => 'text-red-800 dark:text-red-300', 'desc' => 'text-red-600 dark:text-red-400', 'pulse' => true],
-                        'warning' => ['bg' => 'bg-amber-50 dark:bg-amber-950/40', 'border' => 'border-amber-200 dark:border-amber-800', 'icon_bg' => 'bg-amber-100 dark:bg-amber-900/50', 'icon' => 'text-amber-600 dark:text-amber-400', 'title' => 'text-amber-800 dark:text-amber-300', 'desc' => 'text-amber-600 dark:text-amber-400', 'pulse' => false],
-                        'info'    => ['bg' => 'bg-blue-50 dark:bg-blue-950/40', 'border' => 'border-blue-200 dark:border-blue-800', 'icon_bg' => 'bg-blue-100 dark:bg-blue-900/50', 'icon' => 'text-blue-600 dark:text-blue-400', 'title' => 'text-blue-800 dark:text-blue-300', 'desc' => 'text-blue-600 dark:text-blue-400', 'pulse' => false],
-                        'success' => ['bg' => 'bg-green-50 dark:bg-green-950/40', 'border' => 'border-green-200 dark:border-green-800', 'icon_bg' => 'bg-green-100 dark:bg-green-900/50', 'icon' => 'text-green-600 dark:text-green-400', 'title' => 'text-green-800 dark:text-green-300', 'desc' => 'text-green-600 dark:text-green-400', 'pulse' => false],
-                        default   => ['bg' => 'bg-gray-50 dark:bg-gray-900', 'border' => 'border-gray-200 dark:border-gray-800', 'icon_bg' => 'bg-gray-100 dark:bg-gray-800', 'icon' => 'text-gray-600 dark:text-gray-400', 'title' => 'text-gray-800 dark:text-gray-300', 'desc' => 'text-gray-600 dark:text-gray-400', 'pulse' => false],
-                    };
-                @endphp
-                <div class="{{ $colors['bg'] }} {{ $colors['border'] }} border rounded-xl p-4 flex items-start gap-4">
-                    <div class="shrink-0">
-                        <div class="p-2.5 rounded-lg {{ $colors['icon_bg'] }} relative">
-                            @if($alert['type'] === 'danger')
-                                <span class="absolute inset-0 rounded-lg animate-ping bg-red-400/20"></span>
-                            @endif
-                            @switch($alert['icon'])
-                                @case('fire')
-                                    <x-heroicon-s-fire class="w-5 h-5 {{ $colors['icon'] }} relative" />
-                                    @break
-                                @case('clipboard-document-check')
-                                    <x-heroicon-s-clipboard-document-check class="w-5 h-5 {{ $colors['icon'] }} relative" />
-                                    @break
-                                @case('exclamation-triangle')
-                                    <x-heroicon-s-exclamation-triangle class="w-5 h-5 {{ $colors['icon'] }} relative" />
-                                    @break
-                                @case('information-circle')
-                                    <x-heroicon-s-information-circle class="w-5 h-5 {{ $colors['icon'] }} relative" />
-                                    @break
-                                @case('check-circle')
-                                    <x-heroicon-s-check-circle class="w-5 h-5 {{ $colors['icon'] }} relative" />
-                                    @break
-                                @default
-                                    <x-heroicon-s-bell-alert class="w-5 h-5 {{ $colors['icon'] }} relative" />
-                            @endswitch
+        {{-- ─── ALERT STRIPS ────────────────────────────────────────────────────── --}}
+        @foreach($this->alerts as $alert)
+            @if($alert['type'] === 'danger')
+                <a href="{{ $alert['link'] }}"
+                   class="flex items-center gap-3 rounded-xl border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20 px-4 py-2.5 text-sm hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
+                    <span class="relative flex h-2.5 w-2.5 flex-shrink-0">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500"></span>
+                    </span>
+                    <span class="font-semibold text-red-700 dark:text-red-400">{{ $alert['title'] }}</span>
+                    <span class="text-red-500/70 hidden sm:inline">— {{ $alert['description'] }}</span>
+                    <x-heroicon-o-arrow-right class="w-4 h-4 text-red-400 ml-auto flex-shrink-0" />
+                </a>
+            @elseif($alert['type'] === 'warning')
+                <a href="{{ $alert['link'] }}"
+                   class="flex items-center gap-3 rounded-xl border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 px-4 py-2.5 text-sm hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors">
+                    <x-heroicon-o-exclamation-triangle class="w-4 h-4 text-amber-500 flex-shrink-0" />
+                    <span class="font-semibold text-amber-700 dark:text-amber-400">{{ $alert['title'] }}</span>
+                    <span class="text-amber-500/70 hidden sm:inline">— {{ $alert['description'] }}</span>
+                    <x-heroicon-o-arrow-right class="w-4 h-4 text-amber-400 ml-auto flex-shrink-0" />
+                </a>
+            @endif
+        @endforeach
+
+        {{-- ─── BREADCRUMB ──────────────────────────────────────────────────────── --}}
+        <div x-show="selectedAreaName !== null" x-cloak class="flex items-center gap-2 text-sm">
+            <button @click="selectedAreaName = null; selectedEquipo = null"
+                    class="flex items-center gap-1.5 text-primary-600 dark:text-primary-400 hover:underline font-medium">
+                <x-heroicon-o-building-office-2 class="w-4 h-4" />
+                Empresa
+            </button>
+            <x-heroicon-o-chevron-right class="w-3.5 h-3.5 text-gray-400" />
+            <span class="font-semibold text-gray-900 dark:text-white" x-text="selectedAreaName"></span>
+        </div>
+
+        {{-- ─── OVERVIEW: AREA ZONES ────────────────────────────────────────────── --}}
+        <div x-show="selectedAreaName === null"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+            @foreach($this->equiposByArea as $areaData)
+            @php
+                $total      = count($areaData['equipos']);
+                $conChequeo = collect($areaData['equipos'])->where('tiene_chequeo_hoy', true)->count();
+                $pendientes = collect($areaData['equipos'])->sum('reportes_pendientes');
+                $altaPrio   = collect($areaData['equipos'])->sum('reportes_alta_prioridad');
+
+                [$border, $headerBg, $pillBg, $pillText, $statusLabel] = match(true) {
+                    $altaPrio > 0              => ['border-red-500',   'bg-red-50 dark:bg-red-900/20',    'bg-red-100 dark:bg-red-900/40',    'text-red-600 dark:text-red-400',    'Alerta crítica'],
+                    $conChequeo < $total || $pendientes > 0
+                                               => ['border-amber-400', 'bg-amber-50 dark:bg-amber-900/20','bg-amber-100 dark:bg-amber-900/40','text-amber-600 dark:text-amber-400','Atención'],
+                    default                    => ['border-green-500', 'bg-green-50 dark:bg-green-900/20', 'bg-green-100 dark:bg-green-900/40', 'text-green-600 dark:text-green-400', 'Todo en orden'],
+                };
+            @endphp
+
+            <div @click="selectedAreaName = @js($areaData['area'])"
+                 class="cursor-pointer rounded-xl border-2 {{ $border }} bg-white dark:bg-gray-900 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden group">
+
+                <div class="{{ $headerBg }} px-4 py-3 flex items-center justify-between border-b border-inherit">
+                    <h3 class="font-bold text-gray-900 dark:text-white">{{ $areaData['area'] }}</h3>
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{ $pillBg }} {{ $pillText }}">
+                        {{ $statusLabel }}
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-3 divide-x divide-gray-100 dark:divide-gray-800 text-center py-4">
+                    <div class="px-2">
+                        <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ $total }}</div>
+                        <div class="text-xs text-gray-400 mt-0.5">equipos</div>
+                    </div>
+                    <div class="px-2">
+                        <div class="text-2xl font-bold {{ $conChequeo === $total ? 'text-green-600' : 'text-amber-500' }}">
+                            {{ $conChequeo }}/{{ $total }}
                         </div>
+                        <div class="text-xs text-gray-400 mt-0.5">chequeos hoy</div>
                     </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-semibold {{ $colors['title'] }}">{{ $alert['title'] }}</p>
-                        <p class="text-xs {{ $colors['desc'] }} mt-0.5">{{ $alert['description'] }}</p>
-                    </div>
-                    <div class="flex items-center gap-2 shrink-0 self-center">
-                        @if(!empty($alert['link']))
-                            <a
-                                href="{{ $alert['link'] }}"
-                                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors
-                                    {{ $alert['type'] === 'danger'
-                                        ? 'bg-red-100 border-red-300 text-red-700 hover:bg-red-200 dark:bg-red-900/40 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/70'
-                                        : ($alert['type'] === 'warning'
-                                            ? 'bg-amber-100 border-amber-300 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/40 dark:border-amber-700 dark:text-amber-300 dark:hover:bg-amber-900/70'
-                                            : ($alert['type'] === 'info'
-                                                ? 'bg-blue-100 border-blue-300 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/40 dark:border-blue-700 dark:text-blue-300 dark:hover:bg-blue-900/70'
-                                                : 'bg-green-100 border-green-300 text-green-700 hover:bg-green-200 dark:bg-green-900/40 dark:border-green-700 dark:text-green-300 dark:hover:bg-green-900/70'
-                                            )
-                                        )
-                                    }}"
-                            >
-                                {{ $alert['link_label'] }}
-                                <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" />
-                                </svg>
-                            </a>
-                        @endif
-                        @if($alert['type'] === 'danger')
-                            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-300 uppercase tracking-wider">
-                                Urgente
-                            </span>
-                        @endif
+                    <div class="px-2">
+                        <div class="text-2xl font-bold {{ $pendientes > 0 ? ($altaPrio > 0 ? 'text-red-600' : 'text-amber-500') : 'text-gray-300 dark:text-gray-600' }}">
+                            {{ $pendientes }}
+                        </div>
+                        <div class="text-xs text-gray-400 mt-0.5">reportes pend.</div>
                     </div>
                 </div>
+
+                <div class="px-4 pb-4">
+                    <p class="text-xs uppercase tracking-wider text-gray-400 mb-2">Equipos</p>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($areaData['equipos'] as $eq)
+                        @php
+                            $dotClass = match(true) {
+                                $eq['reportes_alta_prioridad'] > 0                                   => 'bg-red-500 animate-pulse ring-2 ring-red-300 dark:ring-red-700',
+                                $eq['tiene_chequeo_hoy'] && $eq['reportes_pendientes'] === 0         => 'bg-green-500',
+                                default                                                               => 'bg-amber-400',
+                            };
+                        @endphp
+                        <div class="w-4 h-4 rounded-sm {{ $dotClass }} transition-all duration-300"
+                             title="{{ $eq['nombre'] }} · {{ $eq['tag'] }}"></div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <div class="px-4 pb-3 flex items-center justify-end gap-1 text-xs text-gray-300 dark:text-gray-600 group-hover:text-primary-500 transition-colors duration-150">
+                    <span>Ver equipos</span>
+                    <x-heroicon-o-arrow-right class="w-3 h-3" />
+                </div>
+            </div>
             @endforeach
         </div>
-    @endif
 
-    {{-- GLOBAL KPI CARDS --}}
-    @php $stats = $this->todayStats; @endphp
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {{-- Chequeos Hoy --}}
-        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-5">
-            <div class="flex items-center gap-3">
-                <div class="p-3 rounded-lg bg-green-50 dark:bg-green-900/30">
-                    <x-heroicon-o-clipboard-document-check class="w-6 h-6 text-green-600 dark:text-green-400" />
-                </div>
-                <div>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['chequeos'] }}</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Chequeos Hoy</p>
-                </div>
-            </div>
-        </div>
+        {{-- ─── AREA DRILL-DOWN ─────────────────────────────────────────────────── --}}
+        @foreach($this->equiposByArea as $areaData)
+        <div x-show="selectedAreaName === @js($areaData['area'])"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 translate-x-2"
+             x-transition:enter-end="opacity-100 translate-x-0"
+             x-cloak
+             class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
 
-        {{-- Recorridos Hoy --}}
-        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-5">
-            <div class="flex items-center gap-3">
-                <div class="p-3 rounded-lg bg-purple-50 dark:bg-purple-900/30">
-                    <x-heroicon-o-clipboard-document-list class="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                </div>
-                <div>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['recorridos'] }}</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Recorridos Hoy</p>
-                </div>
-            </div>
-        </div>
+            @foreach($areaData['equipos'] as $equipo)
+            @php
+                [$ring, $dot, $label, $labelColor, $labelBg] = match(true) {
+                    $equipo['reportes_alta_prioridad'] > 0 => [
+                        'ring-2 ring-red-500',
+                        'bg-red-500 animate-pulse',
+                        'Alerta',
+                        'text-red-700 dark:text-red-300',
+                        'bg-red-100 dark:bg-red-900/30',
+                    ],
+                    !$equipo['tiene_chequeo_hoy'] || $equipo['reportes_pendientes'] > 0 => [
+                        'ring-2 ring-amber-400',
+                        'bg-amber-400',
+                        'Atención',
+                        'text-amber-700 dark:text-amber-300',
+                        'bg-amber-100 dark:bg-amber-900/30',
+                    ],
+                    default => [
+                        'ring-2 ring-green-500',
+                        'bg-green-500',
+                        'OK',
+                        'text-green-700 dark:text-green-300',
+                        'bg-green-100 dark:bg-green-900/30',
+                    ],
+                };
+            @endphp
 
-        {{-- Reportes Hoy --}}
-        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-5">
-            <div class="flex items-center gap-3">
-                <div class="p-3 rounded-lg {{ $stats['reportes_pendientes'] > 0 ? 'bg-red-50 dark:bg-red-900/30' : 'bg-amber-50 dark:bg-amber-900/30' }}">
-                    <x-heroicon-o-exclamation-triangle class="w-6 h-6 {{ $stats['reportes_pendientes'] > 0 ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400' }}" />
-                </div>
-                <div>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['reportes'] }}</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                        Reportes Hoy
-                        @if($stats['reportes_pendientes'] > 0)
-                            <span class="text-red-500 font-semibold">({{ $stats['reportes_pendientes'] }} pendientes)</span>
-                        @endif
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
+            <div @click="selectedEquipo = @js($equipo)"
+                 class="cursor-pointer bg-white dark:bg-gray-900 rounded-xl {{ $ring }} overflow-hidden hover:shadow-md transition-all duration-200 group">
 
-    {{-- EQUIPOS BY AREA --}}
-    @foreach($this->equiposByArea as $areaGroup)
-        <div class="space-y-3">
-            {{-- Area Header --}}
-            <div class="flex items-center gap-3">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ $areaGroup['area'] }}</h3>
-                <span class="text-xs font-medium text-gray-500 bg-gray-100 dark:bg-gray-800 dark:text-gray-400 px-2 py-1 rounded-full">
-                    {{ count($areaGroup['equipos']) }} equipos
-                </span>
-            </div>
-
-            {{-- Equipos Grid --}}
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                @foreach($areaGroup['equipos'] as $equipo)
-                    <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-md transition-shadow duration-200">
-                        {{-- Equipo Image / Placeholder --}}
-                        <div class="h-32 bg-gray-100 dark:bg-gray-800 relative overflow-hidden">
-                            @if($equipo['foto'])
-                                <img
-                                    src="{{ Storage::url($equipo['foto']) }}"
-                                    alt="{{ $equipo['nombre'] }}"
-                                    class="w-full h-full object-cover"
-                                />
-                            @else
-                                <div class="w-full h-full flex items-center justify-center">
-                                    <x-heroicon-o-cog-6-tooth class="w-12 h-12 text-gray-300 dark:text-gray-600" />
-                                </div>
-                            @endif
-
-                            {{-- Status Badge --}}
-                            <div class="absolute top-2 right-2">
-                                @if($equipo['tiene_chequeo_hoy'])
-                                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                                        Chequeado
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
-                                        Sin chequeo
-                                    </span>
-                                @endif
-                            </div>
+                <div class="relative h-28 bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                    @if($equipo['foto_url'])
+                        <img src="{{ $equipo['foto_url'] }}" alt="{{ $equipo['nombre'] }}"
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                             loading="lazy">
+                    @else
+                        <div class="w-full h-full flex items-center justify-center">
+                            <x-heroicon-o-cog-6-tooth class="w-10 h-10 text-gray-300 dark:text-gray-600" />
                         </div>
+                    @endif
 
-                        {{-- Equipo Info --}}
-                        <div class="p-4 space-y-3">
-                            <div>
-                                <h4 class="font-semibold text-gray-900 dark:text-white truncate" title="{{ $equipo['nombre'] }}">
-                                    {{ $equipo['nombre'] }}
-                                </h4>
-                                <div class="flex items-center gap-2 mt-1">
-                                    @if($equipo['tag'])
-                                        <span class="text-xs text-gray-500 dark:text-gray-400 font-mono bg-gray-50 dark:bg-gray-800 px-1.5 py-0.5 rounded">
-                                            {{ $equipo['tag'] }}
-                                        </span>
-                                    @endif
-                                    @if($equipo['capacidad'])
-                                        <span class="text-xs text-gray-400 dark:text-gray-500">
-                                            {{ $equipo['capacidad'] }}
-                                        </span>
-                                    @endif
-                                </div>
-                            </div>
-
-                            {{-- Today's Metrics --}}
-                            <div class="grid grid-cols-3 gap-2 pt-2 border-t border-gray-100 dark:border-gray-800">
-                                {{-- Chequeos --}}
-                                <div class="text-center">
-                                    <p class="text-lg font-bold {{ $equipo['chequeos_hoy'] > 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-400' }}">
-                                        {{ $equipo['chequeos_hoy'] }}
-                                    </p>
-                                    <p class="text-[10px] text-gray-500 dark:text-gray-400 leading-tight">Chequeos</p>
-                                </div>
-
-                                {{-- Reportes --}}
-                                <div class="text-center">
-                                    <p class="text-lg font-bold {{ $equipo['reportes_hoy'] > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-400' }}">
-                                        {{ $equipo['reportes_hoy'] }}
-                                    </p>
-                                    <p class="text-[10px] text-gray-500 dark:text-gray-400 leading-tight">Reportes</p>
-                                </div>
-
-                                {{-- Pendientes --}}
-                                <div class="text-center">
-                                    <p class="text-lg font-bold {{ $equipo['reportes_pendientes'] > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-400' }}">
-                                        {{ $equipo['reportes_pendientes'] }}
-                                    </p>
-                                    <p class="text-[10px] text-gray-500 dark:text-gray-400 leading-tight">Reportes pendientes</p>
-                                </div>
-                            </div>
-
-                            {{-- Last check time --}}
-                            @if($equipo['ultimo_chequeo'])
-                                <div class="text-xs flex items-center gap-1.5 {{ $equipo['ultimo_chequeo_viejo'] ? 'text-red-500 dark:text-red-400 font-medium' : 'text-gray-400 dark:text-gray-500' }}">
-                                    <x-heroicon-m-clock class="w-3 h-3 shrink-0" />
-                                    Último chequeo: {{ $equipo['ultimo_chequeo'] }}
-                                    @if($equipo['ultimo_chequeo_viejo'])
-                                        <span class="inline-flex items-center rounded-full bg-red-100 dark:bg-red-900/40 px-1.5 py-0.5 text-[10px] font-semibold text-red-600 dark:text-red-400 uppercase tracking-wide">
-                                            Vencido
-                                        </span>
-                                    @endif
-                                </div>
+                    <div class="absolute top-2 right-2">
+                        <span class="relative flex h-3 w-3">
+                            @if($equipo['reportes_alta_prioridad'] > 0)
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                             @endif
+                            <span class="relative inline-flex h-3 w-3 rounded-full {{ $dot }}"></span>
+                        </span>
+                    </div>
+
+                    @if($equipo['reportes_pendientes'] > 0)
+                        <div class="absolute top-2 left-2">
+                            <span class="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full leading-none">
+                                {{ $equipo['reportes_pendientes'] }}
+                            </span>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="p-2.5">
+                    <div class="font-semibold text-gray-900 dark:text-white text-sm truncate">{{ $equipo['nombre'] }}</div>
+                    <div class="font-mono text-xs text-gray-400 dark:text-gray-500 mt-0.5">{{ $equipo['tag'] }}</div>
+                    <div class="mt-2 flex items-center justify-between gap-1">
+                        <span class="inline-flex items-center gap-1 text-xs font-medium px-1.5 py-0.5 rounded {{ $labelBg }} {{ $labelColor }}">
+                            <span class="w-1.5 h-1.5 rounded-full {{ $dot }}"></span>
+                            {{ $label }}
+                        </span>
+                        @if($equipo['ultimo_chequeo_viejo'])
+                            <span class="text-xs text-amber-500 font-medium">Vencido</span>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+        @endforeach
+
+        {{-- ─── LEGEND ──────────────────────────────────────────────────────────── --}}
+        <div class="flex flex-wrap items-center gap-5 pt-1 text-xs text-gray-400">
+            <span class="flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded-sm bg-green-500 inline-block"></span> Todo en orden
+            </span>
+            <span class="flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded-sm bg-amber-400 inline-block"></span> Sin chequeo / reportes pendientes
+            </span>
+            <span class="flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded-sm bg-red-500 inline-block animate-pulse"></span> Reporte urgente
+            </span>
+        </div>
+
+        {{-- ─── EQUIPMENT DETAIL MODAL ──────────────────────────────────────────── --}}
+        <div x-show="selectedEquipo !== null"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             @click.self="selectedEquipo = null"
+             @keydown.escape.window="selectedEquipo = null"
+             style="display:none"
+             class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
+
+            <div x-show="selectedEquipo !== null"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+
+                {{-- Photo header --}}
+                <div class="relative h-48 bg-gray-100 dark:bg-gray-800">
+                    <img x-show="selectedEquipo?.foto_url"
+                         :src="selectedEquipo?.foto_url"
+                         :alt="selectedEquipo?.nombre"
+                         class="w-full h-full object-cover">
+                    <div x-show="!selectedEquipo?.foto_url"
+                         class="w-full h-full flex items-center justify-center">
+                        <x-heroicon-o-cog-6-tooth class="w-20 h-20 text-gray-300 dark:text-gray-600" />
+                    </div>
+
+                    <button @click="selectedEquipo = null"
+                            class="absolute top-3 right-3 bg-black/40 hover:bg-black/60 text-white rounded-full p-1.5 transition-colors">
+                        <x-heroicon-o-x-mark class="w-4 h-4" />
+                    </button>
+
+                    {{-- Status pill over photo --}}
+                    <div class="absolute bottom-3 left-3">
+                        <span x-show="selectedEquipo?.reportes_alta_prioridad > 0"
+                              class="inline-flex items-center gap-1.5 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                            Alerta crítica
+                        </span>
+                        <span x-show="selectedEquipo?.reportes_alta_prioridad === 0 && selectedEquipo?.tiene_chequeo_hoy && selectedEquipo?.reportes_pendientes === 0"
+                              class="inline-flex items-center gap-1.5 bg-green-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+                            ✓ Todo en orden
+                        </span>
+                        <span x-show="selectedEquipo?.reportes_alta_prioridad === 0 && (!selectedEquipo?.tiene_chequeo_hoy || selectedEquipo?.reportes_pendientes > 0)"
+                              class="inline-flex items-center gap-1.5 bg-amber-400 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+                            ⚠ Atención
+                        </span>
+                    </div>
+                </div>
+
+                {{-- Content --}}
+                <div class="p-5 space-y-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white" x-text="selectedEquipo?.nombre"></h2>
+                        <div class="flex items-center gap-2 mt-1">
+                            <code class="text-xs font-mono bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded"
+                                  x-text="selectedEquipo?.tag"></code>
+                            <span class="text-xs text-gray-400" x-text="selectedEquipo?.area"></span>
                         </div>
                     </div>
-                @endforeach
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-center">
+                            <div class="text-lg font-bold"
+                                 :class="selectedEquipo?.tiene_chequeo_hoy ? 'text-green-600' : 'text-gray-400'"
+                                 x-text="selectedEquipo?.tiene_chequeo_hoy ? '✓' : '—'"></div>
+                            <div class="text-xs text-gray-500 mt-0.5">Chequeo hoy</div>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-center">
+                            <div class="text-lg font-bold"
+                                 :class="selectedEquipo?.reportes_pendientes > 0 ? 'text-amber-500' : 'text-gray-400'"
+                                 x-text="selectedEquipo?.reportes_pendientes"></div>
+                            <div class="text-xs text-gray-500 mt-0.5">Reps. pend.</div>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-center">
+                            <div class="text-lg font-bold"
+                                 :class="selectedEquipo?.reportes_alta_prioridad > 0 ? 'text-red-600' : 'text-gray-400'"
+                                 x-text="selectedEquipo?.reportes_alta_prioridad"></div>
+                            <div class="text-xs text-gray-500 mt-0.5">Alta prioridad</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 text-sm">
+                        <div class="flex items-center justify-between py-1.5 border-b border-gray-100 dark:border-gray-800">
+                            <span class="text-gray-500">Último chequeo</span>
+                            <span class="font-medium text-gray-900 dark:text-white"
+                                  x-text="selectedEquipo?.ultimo_chequeo ?? 'Sin registro'"></span>
+                        </div>
+                        <template x-if="selectedEquipo?.capacidad">
+                            <div class="flex items-center justify-between py-1.5 border-b border-gray-100 dark:border-gray-800">
+                                <span class="text-gray-500">Capacidad</span>
+                                <span class="font-medium text-gray-900 dark:text-white"
+                                      x-text="selectedEquipo?.capacidad"></span>
+                            </div>
+                        </template>
+                        <template x-if="selectedEquipo?.ultimo_chequeo_viejo">
+                            <div class="flex items-center gap-2 text-amber-600 dark:text-amber-400 text-xs bg-amber-50 dark:bg-amber-900/20 rounded-lg px-3 py-2">
+                                <x-heroicon-o-exclamation-triangle class="w-4 h-4 flex-shrink-0" />
+                                El último chequeo supera las 24 horas
+                            </div>
+                        </template>
+                    </div>
+                </div>
             </div>
         </div>
-    @endforeach
 
-    {{-- Empty State --}}
-    @if(empty($this->equiposByArea))
-        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-12 text-center">
-            <x-heroicon-o-cog-6-tooth class="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">No hay equipos registrados</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Comienza agregando equipos al sistema.</p>
-        </div>
-    @endif
-
+    </div>
 </x-filament-panels::page>
