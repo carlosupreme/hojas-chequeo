@@ -62,14 +62,17 @@ class AnalisisHojaChequeo extends Component
      *
      * For each CentroCosto:
      *   - Sum the expected ejecuciones across all its Turnos
-     *   - Expected per Turno = (scheduled working days in range - off days) × equipos count
-     *   - Actual = finished HojaEjecucion count in range for that turno
+        *   - Expected per Turno = (days configured in the turno within the range - off days) × equipos count
+        *   - Actual = distinct valid finished days per equipo for that turno (max 1 per equipo por día)
      *   - % = actual / expected × 100
      */
     public function getCumplimientoPorCentroCostoProperty(): array
     {
         $startDate = Carbon::parse($this->startDate)->startOfDay();
         $endDate = Carbon::parse($this->endDate)->endOfDay();
+        $selectedHojaChequeo = $this->hojaChequeoId
+            ? HojaChequeo::select('id', 'equipo_id')->find($this->hojaChequeoId)
+            : null;
 
         $centrosCosto = CentroCosto::with(['turnos.equipos', 'offDays'])->get();
         $result = [];
@@ -91,14 +94,20 @@ class AnalisisHojaChequeo extends Component
                 }
 
                 $scheduledDays = $turno->dias ?? []; // e.g. ['monday', 'tuesday', ...]
-                $equiposCount = $turno->equipos->count();
+                $equipos = $turno->equipos;
+
+                if ($selectedHojaChequeo) {
+                    $equipos = $equipos->where('id', $selectedHojaChequeo->equipo_id);
+                }
+
+                $equiposCount = $equipos->count();
 
                 if ($equiposCount === 0 || empty($scheduledDays)) {
                     continue;
                 }
 
-                // Count working days in range for this turno
-                $workingDays = 0;
+                // Build valid working dates in range for this turno
+                $validWorkingDates = [];
                 $period = CarbonPeriod::create($startDate->copy()->startOfDay(), $endDate->copy()->startOfDay());
 
                 foreach ($period as $day) {
@@ -107,36 +116,38 @@ class AnalisisHojaChequeo extends Component
 
                     // Day must be in turno schedule AND not an off day
                     if (in_array($dayName, $scheduledDays) && ! in_array($dateStr, $offDates)) {
-                        $workingDays++;
+                        $validWorkingDates[] = $dateStr;
                     }
+                }
+
+                $workingDays = count($validWorkingDates);
+
+                if ($workingDays === 0) {
+                    continue;
                 }
 
                 $expected = $workingDays * $equiposCount;
 
-                // Actual finished ejecuciones for this turno in range
-                $actualQuery = HojaEjecucion::where('turno_id', $turno->id)
-                    ->whereNotNull('finalizado_en')
-                    ->whereBetween('finalizado_en', [$startDate, $endDate]);
-
-                if ($this->hojaChequeoId) {
-                    $actualQuery->where('hoja_chequeo_id', $this->hojaChequeoId);
-                }
-
-                $actual = $actualQuery->count();
+                // Actual = distinct valid dates checked per equipo (max 1 per day)
+                $actual = 0;
 
                 $totalExpected += $expected;
-                $totalActual += $actual;
 
-                // Per-equipo breakdown: count distinct days with a finished ejecución
+                // Per-equipo breakdown: count distinct valid working dates with a finished ejecución
                 $equiposBreakdown = [];
-                foreach ($turno->equipos as $equipo) {
+                foreach ($equipos as $equipo) {
                     $hojaChequeoIds = $equipo->hojaChequeos()->pluck('id');
+
+                    if ($selectedHojaChequeo) {
+                        $hojaChequeoIds = $hojaChequeoIds->intersect([$selectedHojaChequeo->id])->values();
+                    }
 
                     if ($hojaChequeoIds->isEmpty()) {
                         $equiposBreakdown[] = [
                             'tag' => $equipo->tag,
                             'nombre' => $equipo->nombre,
                             'dias_revisados' => 0,
+                            'dias_esperados' => $workingDays,
                         ];
 
                         continue;
@@ -145,22 +156,24 @@ class AnalisisHojaChequeo extends Component
                     $ejecQuery = HojaEjecucion::whereIn('hoja_chequeo_id', $hojaChequeoIds)
                         ->where('turno_id', $turno->id)
                         ->whereNotNull('finalizado_en')
-                        ->whereBetween('finalizado_en', [$startDate, $endDate]);
-
-                    if ($this->hojaChequeoId) {
-                        $ejecQuery->where('hoja_chequeo_id', $this->hojaChequeoId);
-                    }
+                        ->whereBetween('finalizado_en', [$startDate, $endDate])
+                        ->whereIn(DB::raw('DATE(finalizado_en)'), $validWorkingDates);
 
                     $diasRevisados = (clone $ejecQuery)
                         ->selectRaw('COUNT(DISTINCT DATE(finalizado_en)) as total')
                         ->value('total') ?? 0;
 
+                    $actual += $diasRevisados;
+
                     $equiposBreakdown[] = [
                         'tag' => $equipo->tag,
                         'nombre' => $equipo->nombre,
                         'dias_revisados' => $diasRevisados,
+                        'dias_esperados' => $workingDays,
                     ];
                 }
+
+                $totalActual += $actual;
 
                 $turnosBreakdown[] = [
                     'turno' => $turno->nombre,
