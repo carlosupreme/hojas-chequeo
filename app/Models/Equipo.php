@@ -37,7 +37,6 @@ class Equipo extends Model
 
     }
 
-
     public function scopeCalderas($query)
     {
         return $query->where('tag', 'CM-CAL-01')->orWhere('tag', 'CM-CAL-02');
