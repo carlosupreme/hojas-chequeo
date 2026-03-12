@@ -37,11 +37,13 @@ $PHP artisan migrate --force
 
 # ── Caches ────────────────────────────────────────────────────────────────────
 log "Clearing and rebuilding caches..."
-$PHP artisan config:cache
-$PHP artisan route:cache
-$PHP artisan view:cache
-$PHP artisan cache:clear
-$PHP artisan filament:optimize
+php artisan config:clear 
+php artisan cache:clear 
+php artisan route:clear 
+php artisan view:clear 
+php artisan optimize:clear
+php artisan optimize
+sudo rm -rf /var/lib/php/opcache/*
 
 # ── Queue Workers ──────────────────────────────────────────────────────────────
 log "Restarting queue workers..."
