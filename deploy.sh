@@ -2,7 +2,6 @@
 set -e  # Exit immediately on any error
 
 APP_DIR="/var/www/v2"
-PHP="php"
 BRANCH="${1:-v2}"
 
 RED='\033[0;31m'
@@ -37,7 +36,7 @@ npm run build
 
 # ── Database ──────────────────────────────────────────────────────────────────
 log "Running migrations..."
-$PHP artisan migrate --force
+php artisan migrate --force
 
 # ── Caches ────────────────────────────────────────────────────────────────────
 log "Clearing and rebuilding caches..."
@@ -51,7 +50,7 @@ sudo rm -rf /var/lib/php/opcache/*
 
 # ── Queue Workers ──────────────────────────────────────────────────────────────
 log "Restarting queue workers..."
-$PHP artisan queue:restart
+php artisan queue:restart
 
 # ── Reverb (WebSockets) ───────────────────────────────────────────────────────
 if systemctl is-active --quiet reverb 2>/dev/null; then
