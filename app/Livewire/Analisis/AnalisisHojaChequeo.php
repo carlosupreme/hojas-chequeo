@@ -62,8 +62,8 @@ class AnalisisHojaChequeo extends Component
      *
      * For each CentroCosto:
      *   - Sum the expected ejecuciones across all its Turnos
-        *   - Expected per Turno = (days configured in the turno within the range - off days) × equipos count
-        *   - Actual = distinct valid finished days per equipo for that turno (max 1 per equipo por día)
+     *   - Expected per Turno = (days configured in the turno within the range - off days) × equipos count
+     *   - Actual = distinct valid finished days per equipo for that turno (max 1 per equipo por día)
      *   - % = actual / expected × 100
      */
     public function getCumplimientoPorCentroCostoProperty(): array
