@@ -15,3 +15,57 @@ php artisan db:seed --class=RecorridoGerentesSeeder && \
 php artisan db:seed --class=RecorridoGeneralSeeder
 
 ```
+
+# set up ci/cd
+
+```bash
+sudo visudo
+administrador  ALL=(ALL) NOPASSWD: /bin/systemctl restart php8.4-fpm, /bin/systemctl reload nginx, /bin/systemctl restart >
+```
+
+# set user to php-fpm
+
+```bash
+sudo nano /etc/php/8.4/fpm/pool.d/www.conf
+```
+
+## Change these two lines:
+
+```
+user = administrador
+group = administrador
+```
+
+## Then restart PHP-FPM:
+
+```bash
+sudo systemctl restart php8.4-fpm
+```
+
+# Ensure the folder is owned by the user
+
+```bash
+chown -R administrador:administrador /var/www/v2
+```
+
+# Change systemd owner
+
+```bash
+sudo nano /etc/systemd/system/reverb.service
+```
+
+## Then reload and restart:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart reverb
+```
+
+# Run the script
+
+```bash
+chmod +x && ./deploy.sh
+```
+
+
+
