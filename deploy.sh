@@ -57,7 +57,7 @@ fi
 
 # ── Web Server ────────────────────────────────────────────────────────────────
 log "Restarting PHP-FPM and reloading Nginx..."
-# sudo systemctl restart php8.4-fpm
-# sudo systemctl reload nginx
+sudo systemctl restart php8.4-fpm
+sudo systemctl reload nginx
 
-log "Deploy complete. ✅"
+log "Actualización completada correctamente. ✅"
