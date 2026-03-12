@@ -50,9 +50,9 @@ log "Restarting queue workers..."
 $PHP artisan queue:restart
 
 # ── Reverb (WebSockets) ───────────────────────────────────────────────────────
-if systemctl is-active --quiet laravel-reverb 2>/dev/null; then
+if systemctl is-active --quiet reverb 2>/dev/null; then
     log "Restarting Reverb..."
-    sudo systemctl restart laravel-reverb
+    sudo systemctl restart reverb
 else
     warn "Reverb service not found as systemd unit — restart it manually if needed"
 fi
