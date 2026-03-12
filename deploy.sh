@@ -14,6 +14,10 @@ log() { echo -e "${GREEN}[$(date '+%H:%M:%S')] $1${NC}"; }
 warn() { echo -e "${YELLOW}[$(date '+%H:%M:%S')] ⚠ $1${NC}"; }
 fail() { echo -e "${RED}[$(date '+%H:%M:%S')] ✗ $1${NC}"; exit 1; }
 
+# Load NVM so npm/node are available in non-interactive shells
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
 cd "$APP_DIR" || fail "Cannot cd to $APP_DIR"
 
 log "Starting deploy from branch: $BRANCH"
