@@ -228,7 +228,7 @@ class AnalisisHojaChequeo extends Component
 
             // Get tarjetones stats
             $tarjetones = Tarjeton::where('equipo_id', $equipo->id)
-                ->whereBetween('fecha', [$startDate, $endDate])
+                ->whereBetween('hora_encendido', [$startDate, $endDate])
                 ->get();
 
             $tarjetonesCount = $tarjetones->count();
