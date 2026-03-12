@@ -445,7 +445,7 @@
 
                         <!-- Password Input -->
                         <div class="relative">
-                            <input type="password" x-ref="passwordInput" x-model="password" @keydown.enter="login()"
+                            <input type="text" x-ref="passwordInput" x-model="password" @keydown.enter="login()"
                                 placeholder="Contraseña"
                                 class="w-full px-4 py-4 bg-(--bg-surface) border border-(--border-color) rounded-xl text-[var(--text-primary)] text-center text-lg tracking-widest placeholder-(--text-placeholder) focus:outline-none focus:ring-2 focus:ring-(--ring-accent) focus:border-[var(--color-accent)] transition-all"
                                 :class="{ 'border-red-500 focus:ring-red-500/50': error }">
