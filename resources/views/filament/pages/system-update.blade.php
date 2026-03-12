@@ -1,4 +1,4 @@
-<x-filament-panels::page class="space-y-6">
+<x-filament-panels::page class="space-y-6" wire:poll.3s="refreshLog">
 
     {{-- Status Banner --}}
     @if ($isRunning)
@@ -31,7 +31,13 @@
             </h3>
             <span class="text-xs text-gray-400">{{ file_exists('/tmp/deploy.log') ? 'Última actualización: ' . \Carbon\Carbon::createFromTimestamp(filemtime('/tmp/deploy.log'))->diffForHumans() : 'Sin logs' }}</span>
         </div>
-        <pre class="max-h-[500px] overflow-y-auto p-4 font-mono text-xs leading-relaxed text-gray-800 dark:text-gray-200 whitespace-pre-wrap">{{ $this->logContent }}</pre>
+        <pre
+            id="deploy-log"
+            class="max-h-[500px] overflow-y-auto p-4 font-mono text-xs leading-relaxed text-gray-800 dark:text-gray-200 whitespace-pre-wrap"
+            x-data
+            x-init="$el.scrollTop = $el.scrollHeight"
+            x-on:livewire:navigated.window="$el.scrollTop = $el.scrollHeight"
+        >{{ $this->logContent }}</pre>
     </div>
 
 </x-filament-panels::page>
