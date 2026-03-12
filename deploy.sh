@@ -62,8 +62,9 @@ else
 fi
 
 # ── Web Server ────────────────────────────────────────────────────────────────
-log "Restarting PHP-FPM and reloading Nginx..."
-sudo systemctl restart php8.4-fpm
-sudo systemctl reload nginx
+# Run in background with delay — restarting php-fpm kills the current process
+# so we let the script finish first before the restart happens
+log "Reiniciando PHP-FPM y Nginx en segundo plano..."
+(sleep 3 && sudo systemctl restart php8.4-fpm && sudo systemctl reload nginx) &
 
 log "Actualización completada correctamente. ✅"
