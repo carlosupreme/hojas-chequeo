@@ -57,6 +57,7 @@ $PHP artisan queue:restart
 if systemctl is-active --quiet reverb 2>/dev/null; then
     log "Restarting Reverb..."
     sudo systemctl restart reverb
+    sudo systemctl restart laravel-queue
 else
     warn "Reverb service not found as systemd unit — restart it manually if needed"
 fi

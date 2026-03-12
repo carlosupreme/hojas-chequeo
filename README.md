@@ -59,12 +59,13 @@ sudo nano /etc/systemd/system/reverb.service
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl restart reverb
+sudo systemctl restart laravel-queue
 ```
 
 # Run the script
 
 ```bash
-chmod +x && ./deploy.sh
+chmod +x deploy.sh && ./deploy.sh
 ```
 
 # If fails, install node 
