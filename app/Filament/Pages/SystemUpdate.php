@@ -19,6 +19,8 @@ class SystemUpdate extends Page
 
     protected static string $logFile = '/tmp/deploy.log';
 
+    protected static string $lockFile = '/tmp/deploy.lock';
+
     public bool $isRunning = false;
 
     public function mount(): void
@@ -69,13 +71,10 @@ class SystemUpdate extends Page
 
         file_put_contents($logFile, '['.now()->format('H:i:s').'] Iniciando actualización...'.PHP_EOL);
 
-        // Launch deploy.sh in background — returns immediately
-        exec("nohup bash {$deployScript} >> {$logFile} 2>&1 & echo \$!", $output);
-
-        $pid = $output[0] ?? null;
-        if ($pid) {
-            file_put_contents($logFile, '['.now()->format('H:i:s').'] PID del proceso: '.$pid.PHP_EOL, FILE_APPEND);
-        }
+        // Create lock before launching — shell removes it when script finishes (pass or fail)
+        touch(static::$lockFile);
+        $lockFile = static::$lockFile;
+        exec("nohup bash -c 'bash {$deployScript} >> {$logFile} 2>&1; rm -f {$lockFile}' &");
 
         $this->isRunning = true;
 
@@ -99,13 +98,14 @@ class SystemUpdate extends Page
             return 'No hay log disponible todavía.';
         }
 
-        return file_get_contents(static::$logFile) ?: 'Log vacío.';
+        $content = file_get_contents(static::$logFile) ?: 'Log vacío.';
+
+        // Strip ANSI escape codes
+        return preg_replace('/\x1B\[[0-9;]*[a-zA-Z]/', '', $content);
     }
 
     private function checkIfRunning(): bool
     {
-        exec("pgrep -f 'deploy.sh'", $pids);
-
-        return ! empty($pids);
+        return file_exists(static::$lockFile);
     }
 }
