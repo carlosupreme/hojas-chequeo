@@ -28,7 +28,7 @@ git pull origin "$BRANCH"
 
 # ── PHP Dependencies ──────────────────────────────────────────────────────────
 log "Installing composer dependencies..."
-composer install --no-dev --optimize-autoloader --no-interaction --quiet
+composer install --optimize-autoloader --no-interaction --quiet
 
 # ── Frontend Assets ───────────────────────────────────────────────────────────
 log "Building frontend assets..."
