@@ -87,8 +87,16 @@ class SystemUpdate extends Page
 
     public function refreshLog(): void
     {
+        $wasRunning = $this->isRunning;
         $this->isRunning = $this->checkIfRunning();
-        $this->dispatch('$refresh');
+
+        if ($wasRunning && ! $this->isRunning) {
+            Notification::make()
+                ->title('Sistema actualizado')
+                ->body('La actualización finalizó correctamente.')
+                ->success()
+                ->send();
+        }
     }
 
     #[Computed]
