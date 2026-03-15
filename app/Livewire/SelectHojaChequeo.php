@@ -7,6 +7,7 @@ use App\Models\Equipo;
 use App\Models\HojaChequeo;
 use App\Models\User;
 use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
@@ -47,7 +48,12 @@ class SelectHojaChequeo extends Component implements HasSchemas
                 ->preload()
                 ->live()
                 ->required()
-                ->hiddenLabel(),
+                ->hiddenLabel()
+                ->afterStateUpdated(function (Set $set, $state) {
+                    if (empty($state)) {
+                        $set('centro_costo', Auth::user()->turno?->centro_costo_id);
+                    }
+                }),
         ])->statePath('data');
     }
 
