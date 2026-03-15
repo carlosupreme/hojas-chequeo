@@ -11,11 +11,9 @@
 }
 
 
-.fi-main, .fi-main-ctn {
-    @apply bg-white! dark:bg-zinc-800!;
-}
-
-
+.fi-main,
+.fi-main-ctn,
+.fi-layout-sidebar-toggle-btn-ctn,
 .fi-ta-main {
     @apply bg-white! dark:bg-zinc-800!;
 }
@@ -23,9 +21,10 @@
 
 .fi-sidebar-item.fi-active {
     & .fi-sidebar-item-btn {
-        @apply bg-white border  dark:bg-white/7 border-transparent;
+        @apply bg-white border dark:bg-white/7 border-transparent;
 
-        & .fi-icon, .fi-sidebar-item-label {
+        & .fi-icon,
+        .fi-sidebar-item-label {
             @apply dark:text-white text-zinc-900;
         }
     }
@@ -33,19 +32,31 @@
 
 .fi-sidebar-item {
     & .fi-sidebar-item-btn {
-        & .fi-icon, .fi-sidebar-item-label {
+
+        & .fi-icon,
+        .fi-sidebar-item-label {
             @apply dark:text-white/80 text-zinc-500;
         }
     }
 }
 
-.create-chequeo-page, .create-recorrido-page  {
+.create-chequeo-page,
+.create-recorrido-page {
     & .fi-header {
         @apply hidden;
     }
 
+    & .fi-page-header-main-ctn {
+        @apply pt-0!;
+    }
+
+    /* Remove page-level padding so our custom sticky header sits flush */
     & .fi-page-content,
-    & .fi-body-scroll-ctn > .fi-page {
+    & .fi-body-scroll-ctn>.fi-page {
         @apply p-0!;
     }
+}
+
+.create-chequeo-page .fi-page-content {
+    row-gap: 0;
 }
