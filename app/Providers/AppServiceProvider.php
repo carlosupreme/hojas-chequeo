@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Services\ImageService;
 use Carbon\Carbon;
+use Filament\Support\Facades\FilamentView;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -25,6 +27,12 @@ class AppServiceProvider extends ServiceProvider
     {
         // Set Carbon locale to match Laravel's locale
         Carbon::setLocale(config('app.locale'));
+
+        // Global offline/online banner — registered once, applies to all panels
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::BODY_START,
+            fn () => view('components.filament.offline-banner'),
+        );
 
         // Set specific Spanish localization for better formatting
         if (config('app.locale') === 'es') {
