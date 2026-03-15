@@ -1,69 +1,65 @@
-<div x-data="{
-    notifySave() {
-        this.$el.dispatchEvent(new CustomEvent('chequeo-form-updated', { bubbles: true }));
-    }
-}">
-    {{--
-        DESKTOP VIEW (> lg)
-        Classic Table for high density data
-    --}}
-    <div class="hidden lg:block overflow-x-auto">
+<div>
+    {{-- ================================================================
+         TABLET / DESKTOP TABLE (≥ 768px)
+    ================================================================ --}}
+    <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
-            <tr class="border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30">
-                @foreach($columnas as $columna)
-                    <th class="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        {{ $columna['label'] }}
-                    </th>
-                @endforeach
-                <th class="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">
-                    Estado / Valor
-                </th>
-            </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900">
-            @foreach($items as $item)
-                <tr class="group hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-colors">
+                <tr class="border-b border-gray-200 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-800/40">
                     @foreach($columnas as $columna)
-                        <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
-                            {{ $item['cells'][$columna['key']] ?? '—' }}
-                        </td>
+                        <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {{ $columna['label'] }}
+                        </th>
                     @endforeach
+                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Estado / Valor
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                @foreach($items as $item)
+                    @php $answered = ! is_null($form[$item['id']] ?? null); @endphp
+                    <tr wire:key="row-{{ $item['id'] }}"
+                        class="transition-colors {{ $answered
+                            ? 'bg-green-50/40 dark:bg-green-900/10 hover:bg-green-50/60 dark:hover:bg-green-900/20'
+                            : 'bg-white dark:bg-gray-900 hover:bg-gray-50/60 dark:hover:bg-gray-800/40' }}">
 
-                    {{-- Input Cell --}}
-                    <td class="px-6 py-3 w-64" @change="notifySave()">
-                        <div class="relative">
+                        @foreach($columnas as $columna)
+                            <td class="px-6 py-5 text-sm text-gray-700 dark:text-gray-300 leading-snug">
+                                {{ $item['cells'][$columna['key']] ?? '—' }}
+                            </td>
+                        @endforeach
+
+                        {{-- Input cell --}}
+                        <td class="px-6 py-4">
                             <x-table-inputs.input-dispatcher
                                 :item="$item"
                                 model="form.{{ $item['id'] }}"
                                 :readOnly="$readOnly"
                             />
-                        </div>
-                    </td>
-                </tr>
-            @endforeach
+                        </td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
     </div>
 
-    {{--
-        MOBILE VIEW (< lg)
-        Card Layout for better touch targets
-    --}}
-    <div class="block lg:hidden divide-y divide-gray-100 dark:divide-gray-800">
+    {{-- ================================================================
+         MOBILE CARDS (< 768px)
+    ================================================================ --}}
+    <div class="block md:hidden divide-y divide-gray-100 dark:divide-gray-800">
         @foreach($items as $item)
-            <div class="p-4 bg-white dark:bg-gray-900" wire:key="mobile-item-{{$item['id']}}">
+            @php $answered = ! is_null($form[$item['id']] ?? null); @endphp
+            <div wire:key="card-{{ $item['id'] }}"
+                 class="p-4 {{ $answered ? 'bg-green-50/40 dark:bg-green-900/10' : 'bg-white dark:bg-gray-900' }}">
 
-                {{-- Header: Item Name --}}
+                {{-- Item name --}}
+                <p class="text-sm font-medium text-gray-800 dark:text-white mb-3 leading-snug">
+                    {{ $item['cells'][$columnas[0]['key']] ?? '—' }}
+                </p>
+
+                {{-- Input --}}
                 <div class="mb-3">
-                    <span class="text-xs font-bold text-gray-400 uppercase tracking-wide">Item</span>
-                    <p class="text-sm font-semibold text-gray-900 dark:text-white leading-tight">
-                        {{ $item['cells'][$columnas[0]['key']] ?? 'N/A' }}
-                    </p>
-                </div>
-
-                {{-- Input Area (Prominent) --}}
-                <div class="mb-4" @change="notifySave()">
                     <x-table-inputs.input-dispatcher
                         :item="$item"
                         model="form.{{ $item['id'] }}"
@@ -71,29 +67,28 @@
                     />
                 </div>
 
-                {{-- Details Toggle (Accordion) --}}
-                <div x-data="{ expanded: false }" class="border-t border-gray-100 dark:border-gray-800 pt-2">
-                    <button
-                        @click="expanded = !expanded"
-                        class="flex items-center justify-between w-full text-xs text-gray-500 dark:text-gray-400 py-1"
-                    >
-                        <span>Ver detalles (Frecuencia, Método...)</span>
-                        <svg class="w-4 h-4 transition-transform duration-200" :class="expanded ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                    </button>
-
-                    <div x-show="expanded" x-collapse class="mt-2 space-y-2 pb-2">
-                        @foreach($columnas as $index => $header)
-                            @if($index > 0)
-                                <div class="grid grid-cols-3 gap-2 text-xs">
-                                    <span class="font-medium text-gray-500 dark:text-gray-400">{{ $header['label'] }}</span>
-                                    <span class="col-span-2 text-gray-700 dark:text-gray-300">
-                                        {{ $item['cells'][$header['key']] ?? '—' }}
-                                    </span>
-                                </div>
-                            @endif
-                        @endforeach
+                {{-- Collapsible details --}}
+                @if(count($columnas) > 1)
+                    <div x-data="{ open: false }" class="border-t border-gray-100 dark:border-gray-800 pt-2">
+                        <button @click="open = !open"
+                            class="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-1">
+                            <svg class="w-3.5 h-3.5 transition-transform" :class="open && 'rotate-180'" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                            Ver detalles
+                        </button>
+                        <div x-show="open" x-collapse class="mt-2 space-y-1.5">
+                            @foreach($columnas as $index => $col)
+                                @if($index > 0)
+                                    <div class="flex gap-2 text-xs">
+                                        <span class="w-24 shrink-0 font-medium text-gray-500 dark:text-gray-400">{{ $col['label'] }}</span>
+                                        <span class="text-gray-700 dark:text-gray-300">{{ $item['cells'][$col['key']] ?? '—' }}</span>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
                     </div>
-                </div>
+                @endif
             </div>
         @endforeach
     </div>

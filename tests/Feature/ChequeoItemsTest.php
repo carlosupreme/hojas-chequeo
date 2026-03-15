@@ -3,12 +3,14 @@
 namespace Tests\Feature;
 
 use App\Livewire\ChequeoItems;
+use App\Models\AnswerOption;
 use App\Models\AnswerType;
 use App\Models\Equipo;
 use App\Models\HojaChequeo;
 use App\Models\HojaColumna;
 use App\Models\HojaEjecucion;
 use App\Models\HojaFila;
+use App\Models\HojaFilaRespuesta;
 use App\Models\Perfil;
 use App\Models\User;
 use Carbon\Carbon;
@@ -229,5 +231,87 @@ class ChequeoItemsTest extends TestCase
         $component = $this->mountFresh($ejecucion);
 
         $this->assertEquals(77, $component->get("form.{$fila->id}"));
+    }
+
+    // -------------------------------------------------------------------------
+    // PPM — Parada por Mantenimiento
+    // -------------------------------------------------------------------------
+
+    public function test_ppm_activated_bulk_fills_all_items_with_realizado(): void
+    {
+        $iconType = AnswerType::factory()->iconSet()->create();
+        $realizadoOption = AnswerOption::create([
+            'answer_type_id' => $iconType->id,
+            'key' => 'realizado',
+            'label' => 'Realizado',
+            'icon' => 'heroicon-o-check',
+            'color' => 'green',
+        ]);
+        $fila = HojaFila::factory()->create([
+            'hoja_chequeo_id' => $this->hoja->id,
+            'answer_type_id' => $iconType->id,
+        ]);
+        $ejecucion = HojaEjecucion::factory()->create([
+            'hoja_chequeo_id' => $this->hoja->id,
+            'user_id' => $this->user->id,
+        ]);
+
+        $component = $this->mountFresh($ejecucion)
+            ->dispatch('ppm-activated');
+
+        $this->assertEquals($realizadoOption->id, $component->get("form.{$fila->id}"));
+    }
+
+    public function test_ppm_activated_persists_respuestas_when_ejecucion_exists(): void
+    {
+        $iconType = AnswerType::factory()->iconSet()->create();
+        $realizadoOption = AnswerOption::create([
+            'answer_type_id' => $iconType->id,
+            'key' => 'realizado',
+            'label' => 'Realizado',
+            'icon' => 'heroicon-o-check',
+            'color' => 'green',
+        ]);
+        $fila = HojaFila::factory()->create([
+            'hoja_chequeo_id' => $this->hoja->id,
+            'answer_type_id' => $iconType->id,
+        ]);
+        $ejecucion = HojaEjecucion::factory()->create([
+            'hoja_chequeo_id' => $this->hoja->id,
+            'user_id' => $this->user->id,
+        ]);
+
+        $this->mountFresh($ejecucion)
+            ->dispatch('ppm-activated');
+
+        $this->assertDatabaseHas('hoja_fila_respuestas', [
+            'hoja_ejecucion_id' => $ejecucion->id,
+            'hoja_fila_id' => $fila->id,
+            'answer_option_id' => $realizadoOption->id,
+        ]);
+    }
+
+    public function test_ppm_deactivated_clears_form_values(): void
+    {
+        $fila = $this->filaOfType('number');
+        $ejecucion = HojaEjecucion::factory()->create([
+            'hoja_chequeo_id' => $this->hoja->id,
+            'user_id' => $this->user->id,
+        ]);
+
+        $component = $this->mountFresh($ejecucion)
+            ->set("form.{$fila->id}", 5)
+            ->dispatch('ppm-deactivated');
+
+        $this->assertNull($component->get("form.{$fila->id}"));
+    }
+
+    public function test_progress_updated_event_dispatched_on_form_change(): void
+    {
+        $fila = $this->filaOfType('number');
+
+        $this->mountFresh()
+            ->set("form.{$fila->id}", 42)
+            ->assertDispatched('progress-updated');
     }
 }

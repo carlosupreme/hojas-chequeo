@@ -15,10 +15,12 @@ use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Support\Enums\FontWeight;
 use Filament\Support\Enums\Width;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -61,6 +63,12 @@ class ChequeosTable
                         ->when($data['value'] === 'pending', fn ($q) => $q->whereNull('finalizado_en'))
                         ->when($data['value'] === 'finished', fn ($q) => $q->whereNotNull('finalizado_en'))
                     ),
+
+                TernaryFilter::make('es_ppm')
+                    ->label('PPM')
+                    ->placeholder('Todos')
+                    ->trueLabel('Solo PPM')
+                    ->falseLabel('Sin PPM'),
 
                 SelectFilter::make('area')
                     ->label('Área')
@@ -199,6 +207,14 @@ class ChequeosTable
                         return $duration->format('%Hh %Im %Ss');
                     }),
 
+                IconColumn::make('es_ppm')
+                    ->label('PPM')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-wrench-screwdriver')
+                    ->falseIcon('heroicon-o-minus')
+                    ->trueColor('warning')
+                    ->falseColor('gray'),
+
             ])
             ->defaultSort('finalizado_en', 'desc')
             ->persistSortInSession()
@@ -209,7 +225,7 @@ class ChequeosTable
                         ->label('Continuar')
                         ->icon('heroicon-m-play')
                         ->color('warning')
-                        ->visible(fn (HojaEjecucion $record) => is_null($record->finalizado_en) || auth()->user()
+                        ->visible(fn (HojaEjecucion $record) => is_null($record->finalizado_en) || Auth::user()
                             ->canModifyDate())
                         ->url(function (HojaEjecucion $record) {
                             $b = ChequeosResource::getUrl('index');
@@ -222,7 +238,8 @@ class ChequeosTable
                         ->modalFooterActions([])
                         ->hidden(fn (HojaEjecucion $record) => is_null($record->finalizado_en))
                         ->label('Ver Detalle')
-                        ->modalWidth(Width::FiveExtraLarge)
+                        ->modalWidth(Width::SevenExtraLarge)
+                        ->extraModalWindowAttributes(['x-init' => 'scrollModalToTop($el)'])
                         ->modalContent(fn (HojaEjecucion $record) => view('livewire.view-chequeo', compact('record'))),
 
                     DeleteAction::make()

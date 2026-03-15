@@ -24,6 +24,7 @@ class HojaEjecucion extends Model
         'firma_supervisor',
         'observaciones',
         'finalizado_en',
+        'es_ppm',
         'created_at',
     ];
 
@@ -31,6 +32,7 @@ class HojaEjecucion extends Model
     {
         return [
             'finalizado_en' => 'datetime',
+            'es_ppm' => 'boolean',
         ];
     }
 

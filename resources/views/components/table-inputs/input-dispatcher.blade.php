@@ -11,7 +11,7 @@
 
 <div class="w-full">
     @if($item['type_key'] === 'icon_set')
-        <x-table-inputs.icon-select :options="$item['options']" :wire:model.live="$model" :readOnly="$readOnly"/>
+        <x-table-inputs.icon-buttons :options="$item['options']" :wire:model.live="$model" :readOnly="$readOnly"/>
     @elseif($item['type_key'] === 'number')
         <x-filament::input.wrapper>
             <x-filament::input type="number" :wire:model.live.debounce.500ms="$model" :readonly="$readOnly"/>

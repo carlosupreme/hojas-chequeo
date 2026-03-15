@@ -241,4 +241,64 @@ class CreateChequeoTest extends TestCase
         $this->assertEquals($selectedDate, $ejecucion->created_at->toDateString());
         $this->assertEquals($selectedDate, $ejecucion->finalizado_en->toDateString());
     }
+
+    // -------------------------------------------------------------------------
+    // PPM — Parada por Mantenimiento
+    // -------------------------------------------------------------------------
+
+    public function test_activate_ppm_sets_es_ppm_on_component(): void
+    {
+        $this->actingAs($this->user);
+
+        Livewire::withQueryParams(['h' => $this->hoja->id])
+            ->test(CreateChequeo::class)
+            ->call('activatePpm')
+            ->assertSet('esPpm', true);
+    }
+
+    public function test_activate_ppm_persists_flag_on_existing_ejecucion(): void
+    {
+        $this->actingAs($this->user);
+
+        $ejecucion = HojaEjecucion::factory()->create([
+            'hoja_chequeo_id' => $this->hoja->id,
+            'user_id' => $this->user->id,
+        ]);
+
+        Livewire::withQueryParams(['e' => $ejecucion->id])
+            ->test(CreateChequeo::class)
+            ->call('activatePpm');
+
+        $this->assertTrue($ejecucion->fresh()->es_ppm);
+    }
+
+    public function test_deactivate_ppm_unsets_es_ppm_on_component(): void
+    {
+        $this->actingAs($this->user);
+
+        Livewire::withQueryParams(['h' => $this->hoja->id])
+            ->test(CreateChequeo::class)
+            ->call('activatePpm')
+            ->assertSet('esPpm', true)
+            ->call('deactivatePpm')
+            ->assertSet('esPpm', false);
+    }
+
+    public function test_create_stores_es_ppm_true_when_ppm_active(): void
+    {
+        $this->actingAs($this->user);
+
+        $ejecucion = HojaEjecucion::factory()->create([
+            'hoja_chequeo_id' => $this->hoja->id,
+            'user_id' => $this->user->id,
+        ]);
+
+        Livewire::withQueryParams(['e' => $ejecucion->id])
+            ->test(CreateChequeo::class)
+            ->call('activatePpm')
+            ->set('data.firma_operador', null)
+            ->call('create');
+
+        $this->assertTrue($ejecucion->fresh()->es_ppm);
+    }
 }

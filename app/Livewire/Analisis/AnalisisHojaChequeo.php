@@ -389,6 +389,25 @@ class AnalisisHojaChequeo extends Component
     }
 
     /**
+     * Count HojaEjecucion records with es_ppm = true, scoped to selected HojaChequeo and date range.
+     */
+    public function getPpmCountProperty(): int
+    {
+        $query = HojaEjecucion::where('es_ppm', true)
+            ->whereNotNull('finalizado_en')
+            ->whereBetween('finalizado_en', [
+                Carbon::parse($this->startDate)->startOfDay(),
+                Carbon::parse($this->endDate)->endOfDay(),
+            ]);
+
+        if ($this->hojaChequeoId) {
+            $query->where('hoja_chequeo_id', $this->hojaChequeoId);
+        }
+
+        return $query->count();
+    }
+
+    /**
      * Get total HojaEjecucion count by Turno
      */
     public function getTurnoEjecucionCountProperty()

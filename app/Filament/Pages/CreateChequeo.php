@@ -36,6 +36,17 @@ class CreateChequeo extends Page
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPencilSquare;
 
+    // Hide default Filament page header — we render our own sticky header
+    public function getHeader(): ?\Illuminate\Contracts\View\View
+    {
+        return null;
+    }
+
+    public function getBreadcrumbs(): array
+    {
+        return [];
+    }
+
     public static function getNavigationLabel(): string
     {
         return 'Chequeo diario';
@@ -59,6 +70,8 @@ class CreateChequeo extends Page
     public bool $autoSaving = false;
 
     public bool $dateWasChanged = false;
+
+    public bool $esPpm = false;
 
     protected ?string $originalDateSelected = null;
 
@@ -215,6 +228,7 @@ class CreateChequeo extends Page
             'centro_costo_id' => $this->centroCostoId,
             'created_at' => $this->dateSelected,
             'hoja_chequeo_id' => $this->hojaChequeo->id,
+            'es_ppm' => $this->esPpm,
         ];
 
         if ($this->shouldOverrideExecutionDates() && $this->hojaEjecucion?->finalizado_en) {
@@ -234,6 +248,27 @@ class CreateChequeo extends Page
         broadcast(new ChequeoAutoSaved($this->hojaEjecucion))->toOthers();
 
         $this->dispatch('chequeo-autosave-saved');
+    }
+
+    public function activatePpm(): void
+    {
+        $this->esPpm = true;
+        $this->dispatch('ppm-activated');
+        $this->data['observaciones'] = ($this->data['observaciones'] ?? '')."\nPPM";
+
+        if ($this->ejecucionId) {
+            HojaEjecucion::where('id', $this->ejecucionId)->update(['es_ppm' => true]);
+        }
+    }
+
+    public function deactivatePpm(): void
+    {
+        $this->esPpm = false;
+        $this->dispatch('ppm-deactivated');
+        $this->data['observaciones'] = str_replace("\nPPM", '', $this->data['observaciones'] ?? '');
+        if ($this->ejecucionId) {
+            HojaEjecucion::where('id', $this->ejecucionId)->update(['es_ppm' => false]);
+        }
     }
 
     public function reportAction(): Action
@@ -312,11 +347,13 @@ class CreateChequeo extends Page
 
         $data = [
             ...$this->form->getState(),
+            'firma_operador' => $this->data['firma_operador'] ?? null,
             'user_id' => $this->user->id,
             'turno_id' => $this->user->turno_id,
             'centro_costo_id' => $this->centroCostoId,
             'created_at' => $this->dateSelected,
             'hoja_chequeo_id' => $this->hojaChequeo->id,
+            'es_ppm' => $this->esPpm,
         ];
 
         if ($forcedFinalizadoEn && $this->hojaEjecucion?->finalizado_en) {
@@ -387,6 +424,16 @@ class CreateChequeo extends Page
     public function form(Schema $schema): Schema
     {
         return ChequeosForm::base($schema)->statePath('data');
+    }
+
+    public function signatureForm(Schema $schema): Schema
+    {
+        return ChequeosForm::signature($schema)->statePath('data');
+    }
+
+    protected function getForms(): array
+    {
+        return ['form', 'signatureForm', 'dateForm'];
     }
 
     public static function getNavigationGroup(): ?string

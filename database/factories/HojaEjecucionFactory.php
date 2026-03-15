@@ -29,4 +29,9 @@ class HojaEjecucionFactory extends Factory
     {
         return $this->state(['finalizado_en' => now()]);
     }
+
+    public function ppm(): static
+    {
+        return $this->state(['es_ppm' => true]);
+    }
 }

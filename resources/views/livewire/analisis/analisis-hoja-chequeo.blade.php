@@ -19,6 +19,19 @@
         </div>
     </div>
 
+    {{-- PPM STAT CARD --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-5 flex items-center gap-4">
+            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                <x-heroicon-o-wrench-screwdriver class="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            </div>
+            <div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Paradas PPM</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $this->ppmCount }}</p>
+            </div>
+        </div>
+    </div>
+
     {{-- CHARTS ROW --}}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 

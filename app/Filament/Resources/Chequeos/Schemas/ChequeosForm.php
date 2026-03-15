@@ -6,7 +6,6 @@ use App\Models\User;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Saade\FilamentAutograph\Forms\Components\SignaturePad;
 
@@ -16,19 +15,25 @@ class ChequeosForm
     {
         return $schema
             ->components([
-                Grid::make()->schema([
-                    SignaturePad::make('firma_operador')
-                        ->label('Firma')
-                        ->penColor('blue')
-                        ->penColorOnDark('blue')
-                        ->live(),
-                    TextInput::make('nombre_operador')
-                        ->label('Nombre')
-                        ->required(),
-                ]),
+                TextInput::make('nombre_operador')
+                    ->label('Nombre del operador')
+                    ->required(),
                 Textarea::make('observaciones')
                     ->label('Observaciones')
-                    ->columnSpanFull(),
+                    ->rows(3)
+                    ->placeholder('Anotaciones sobre el turno (opcional)'),
+            ]);
+    }
+
+    public static function signature(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                SignaturePad::make('firma_operador')
+                    ->label('Firma del operador')
+                    ->penColor('blue')
+                    ->penColorOnDark('blue')
+                    ->live(),
             ]);
     }
 

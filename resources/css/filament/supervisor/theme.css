@@ -43,4 +43,9 @@
     & .fi-header {
         @apply hidden;
     }
+
+    & .fi-page-content,
+    & .fi-body-scroll-ctn > .fi-page {
+        @apply p-0!;
+    }
 }

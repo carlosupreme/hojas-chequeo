@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\AnswerOption;
 use App\Models\HojaChequeo;
 use App\Models\HojaEjecucion;
 use App\Models\HojaFilaRespuesta;
@@ -24,6 +25,10 @@ class ChequeoItems extends Component
     public bool $readOnly = false;
 
     public ?int $ejecucionId = null;
+
+    public int $answeredCount = 0;
+
+    public int $totalCount = 0;
 
     public function mount(HojaChequeo $hoja, ?HojaEjecucion $ejecucion = null, bool $readOnly = false): void
     {
@@ -81,6 +86,9 @@ class ChequeoItems extends Component
                 'cells' => $cells,
             ];
         })->toArray();
+
+        $this->recomputeProgress();
+        $this->dispatch('progress-updated', answered: $this->answeredCount, total: $this->totalCount);
     }
 
     #[On('hoja-ejecucion-saved')]
@@ -135,7 +143,54 @@ class ChequeoItems extends Component
      */
     public function updatedForm($value, $key): void
     {
+        $this->recomputeProgress();
+        $this->dispatch('progress-updated', answered: $this->answeredCount, total: $this->totalCount);
         $this->dispatch('chequeo-item-changed', filaId: (int) $key, value: $value);
+    }
+
+    #[On('ppm-activated')]
+    public function bulkFillPpm(): void
+    {
+        $realizadoId = AnswerOption::where('key', 'realizado')->value('id');
+
+        foreach ($this->items as $fila) {
+            $filaId = $fila['id'];
+            $this->form[$filaId] = match ($fila['type_key']) {
+                'icon_set' => $realizadoId,
+                'number' => 0,
+                'text' => ' ',
+                'boolean' => true,
+                default => null,
+            };
+        }
+
+        $this->recomputeProgress();
+        $this->dispatch('progress-updated', answered: $this->answeredCount, total: $this->totalCount);
+
+        if ($this->ejecucionId) {
+            foreach ($this->items as $fila) {
+                $this->saveFilaRespuesta($this->ejecucionId, $fila['id'], $this->form[$fila['id']]);
+            }
+        }
+    }
+
+    #[On('ppm-deactivated')]
+    public function clearPpmFill(): void
+    {
+        foreach ($this->items as $fila) {
+            $this->form[$fila['id']] = null;
+        }
+
+        $this->recomputeProgress();
+        $this->dispatch('progress-updated', answered: $this->answeredCount, total: $this->totalCount);
+    }
+
+    private function recomputeProgress(): void
+    {
+        $this->totalCount = count($this->items);
+        $this->answeredCount = collect($this->form)
+            ->filter(fn ($v) => ! is_null($v))
+            ->count();
     }
 
     /**
