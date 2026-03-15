@@ -10,8 +10,6 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/js/alpine.js',
                 'resources/css/filament/admin/theme.css',
-                'resources/css/filament/operador/theme.css',
-                'resources/css/filament/supervisor/theme.css',
             ],
             refresh: true,
         }),

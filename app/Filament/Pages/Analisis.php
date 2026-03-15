@@ -8,6 +8,7 @@ use App\Models\ValorRecorrido;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\DB;
@@ -31,24 +32,26 @@ class Analisis extends Page
     public function dateRangeForm(Schema $schema): Schema
     {
         return $schema->components([
-            DatePicker::make('inicio')
-                ->inlineLabel()
-                ->displayFormat('D d/m/Y')
-                ->native(false)
-                ->locale('es')
-                ->closeOnDateSelection()
-                ->required()
-                ->live()
-                ->maxDate(now()),
-            DatePicker::make('final')
-                ->inlineLabel()
-                ->displayFormat('D d/m/Y')
-                ->native(false)
-                ->locale('es')
-                ->closeOnDateSelection()
-                ->required()
-                ->live()
-                ->maxDate(now()),
+            Grid::make()->components([
+                DatePicker::make('inicio')
+                    ->hiddenLabel()
+                    ->displayFormat('D d/m/Y')
+                    ->native(false)
+                    ->locale('es')
+                    ->closeOnDateSelection()
+                    ->required()
+                    ->live()
+                    ->maxDate(now()),
+                DatePicker::make('final')
+                    ->hiddenLabel()
+                    ->displayFormat('D d/m/Y')
+                    ->native(false)
+                    ->locale('es')
+                    ->closeOnDateSelection()
+                    ->required()
+                    ->live()
+                    ->maxDate(now()),
+            ]),
         ])->statePath('dateRange');
     }
 

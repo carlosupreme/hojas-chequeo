@@ -814,7 +814,7 @@ class SupervisorPanelProvider extends PanelProvider
                 </script>
                 ")
             )
-            ->viteTheme('resources/css/filament/supervisor/theme.css')
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->favicon(asset('/logo.png'))
             ->brandLogo(asset('logo.png'))
             ->darkModeBrandLogo(asset('dark.png'))

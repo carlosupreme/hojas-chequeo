@@ -87,19 +87,25 @@
     style="min-height: 40px;"
 >
     @foreach($options as $option)
-        <button
-            type="button"
+        {{-- Wrapper is what GSAP animates; button inside stays full-size (no border artifacts at width:0) --}}
+        <div
+            class="icon-btn shrink-0 overflow-hidden"
             data-id="{{ $option['id'] }}"
-            title="{{ $option['label'] }}"
-            @disabled($readOnly)
-            @click="toggle({{ $option['id'] }})"
-            class="icon-btn flex items-center justify-center w-10 h-10 rounded-lg border-2 shrink-0 overflow-hidden transition-colors duration-150"
-            :class="value == {{ $option['id'] }}
-                ? (colorSelected['{{ $option['color'] }}'] ?? colorSelected.gray)
-                : colorUnselected"
+            style="width: 40px;"
         >
-            <span class="pointer-events-none">{!! $option['icon_html'] !!}</span>
-        </button>
+            <button
+                type="button"
+                title="{{ $option['label'] }}"
+                @disabled($readOnly)
+                @click="toggle({{ $option['id'] }})"
+                class="flex items-center justify-center w-10 h-10 rounded-lg border-2 transition-colors duration-150"
+                :class="value == {{ $option['id'] }}
+                    ? (colorSelected['{{ $option['color'] }}'] ?? colorSelected.gray)
+                    : colorUnselected"
+            >
+                <span class="pointer-events-none">{!! $option['icon_html'] !!}</span>
+            </button>
+        </div>
         @if(!$loop->last)
             <span class="icon-gap inline-block shrink-0" style="width: 6px;"></span>
         @endif

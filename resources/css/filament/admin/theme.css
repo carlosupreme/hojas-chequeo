@@ -47,7 +47,7 @@
     }
 
     & .fi-page-header-main-ctn {
-        @apply pt-0!;
+        padding-block: 0;
     }
 
     /* Remove page-level padding so our custom sticky header sits flush */
