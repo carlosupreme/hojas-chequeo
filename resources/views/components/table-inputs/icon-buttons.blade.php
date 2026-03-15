@@ -55,26 +55,30 @@
             const hasValue = v !== null && v !== undefined && v !== '';
 
             if (hasValue) {
-                // Keep selected button visible, collapse others, show label
+                // Keep selected wrapper visible, collapse others, show label
                 const sel    = btns.find(b => String(b.dataset.id) === String(v));
                 const others = btns.filter(b => String(b.dataset.id) !== String(v));
                 if (withAnimation) {
-                    if (sel) gsap.to(sel, { width: 40, opacity: 1, duration: 0.22, ease: 'power2.out', overwrite: true });
-                    gsap.to(others, { width: 0, opacity: 0, duration: 0.22, ease: 'power2.in',  overwrite: true });
-                    gsap.to(gaps,   { width: 0, opacity: 0, duration: 0.20, ease: 'power2.in',  overwrite: true });
-                    gsap.to(label,  { width: 'auto', opacity: 1, duration: 0.28, delay: 0.18, ease: 'power2.out', overwrite: true });
+                    // Timeline batches all tweens into one RAF tick
+                    const tl = gsap.timeline();
+                    // Collapse: width only — overflow:hidden already clips content at width:0 (no opacity needed)
+                    tl.to(others, { width: 0,              duration: 0.18, ease: 'power2.in',  force3D: true, overwrite: 'auto' }, 0)
+                      .to(gaps,   { width: 0, opacity: 0,  duration: 0.16, ease: 'power2.in',               overwrite: 'auto' }, 0)
+                      .to(label,  { width: 'auto', opacity: 1, duration: 0.24, ease: 'power2.out',          overwrite: 'auto' }, 0.16);
+                    if (sel) tl.to(sel, { width: 40, opacity: 1, duration: 0.22, ease: 'power2.out', force3D: true, overwrite: 'auto' }, 0);
                 } else {
                     if (sel) gsap.set(sel, { width: 40, opacity: 1 });
-                    gsap.set(others, { width: 0, opacity: 0 });
+                    gsap.set(others, { width: 0 });
                     gsap.set(gaps,   { width: 0, opacity: 0 });
                     gsap.set(label,  { width: 'auto', opacity: 1 });
                 }
             } else {
-                // Expand all buttons back, hide label
+                // Expand all wrappers back, hide label
                 if (withAnimation) {
-                    gsap.to(label, { width: 0, opacity: 0, duration: 0.18, ease: 'power2.in',       overwrite: true });
-                    gsap.to(btns,  { width: 40, opacity: 1, duration: 0.28, delay: 0.15, ease: 'back.out(1.4)', overwrite: true });
-                    gsap.to(gaps,  { width: 6,  opacity: 1, duration: 0.28, delay: 0.15, ease: 'back.out(1.4)', overwrite: true });
+                    const tl = gsap.timeline();
+                    tl.to(label, { width: 0, opacity: 0,  duration: 0.14, ease: 'power2.in',               overwrite: 'auto' }, 0)
+                      .to(btns,  { width: 40, opacity: 1, duration: 0.24, ease: 'back.out(1.4)', force3D: true, overwrite: 'auto' }, 0.12)
+                      .to(gaps,  { width: 6,  opacity: 1, duration: 0.24, ease: 'back.out(1.4)',            overwrite: 'auto' }, 0.12);
                 } else {
                     gsap.set(label, { width: 0, opacity: 0 });
                     gsap.set(btns,  { width: 40, opacity: 1 });

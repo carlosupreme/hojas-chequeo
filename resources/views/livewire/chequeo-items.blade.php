@@ -7,11 +7,11 @@
             <thead>
                 <tr class="border-b border-gray-200 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-800/40">
                     @foreach($columnas as $columna)
-                        <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <th class="px-4 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                             {{ $columna['label'] }}
                         </th>
                     @endforeach
-                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <th class="px-4 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Estado / Valor
                     </th>
                 </tr>
@@ -25,13 +25,13 @@
                             : 'bg-white dark:bg-gray-900 hover:bg-gray-50/60 dark:hover:bg-gray-800/40' }}">
 
                         @foreach($columnas as $columna)
-                            <td class="px-6 py-5 text-sm text-gray-700 dark:text-gray-300 leading-snug">
+                            <td class="px-3 py-3 text-sm text-gray-700 dark:text-gray-300 leading-snug">
                                 {{ $item['cells'][$columna['key']] ?? '—' }}
                             </td>
                         @endforeach
 
                         {{-- Input cell --}}
-                        <td class="px-6 py-4">
+                        <td class="px-3 py-3">
                             <x-table-inputs.input-dispatcher
                                 :item="$item"
                                 model="form.{{ $item['id'] }}"
