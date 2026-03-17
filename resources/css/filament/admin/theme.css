@@ -115,82 +115,83 @@
 /* ── DARK MODE TOKENS ──────────────────────────────────────── */
 
 .dark {
-    --bg-page:          #020617;   /* slate-950 */
-    --bg-surface:       #0f172a;   /* slate-900 */
-    --bg-subtle:        #1e293b;   /* slate-800 */
-    --bg-muted:         #334155;   /* slate-700 */
-    --bg-overlay:       rgba(0, 0, 0, 0.7);
+    /* 3-level elevation: sidebar (darkest) → page → surface (lightest dark) */
+    --bg-page:          #16171c;   /* mid-dark shell          */
+    --bg-surface:       #1e1f27;   /* cards, sections         */
+    --bg-subtle:        #252633;   /* hover rows, alt rows    */
+    --bg-muted:         #2d2e3e;   /* active states           */
+    --bg-overlay:       rgba(0, 0, 0, 0.75);
 
-    --sidebar-bg:              #1e293b;   /* slate-800 */
-    --sidebar-border:          #334155;   /* slate-700 */
-    --sidebar-text:            #94a3b8;
+    --sidebar-bg:              #111218;   /* darkest layer   */
+    --sidebar-border:          #1a1b22;
+    --sidebar-text:            #9899b0;
     --sidebar-text-active:     #ffffff;
-    --sidebar-item-active-bg:  #334155;
-    --sidebar-item-active-border: #475569;
-    --sidebar-group-label:     #475569;
-    --sidebar-header-bg:       #1e293b;
-    --sidebar-footer-bg:       #1e293b;
+    --sidebar-item-active-bg:  #2a2b3d;
+    --sidebar-item-active-border: #3a3b52;
+    --sidebar-group-label:     #545570;
+    --sidebar-header-bg:       #111218;
+    --sidebar-footer-bg:       #111218;
 
-    --topbar-bg:        #0f172a;
-    --topbar-border:    #1e293b;
+    --topbar-bg:        #16171c;
+    --topbar-border:    #1e1f27;
 
-    --border:           #1e293b;
-    --border-strong:    #334155;
-    --border-focus:     #3b82f6;
+    --border:           #1e2030;
+    --border-strong:    #27283a;
+    --border-focus:     #6366f1;   /* indigo-500 — matches the purple accent */
 
-    --text-primary:     #f1f5f9;   /* slate-100 */
-    --text-secondary:   #94a3b8;   /* slate-400 */
-    --text-muted:       #475569;   /* slate-600 */
-    --text-disabled:    #334155;
+    --text-primary:     #e2e4f0;
+    --text-secondary:   #8a8b9e;
+    --text-muted:       #4a4b60;
+    --text-disabled:    #2d2e3e;
 
-    --shadow-xs:   0 1px 2px 0 rgb(0 0 0 / 0.3);
-    --shadow-sm:   0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.3);
-    --shadow-md:   0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
-    --shadow-lg:   0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
-    --shadow-xl:   0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+    --shadow-xs:   0 1px 2px 0 rgb(0 0 0 / 0.4);
+    --shadow-sm:   0 1px 3px 0 rgb(0 0 0 / 0.5), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+    --shadow-md:   0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+    --shadow-lg:   0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+    --shadow-xl:   0 20px 25px -5px rgb(0 0 0 / 0.6), 0 8px 10px -6px rgb(0 0 0 / 0.5);
 
-    --table-header-bg:      #1e293b;
-    --table-header-text:    #94a3b8;
-    --table-row-bg:         #0f172a;
-    --table-row-hover:      #1e293b;
-    --table-stripe-bg:      #1a2744;
-    --table-border:         #1e293b;
+    --table-header-bg:      #1a1b22;
+    --table-header-text:    #6b6c82;
+    --table-row-bg:         #1e1f27;
+    --table-row-hover:      #252633;
+    --table-stripe-bg:      #21222a;
+    --table-border:         #252633;
 
-    --input-bg:             #1e293b;
-    --input-border:         #334155;
-    --input-border-focus:   #3b82f6;
-    --input-text:           #f1f5f9;
-    --input-placeholder:    #475569;
-    --input-disabled-bg:    #0f172a;
+    --input-bg:             #252633;
+    --input-border:         #2d2e3e;
+    --input-border-focus:   #6366f1;
+    --input-text:           #e2e4f0;
+    --input-placeholder:    #4a4b60;
+    --input-disabled-bg:    #1e1f27;
 
-    --modal-bg:             #0f172a;
-    --modal-border:         #1e293b;
-    --modal-header-bg:      #0f172a;
-    --modal-footer-bg:      #1e293b;
+    --modal-bg:             #1e1f27;
+    --modal-border:         #27283a;
+    --modal-header-bg:      #1a1b22;
+    --modal-footer-bg:      #252633;
 
-    --notification-bg:      #0f172a;
-    --notification-border:  #1e293b;
+    --notification-bg:      #1e1f27;
+    --notification-border:  #27283a;
 
-    --widget-bg:            #0f172a;
-    --widget-border:        #1e293b;
+    --widget-bg:            #1e1f27;
+    --widget-border:        #252633;
 
-    --breadcrumb-text:      #475569;
-    --breadcrumb-sep:       #334155;
-    --breadcrumb-active:    #f1f5f9;
+    --breadcrumb-text:      #4a4b60;
+    --breadcrumb-sep:       #27283a;
+    --breadcrumb-active:    #e2e4f0;
 
     /* ── Table filter tabs ────────────────────────── */
     --tabs-item-bg:           transparent;
-    --tabs-item-bg-active:    #1e293b;
-    --tabs-item-text:         #475569;
-    --tabs-item-text-active:  #f1f5f9;
-    --tabs-item-border:       #334155;
-    --tabs-item-border-active:#475569;
-    --tabs-item-shadow-active: 0 1px 3px 0 rgb(0 0 0 / 0.4);
+    --tabs-item-bg-active:    #252633;
+    --tabs-item-text:         #4a4b60;
+    --tabs-item-text-active:  #e2e4f0;
+    --tabs-item-border:       #1e2030;
+    --tabs-item-border-active:#2d2e3e;
+    --tabs-item-shadow-active: 0 1px 4px 0 rgb(0 0 0 / 0.5);
 
     /* ── Scrollbar ────────────────────────────────── */
-    --scrollbar-track:        #0f172a;
-    --scrollbar-thumb:        #334155;
-    --scrollbar-thumb-hover:  #475569;
+    --scrollbar-track:        #16171c;
+    --scrollbar-thumb:        #252633;
+    --scrollbar-thumb-hover:  #2d2e3e;
 }
 
 /* ============================================================
