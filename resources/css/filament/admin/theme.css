@@ -6,39 +6,756 @@
 
 @source inline('{dark:,}{bg,border,text}-{red,yellow,blue,green}-{50,100,200,300,400,500,600,700,800,900}{/10,/20,/30,/40,/50,/60,/70,/80,/90,}');
 
-.fi-sidebar {
-    @apply border-r border-zinc-200! bg-zinc-50! dark:bg-zinc-900! dark:border-zinc-700!;
+/* ============================================================
+   DESIGN TOKENS — edit only this block to retheme
+   ============================================================ */
+
+:root {
+    /* ── Backgrounds ─────────────────────────────── */
+    --bg-page:          #f8fafc;   /* body / outer shell  */
+    --bg-surface:       #ffffff;   /* cards, sections     */
+    --bg-subtle:        #f1f5f9;   /* table stripes, inputs bg */
+    --bg-muted:         #e2e8f0;   /* hover rows, placeholders */
+    --bg-overlay:       rgba(15, 23, 42, 0.6); /* modal backdrop */
+
+    /* ── Sidebar ─────────────────────────────────── */
+    --sidebar-bg:              #f1f5f9;   /* slate-100 — subtle gray in light */
+    --sidebar-border:          #e2e8f0;   /* slate-200 */
+    --sidebar-text:            #64748b;   /* slate-500 */
+    --sidebar-text-active:     #0f172a;   /* slate-900 */
+    --sidebar-item-active-bg:  #e2e8f0;   /* slate-200 */
+    --sidebar-item-active-border: #cbd5e1; /* slate-300 */
+    --sidebar-group-label:     #94a3b8;   /* slate-400 */
+    --sidebar-header-bg:       #f1f5f9;
+    --sidebar-footer-bg:       #f1f5f9;
+
+    /* ── Topbar ──────────────────────────────────── */
+    --topbar-bg:        #ffffff;
+    --topbar-border:    #e2e8f0;
+
+    /* ── Borders ─────────────────────────────────── */
+    --border:           #e2e8f0;   /* slate-200 */
+    --border-strong:    #cbd5e1;   /* slate-300 */
+    --border-focus:     #3b82f6;   /* blue-500  */
+
+    /* ── Text ────────────────────────────────────── */
+    --text-primary:     #0f172a;   /* slate-900 */
+    --text-secondary:   #475569;   /* slate-600 */
+    --text-muted:       #94a3b8;   /* slate-400 */
+    --text-disabled:    #cbd5e1;   /* slate-300 */
+
+    /* ── Shadows ─────────────────────────────────── */
+    --shadow-xs:   0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-sm:   0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+    --shadow-md:   0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+    --shadow-lg:   0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+    --shadow-xl:   0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.06);
+
+    /* ── Radius ──────────────────────────────────── */
+    --radius-sm:   0.375rem;   /* 6px  — badges, tags     */
+    --radius:      0.5rem;     /* 8px  — buttons, inputs  */
+    --radius-md:   0.75rem;    /* 12px — cards, sections  */
+    --radius-lg:   1rem;       /* 16px — modals           */
+    --radius-xl:   1.25rem;    /* 20px — large panels     */
+
+    /* ── Table ───────────────────────────────────── */
+    --table-header-bg:      #f8fafc;
+    --table-header-text:    #475569;
+    --table-row-bg:         #ffffff;
+    --table-row-hover:      #f8fafc;
+    --table-stripe-bg:      #f8fafc;
+    --table-border:         #e2e8f0;
+
+    /* ── Forms & Inputs ──────────────────────────── */
+    --input-bg:             #ffffff;
+    --input-border:         #cbd5e1;
+    --input-border-focus:   #3b82f6;
+    --input-text:           #0f172a;
+    --input-placeholder:    #94a3b8;
+    --input-disabled-bg:    #f1f5f9;
+
+    /* ── Modal ───────────────────────────────────── */
+    --modal-bg:             #ffffff;
+    --modal-border:         #e2e8f0;
+    --modal-header-bg:      #ffffff;
+    --modal-footer-bg:      #f8fafc;
+
+    /* ── Notifications ───────────────────────────── */
+    --notification-bg:      #ffffff;
+    --notification-border:  #e2e8f0;
+
+    /* ── Widgets / Stat Cards ─────────────────────── */
+    --widget-bg:            #ffffff;
+    --widget-border:        #e2e8f0;
+
+    /* ── Breadcrumbs ─────────────────────────────── */
+    --breadcrumb-text:      #94a3b8;
+    --breadcrumb-sep:       #cbd5e1;
+    --breadcrumb-active:    #0f172a;
+
+    /* ── Table filter tabs (pills above table) ───── */
+    --tabs-item-bg:           transparent;
+    --tabs-item-bg-active:    #ffffff;
+    --tabs-item-text:         #64748b;
+    --tabs-item-text-active:  #0f172a;
+    --tabs-item-border:       #e2e8f0;
+    --tabs-item-border-active:#cbd5e1;
+    --tabs-item-shadow-active: 0 1px 3px 0 rgb(0 0 0 / 0.08);
+
+    /* ── Scrollbar ────────────────────────────────── */
+    --scrollbar-size:         6px;
+    --scrollbar-track:        #f1f5f9;
+    --scrollbar-thumb:        #cbd5e1;
+    --scrollbar-thumb-hover:  #94a3b8;
+
+    /* ── Badges ──────────────────────────────────── */
+    --badge-radius:         9999px;
 }
 
+/* ── DARK MODE TOKENS ──────────────────────────────────────── */
+
+.dark {
+    --bg-page:          #020617;   /* slate-950 */
+    --bg-surface:       #0f172a;   /* slate-900 */
+    --bg-subtle:        #1e293b;   /* slate-800 */
+    --bg-muted:         #334155;   /* slate-700 */
+    --bg-overlay:       rgba(0, 0, 0, 0.7);
+
+    --sidebar-bg:              #1e293b;   /* slate-800 */
+    --sidebar-border:          #334155;   /* slate-700 */
+    --sidebar-text:            #94a3b8;
+    --sidebar-text-active:     #ffffff;
+    --sidebar-item-active-bg:  #334155;
+    --sidebar-item-active-border: #475569;
+    --sidebar-group-label:     #475569;
+    --sidebar-header-bg:       #1e293b;
+    --sidebar-footer-bg:       #1e293b;
+
+    --topbar-bg:        #0f172a;
+    --topbar-border:    #1e293b;
+
+    --border:           #1e293b;
+    --border-strong:    #334155;
+    --border-focus:     #3b82f6;
+
+    --text-primary:     #f1f5f9;   /* slate-100 */
+    --text-secondary:   #94a3b8;   /* slate-400 */
+    --text-muted:       #475569;   /* slate-600 */
+    --text-disabled:    #334155;
+
+    --shadow-xs:   0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow-sm:   0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+    --shadow-md:   0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+    --shadow-lg:   0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+    --shadow-xl:   0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+
+    --table-header-bg:      #1e293b;
+    --table-header-text:    #94a3b8;
+    --table-row-bg:         #0f172a;
+    --table-row-hover:      #1e293b;
+    --table-stripe-bg:      #1a2744;
+    --table-border:         #1e293b;
+
+    --input-bg:             #1e293b;
+    --input-border:         #334155;
+    --input-border-focus:   #3b82f6;
+    --input-text:           #f1f5f9;
+    --input-placeholder:    #475569;
+    --input-disabled-bg:    #0f172a;
+
+    --modal-bg:             #0f172a;
+    --modal-border:         #1e293b;
+    --modal-header-bg:      #0f172a;
+    --modal-footer-bg:      #1e293b;
+
+    --notification-bg:      #0f172a;
+    --notification-border:  #1e293b;
+
+    --widget-bg:            #0f172a;
+    --widget-border:        #1e293b;
+
+    --breadcrumb-text:      #475569;
+    --breadcrumb-sep:       #334155;
+    --breadcrumb-active:    #f1f5f9;
+
+    /* ── Table filter tabs ────────────────────────── */
+    --tabs-item-bg:           transparent;
+    --tabs-item-bg-active:    #1e293b;
+    --tabs-item-text:         #475569;
+    --tabs-item-text-active:  #f1f5f9;
+    --tabs-item-border:       #334155;
+    --tabs-item-border-active:#475569;
+    --tabs-item-shadow-active: 0 1px 3px 0 rgb(0 0 0 / 0.4);
+
+    /* ── Scrollbar ────────────────────────────────── */
+    --scrollbar-track:        #0f172a;
+    --scrollbar-thumb:        #334155;
+    --scrollbar-thumb-hover:  #475569;
+}
+
+/* ============================================================
+   INTER VARIABLE — optical features
+   ============================================================ */
+
+:root {
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    font-optical-sizing: auto;
+}
+
+
+/* ============================================================
+   LAYOUT — body, page shell
+   ============================================================ */
+
+.fi-body {
+    background-color: var(--bg-page) !important;
+    color: var(--text-primary) !important;
+}
+
+.fi-layout {
+    background-color: var(--bg-page) !important;
+}
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+
+.fi-sidebar {
+    background-color: var(--sidebar-bg) !important;
+    border-right: 1px solid var(--sidebar-border) !important;
+}
+
+.fi-sidebar-header {
+    background-color: var(--sidebar-header-bg) !important;
+    border-bottom: 1px solid var(--sidebar-border) !important;
+}
+
+.fi-sidebar-footer {
+    background-color: var(--sidebar-footer-bg) !important;
+    border-top: 1px solid var(--sidebar-border) !important;
+}
+
+.fi-sidebar-nav {
+    background-color: var(--sidebar-bg) !important;
+}
+
+/* Group labels */
+.fi-sidebar-group-label {
+    color: var(--sidebar-group-label) !important;
+    font-size: 0.6875rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+}
+
+/* Inactive items */
+.fi-sidebar-item .fi-sidebar-item-btn .fi-icon,
+.fi-sidebar-item .fi-sidebar-item-btn .fi-sidebar-item-label {
+    color: var(--sidebar-text) !important;
+}
+
+/* Active item */
+.fi-sidebar-item.fi-active .fi-sidebar-item-btn {
+    background-color: var(--sidebar-item-active-bg) !important;
+    border: 1px solid var(--sidebar-item-active-border) !important;
+}
+
+.fi-sidebar-item.fi-active .fi-sidebar-item-btn .fi-icon,
+.fi-sidebar-item.fi-active .fi-sidebar-item-btn .fi-sidebar-item-label {
+    color: var(--sidebar-text-active) !important;
+}
+
+/* Hover */
+.fi-sidebar-item .fi-sidebar-item-btn:hover {
+    background-color: var(--sidebar-item-active-bg) !important;
+}
+
+.fi-sidebar-item .fi-sidebar-item-btn:hover .fi-icon,
+.fi-sidebar-item .fi-sidebar-item-btn:hover .fi-sidebar-item-label {
+    color: var(--sidebar-text-active) !important;
+}
+
+/* ============================================================
+   TOPBAR
+   ============================================================ */
+
+.fi-topbar {
+    background-color: var(--topbar-bg) !important;
+    border-bottom: 1px solid var(--topbar-border) !important;
+    box-shadow: var(--shadow-xs) !important;
+}
+
+/* ============================================================
+   MAIN CONTENT AREA
+   ============================================================ */
 
 .fi-main,
 .fi-main-ctn,
 .fi-layout-sidebar-toggle-btn-ctn,
 .fi-ta-main {
-    @apply bg-white! dark:bg-zinc-800!;
+    background-color: var(--bg-page) !important;
+}
+
+/* Page header */
+.fi-header {
+    background-color: var(--bg-page) !important;
+}
+
+.fi-page-header-heading {
+    color: var(--text-primary) !important;
+}
+
+.fi-page-header-subheading {
+    color: var(--text-secondary) !important;
+}
+
+/* Breadcrumbs */
+.fi-breadcrumbs {
+    color: var(--breadcrumb-text) !important;
+}
+
+.fi-breadcrumbs-item-separator {
+    color: var(--breadcrumb-sep) !important;
+}
+
+.fi-breadcrumbs-item:last-child {
+    color: var(--breadcrumb-active) !important;
+}
+
+/* Footer */
+.fi-footer {
+    background-color: var(--bg-page) !important;
+    border-top: 1px solid var(--border) !important;
+    color: var(--text-muted) !important;
+}
+
+/* ============================================================
+   SECTIONS & CARDS
+   ============================================================ */
+
+.fi-section {
+    background-color: var(--bg-surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.fi-section-header {
+    background-color: var(--bg-surface) !important;
+    border-bottom: 1px solid var(--border) !important;
+    border-radius: var(--radius-md) var(--radius-md) 0 0 !important;
+}
+
+.fi-section-header-heading {
+    color: var(--text-primary) !important;
 }
 
 
-.fi-sidebar-item.fi-active {
-    & .fi-sidebar-item-btn {
-        @apply bg-white border dark:bg-white/7 border-transparent;
-
-        & .fi-icon,
-        .fi-sidebar-item-label {
-            @apply dark:text-white text-zinc-900;
-        }
-    }
+.fi-section-content-ctn {
+    border-radius: 0 0 var(--radius-md) var(--radius-md) !important;
 }
 
-.fi-sidebar-item {
-    & .fi-sidebar-item-btn {
-
-        & .fi-icon,
-        .fi-sidebar-item-label {
-            @apply dark:text-white/80 text-zinc-500;
-        }
-    }
+.fi-card {
+    background-color: var(--bg-surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-sm) !important;
 }
+
+/* ============================================================
+   TABLES  (fi-ta-*)
+   ============================================================ */
+
+.fi-ta-ctn {
+    background-color: var(--bg-surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-sm) !important;
+    overflow: hidden !important;
+}
+
+.fi-ta-table {
+    background-color: var(--table-row-bg) !important;
+}
+
+/* Header row */
+.fi-ta-header-cell,
+th.fi-ta-cell,
+.fi-ta-actions-header-cell,
+.fi-ta-empty-header-cell {
+    background-color: var(--table-header-bg) !important;
+    color: var(--table-header-text) !important;
+    font-weight: 600 !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.04em !important;
+    text-transform: uppercase !important;
+    border-bottom: 1px solid var(--table-border) !important;
+}
+
+/* Body rows */
+.fi-ta-row {
+    background-color: var(--table-row-bg) !important;
+    border-bottom: 1px solid var(--table-border) !important;
+    transition: background-color 0.1s ease !important;
+}
+
+.fi-ta-row:hover {
+    background-color: var(--table-row-hover) !important;
+}
+
+.fi-ta-cell {
+    color: var(--text-primary) !important;
+}
+
+/* Empty state */
+.fi-ta-empty-state {
+    background-color: var(--bg-surface) !important;
+    color: var(--text-muted) !important;
+}
+
+/* Filters bar */
+.fi-ta-filters-ctn {
+    background-color: var(--bg-surface) !important;
+    border-bottom: 1px solid var(--border) !important;
+}
+
+
+/* Pagination */
+.fi-ta-pagination {
+    background-color: var(--bg-surface) !important;
+    border-top: 1px solid var(--border) !important;
+    color: var(--text-secondary) !important;
+}
+
+/* ============================================================
+   FORMS  (fi-fo-*)
+   ============================================================ */
+
+.fi-fo-field-wrp {
+    color: var(--text-primary) !important;
+}
+
+.fi-input,
+.fi-fo-text-input,
+.fi-fo-textarea,
+.fi-fo-select,
+.fi-select-input {
+    background-color: var(--input-bg) !important;
+    border: 1px solid var(--input-border) !important;
+    border-radius: var(--radius) !important;
+    color: var(--input-text) !important;
+}
+
+.fi-input:focus,
+.fi-fo-text-input:focus,
+.fi-fo-textarea:focus,
+.fi-select-input:focus {
+    border-color: var(--input-border-focus) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--input-border-focus) 20%, transparent) !important;
+    outline: none !important;
+}
+
+.fi-input::placeholder,
+.fi-fo-text-input::placeholder,
+.fi-fo-textarea::placeholder {
+    color: var(--input-placeholder) !important;
+}
+
+.fi-input:disabled,
+.fi-fo-text-input:disabled {
+    background-color: var(--input-disabled-bg) !important;
+    color: var(--text-disabled) !important;
+}
+
+.fi-fo-field-wrp-label {
+    color: var(--text-secondary) !important;
+    font-weight: 500 !important;
+}
+
+.fi-fo-field-wrp-hint {
+    color: var(--text-muted) !important;
+}
+
+/* ============================================================
+   MODALS  (fi-modal-*)
+   ============================================================ */
+
+.fi-modal-close-overlay {
+    background-color: var(--bg-overlay) !important;
+    backdrop-filter: blur(4px) !important;
+}
+
+.fi-modal-window {
+    background-color: var(--modal-bg) !important;
+    border: 1px solid var(--modal-border) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-xl) !important;
+}
+
+.fi-modal-header {
+    background-color: var(--modal-header-bg) !important;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+}
+
+.fi-modal-heading {
+    color: var(--text-primary) !important;
+}
+
+.fi-modal-description {
+    color: var(--text-secondary) !important;
+}
+
+.fi-modal-content {
+    background-color: var(--modal-bg) !important;
+    color: var(--text-primary) !important;
+}
+
+.fi-modal-footer {
+    background-color: inherit;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
+}
+
+/* ============================================================
+   BUTTONS  (fi-btn)
+   ============================================================ */
+
+.fi-btn {
+    border-radius: var(--radius) !important;
+    font-weight: 500 !important;
+    transition: all 0.15s ease !important;
+}
+
+/* ============================================================
+   BADGES  (fi-badge)
+   ============================================================ */
+
+.fi-badge {
+    border-radius: var(--badge-radius) !important;
+    font-weight: 500 !important;
+    font-size: 0.6875rem !important;
+    letter-spacing: 0.03em !important;
+}
+
+/* ============================================================
+   NOTIFICATIONS  (fi-no-*)
+   ============================================================ */
+
+.fi-no-notification {
+    background-color: var(--notification-bg) !important;
+    border: 1px solid var(--notification-border) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-lg) !important;
+    color: var(--text-primary) !important;
+}
+
+.fi-no-notification-title {
+    color: var(--text-primary) !important;
+}
+
+.fi-no-notification-body {
+    color: var(--text-secondary) !important;
+}
+
+/* ============================================================
+   WIDGETS  (fi-wi-*)
+   ============================================================ */
+
+.fi-wi-stats-overview-stat {
+    background-color: var(--widget-bg) !important;
+    border: 1px solid var(--widget-border) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.fi-wi-stats-overview-stat-label {
+    color: var(--text-secondary) !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+}
+
+.fi-wi-stats-overview-stat-value {
+    color: var(--text-primary) !important;
+    font-weight: 700 !important;
+}
+
+.fi-wi-stats-overview-stat-description {
+    color: var(--text-muted) !important;
+}
+
+/* ============================================================
+   DROPDOWN MENUS
+   ============================================================ */
+
+/* Select search input — neutralize our global fi-input border/radius
+   so it doesn't add height or break the dropdown layout */
+.fi-select-input-search-ctn .fi-input {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+}
+
+.fi-dropdown-panel {
+    background-color: var(--bg-surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-lg) !important;
+}
+
+.fi-dropdown-list-item-label {
+    color: var(--text-primary) !important;
+}
+
+.fi-dropdown-list-item:hover {
+    background-color: var(--bg-subtle) !important;
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+
+.fi-tabs {
+    border-bottom: 1px solid var(--border) !important;
+}
+
+.fi-tabs-tab {
+    color: var(--text-muted) !important;
+    font-weight: 500 !important;
+}
+
+.fi-tabs-tab[aria-selected="true"],
+.fi-tabs-tab.fi-active {
+    color: var(--text-primary) !important;
+    border-bottom-color: var(--border-focus) !important;
+}
+
+/* ============================================================
+   INPUT WRAPPER  (fi-input-wrp)
+   The outer shell that holds the input + prefix/suffix icons
+   ============================================================ */
+
+.fi-input-wrp {
+    background-color: var(--input-bg) !important;
+    border: 1px solid var(--input-border) !important;
+    border-radius: var(--radius) !important;
+    color: var(--input-text) !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.fi-input-wrp:focus-within {
+    border-color: var(--input-border-focus) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--input-border-focus) 18%, transparent) !important;
+}
+
+.fi-input-wrp input,
+.fi-input-wrp textarea,
+.fi-input-wrp select {
+    background-color: transparent !important;
+    color: var(--input-text) !important;
+}
+
+.fi-input-wrp input::placeholder,
+.fi-input-wrp textarea::placeholder {
+    color: var(--input-placeholder) !important;
+}
+
+/* Table search — flatten the prefix icon area so it blends with the wrapper.
+   Filament gives .fi-input-wrp-prefix its own bg + right border by default,
+   causing the "box-inside-a-box" look seen in the search field. */
+.fi-ta-search-field .fi-input-wrp-prefix {
+    background-color: transparent !important;
+    border-right: none !important;
+    box-shadow: none !important;
+}
+
+
+.fi-ta-search-field .fi-input-wrp {
+    border-radius: var(--radius) !important;
+}
+
+.fi-input-has-inline-prefix {
+    border: none !important;
+    outline: none !important;
+}
+
+/* ============================================================
+   TABLE FILTER TABS  (fi-tabs-item — pills above the table)
+   ============================================================ */
+
+.fi-tabs-item {
+    background-color: var(--tabs-item-bg) !important;
+    border: 1px solid transparent !important;
+    border-radius: var(--radius) !important;
+    color: var(--tabs-item-text) !important;
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+    transition: background-color 0.15s ease, color 0.15s ease !important;
+}
+
+.fi-tabs-item:hover {
+    background-color: var(--bg-muted) !important;
+    color: var(--text-primary) !important;
+}
+
+.fi-tabs-item[aria-selected="true"],
+.fi-tabs-item.fi-active {
+    background-color: var(--tabs-item-bg-active) !important;
+    border-color: var(--tabs-item-border-active) !important;
+    color: var(--tabs-item-text-active) !important;
+    box-shadow: var(--tabs-item-shadow-active) !important;
+}
+
+/* Badge/count pill inside the tab item */
+.fi-tabs-item .fi-badge {
+    opacity: 0.75;
+}
+
+.fi-tabs-item[aria-selected="true"] .fi-badge,
+.fi-tabs-item.fi-active .fi-badge {
+    opacity: 1;
+}
+
+/* ============================================================
+   SCROLLBARS — pure CSS, no hook classes needed
+   Works in Chromium/Safari. Firefox uses scrollbar-* props.
+   ============================================================ */
+
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* Chromium / Safari */
+::-webkit-scrollbar {
+    width: var(--scrollbar-size);
+    height: var(--scrollbar-size);
+}
+
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
+    border-radius: 999px;
+    border: 2px solid var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-thumb-hover);
+}
+
+::-webkit-scrollbar-corner {
+    background: var(--scrollbar-track);
+}
+
+/* ============================================================
+   PAGE-SPECIFIC OVERRIDES (existing)
+   ============================================================ */
 
 .create-chequeo-page,
 .create-recorrido-page {

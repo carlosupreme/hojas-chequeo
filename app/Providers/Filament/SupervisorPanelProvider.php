@@ -41,6 +41,7 @@ class SupervisorPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
+            ->font('Inter Variable', provider: \Filament\FontProviders\LocalFontProvider::class, url: '/css/inter.css')
             ->databaseNotifications()
             ->renderHook(
                 PanelsRenderHook::HEAD_END,

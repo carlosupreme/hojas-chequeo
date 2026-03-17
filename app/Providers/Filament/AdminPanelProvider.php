@@ -809,7 +809,7 @@ class AdminPanelProvider extends PanelProvider
                 ")
             )
             ->viteTheme('resources/css/filament/admin/theme.css')
-            ->font('Poppins')
+            ->font('Inter Variable', provider: \Filament\FontProviders\LocalFontProvider::class, url: '/css/inter.css')
             ->passwordReset()
             ->globalSearch(false)
             ->profile(isSimple: false)

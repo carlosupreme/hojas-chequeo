@@ -38,6 +38,7 @@ class OperadorPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
+            ->font('Inter Variable', provider: \Filament\FontProviders\LocalFontProvider::class, url: '/css/inter.css')
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
