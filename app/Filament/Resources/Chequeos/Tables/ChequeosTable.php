@@ -160,23 +160,6 @@ class ChequeosTable
                     ->sortable()
                     ->color('primary'),
 
-                // COLUMN 2: AREA (Helpful context)
-                TextColumn::make('observaciones')
-                    ->label('Observaciones')
-                    ->badge()
-                    ->color('warning')
-                    ->limit(30)
-                    ->tooltip(function (TextColumn $column): ?string {
-                        $state = $column->getState();
-
-                        if (strlen($state) <= $column->getCharacterLimit()) {
-                            return null;
-                        }
-
-                        // Only render the tooltip if the column contents exceeds the length limit.
-                        return $state;
-                    }),
-
                 // COLUMN 4: OPERATOR & SHIFT (Stacked)
                 TextColumn::make('nombre_operador')
                     ->label('Operador')
@@ -205,6 +188,21 @@ class ChequeosTable
                         $duration = $record->created_at->diff($record->finalizado_en);
 
                         return $duration->format('%Hh %Im %Ss');
+                    }),
+
+                TextColumn::make('observaciones')
+                    ->label('Observaciones')
+                    ->badge()
+                    ->color('gray')
+                    ->limit(30)
+                    ->tooltip(function (TextColumn $column): ?string {
+                        $state = $column->getState();
+
+                        if (strlen($state) <= $column->getCharacterLimit()) {
+                            return null;
+                        }
+
+                        return $state;
                     }),
 
                 IconColumn::make('es_ppm')
