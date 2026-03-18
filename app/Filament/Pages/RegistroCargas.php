@@ -2,9 +2,10 @@
 
 namespace App\Filament\Pages;
 
-use App\Models\CentroCosto;
 use App\Models\Equipo;
 use App\Models\RegistroCarga;
+use App\Models\Turno;
+use App\Models\User;
 use BackedEnum;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
@@ -34,12 +35,14 @@ class RegistroCargas extends Page
 
     public ?array $historialFilter = [];
 
+    public User $user;
+
     public function mount(): void
     {
-        $user = Auth::user();
+        $this->user = Auth::user();
 
         $this->form->fill([
-            'centro_costo_id' => $user->turno?->centro_costo_id,
+            'turno_id' => $this->user->turno_id,
         ]);
 
         $this->historialFilterForm->fill([
@@ -53,9 +56,9 @@ class RegistroCargas extends Page
         return $schema
             ->statePath('data')
             ->components([
-                Select::make('centro_costo_id')
-                    ->label('Centro de costo')
-                    ->options(CentroCosto::pluck('nombre', 'id'))
+                Select::make('turno_id')
+                    ->label('Turno')
+                    ->options(Turno::pluck('nombre', 'id'))
                     ->native(false)
                     ->preload()
                     ->live()
@@ -106,12 +109,14 @@ class RegistroCargas extends Page
         }
 
         $state = $this->form->getState();
+        $turnoId = $state['turno_id'] ?? $this->user->turno_id;
+        $centroCostoId = Turno::find($turnoId)->centro_costo_id ?? $this->user->turno?->centro_costo_id;
 
         RegistroCarga::create([
             'equipo_id' => $this->equipoId,
-            'user_id' => Auth::id(),
-            'turno_id' => Auth::user()->turno_id,
-            'centro_costo_id' => $state['centro_costo_id'] ?? null,
+            'user_id' => $this->user->id,
+            'turno_id' => $turnoId,
+            'centro_costo_id' => $centroCostoId,
             'registrado_en' => now(),
         ]);
 
@@ -151,12 +156,12 @@ class RegistroCargas extends Page
             $stats = [
                 'hoy' => $base()->count(),
                 'turno' => $turnoId ? $base()->forTurno($turnoId)->count() : 0,
-                'yo' => $base()->forUser(Auth::id())->count(),
+                'yo' => $base()->forUser($this->user->id)->count(),
             ];
         }
 
         $historial = collect();
-        $canSeeHistorial = Auth::user()->hasRole(['Administrador', 'Supervisor']);
+        $canSeeHistorial = $this->user->hasRole(['Administrador', 'Supervisor']);
 
         if ($canSeeHistorial) {
             $desde = Carbon::parse($this->historialFilter['desde'] ?? today())->startOfDay();
