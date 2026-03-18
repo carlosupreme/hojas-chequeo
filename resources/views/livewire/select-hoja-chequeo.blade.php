@@ -26,7 +26,7 @@
                 </p>
             </div>
 
-            {{-- Centro de costo + time --}}
+            {{-- Turno selector  --}}
             <div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 px-3 py-2 w-full sm:w-auto">
                 <div class="flex-1 sm:w-52 z-30">
                     {{ $this->form }}
