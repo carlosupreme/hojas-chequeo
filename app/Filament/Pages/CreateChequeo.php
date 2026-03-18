@@ -9,6 +9,7 @@ use App\Models\Equipo;
 use App\Models\HojaChequeo;
 use App\Models\HojaEjecucion;
 use App\Models\Reporte;
+use App\Models\Turno;
 use App\Models\User;
 use App\WithImageService;
 use BackedEnum;
@@ -36,17 +37,6 @@ class CreateChequeo extends Page
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPencilSquare;
 
-    // Hide default Filament page header — we render our own sticky header
-    public function getHeader(): ?\Illuminate\Contracts\View\View
-    {
-        return null;
-    }
-
-    public function getBreadcrumbs(): array
-    {
-        return [];
-    }
-
     public static function getNavigationLabel(): string
     {
         return 'Chequeo diario';
@@ -57,7 +47,7 @@ class CreateChequeo extends Page
     #[Url(as: 'h', except: null)]
     public null|string|int $hojaId = null;
 
-    public null|string|int $centroCostoId = null;
+    public null|string|int $turnoId = null;
 
     public ?HojaChequeo $hojaChequeo = null;
 
@@ -100,7 +90,7 @@ class CreateChequeo extends Page
     public function setHojaChequeo(array $data): void
     {
         $this->hojaId = $data['id'];
-        $this->centroCostoId = $data['centro_costo'];
+        $this->turnoId = $data['turno'];
         $this->loadHojaChequeo();
     }
 
@@ -108,14 +98,20 @@ class CreateChequeo extends Page
     public function setHojaEjecucion(array $data): void
     {
         $this->ejecucionId = $data['id'];
-        $this->centroCostoId = $data['centro_costo'];
+        $this->turnoId = $data['turno'];
         $this->loadEjecucion();
     }
 
     protected function loadEjecucion(): void
     {
         $this->hojaEjecucion = HojaEjecucion::findOrFail($this->ejecucionId);
+
+        if (! $this->turnoId && ($this->hojaEjecucion->turno_id || $this->user->turno_id)) {
+            $this->turnoId = $this->hojaEjecucion->turno_id ?? $this->user->turno_id;
+        }
+
         $this->hojaId = $this->hojaEjecucion->hoja_chequeo_id;
+
         $this->loadHojaChequeo();
     }
 
@@ -147,7 +143,7 @@ class CreateChequeo extends Page
     {
         $currentDate = $this->normalizeDateForComparison($value);
 
-        if (! $this->canOverrideExecutionDates() || is_null($currentDate)) {
+        if (! $this->canOverrideExecutionDates() || $currentDate === null) {
             $this->dateWasChanged = false;
 
             return;
@@ -159,15 +155,16 @@ class CreateChequeo extends Page
     public function resetState(): void
     {
         $this->hojaId = null;
-        $this->centroCostoId = null;
+        $this->turnoId = null;
         $this->hojaChequeo = null;
         $this->ejecucionId = null;
         $this->hojaEjecucion = null;
         $this->form->fill([
             'nombre_operador' => $this->user->name,
         ]);
+        $this->esPpm = false;
         $this->dateSelected = Carbon::now();
-        if (! is_null($this->backUrl)) {
+        if ($this->backUrl !== null) {
             redirect()->to($this->backUrl);
         }
     }
@@ -219,13 +216,21 @@ class CreateChequeo extends Page
             return;
         }
 
+        if (! $this->turnoId && $this->user->turno_id) {
+            $this->turnoId = $this->user->turno_id;
+        }
+
+        if (! $this->turnoId) {
+            return;
+        }
+
         $this->dispatch('chequeo-autosave-saving');
 
         $data = [
             ...$state,
             'user_id' => $this->user->id,
-            'turno_id' => $this->user->turno_id,
-            'centro_costo_id' => $this->centroCostoId,
+            'turno_id' => $this->turnoId,
+            'centro_costo_id' => Turno::findOrFail($this->turnoId)->centro_costo_id,
             'created_at' => $this->dateSelected,
             'hoja_chequeo_id' => $this->hojaChequeo->id,
             'es_ppm' => $this->esPpm,
@@ -343,14 +348,24 @@ class CreateChequeo extends Page
 
     public function create(): void
     {
+        if (! $this->turnoId && $this->user->turno_id) {
+            $this->turnoId = $this->user->turno_id;
+        }
+
+        if (! $this->turnoId) {
+            Notification::make()->danger()->title('Debe seleccionar un turno')->send();
+
+            return;
+        }
+
         $forcedFinalizadoEn = $this->getForcedFinalizadoEnForSave();
 
         $data = [
             ...$this->form->getState(),
             'firma_operador' => $this->data['firma_operador'] ?? null,
             'user_id' => $this->user->id,
-            'turno_id' => $this->user->turno_id,
-            'centro_costo_id' => $this->centroCostoId,
+            'turno_id' => $this->turnoId,
+            'centro_costo_id' => Turno::findOrFail($this->turnoId)->centro_costo_id,
             'created_at' => $this->dateSelected,
             'hoja_chequeo_id' => $this->hojaChequeo->id,
             'es_ppm' => $this->esPpm,

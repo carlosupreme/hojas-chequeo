@@ -4,12 +4,14 @@ namespace Tests\Feature;
 
 use App\Filament\Pages\CreateChequeo;
 use App\Models\AnswerType;
+use App\Models\CentroCosto;
 use App\Models\Equipo;
 use App\Models\HojaChequeo;
 use App\Models\HojaColumna;
 use App\Models\HojaEjecucion;
 use App\Models\HojaFila;
 use App\Models\Perfil;
+use App\Models\Turno;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -27,12 +29,24 @@ class CreateChequeoTest extends TestCase
 
     private HojaFila $fila;
 
+    private Turno $turno;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $perfil = Perfil::factory()->accesoTotal()->create();
         $this->user = User::factory()->create(['perfil_id' => $perfil->id, 'turno_id' => null]);
+
+        $centroCosto = CentroCosto::create(['nombre' => 'Centro de Costo Test']);
+        $this->turno = Turno::create([
+            'centro_costo_id' => $centroCosto->id,
+            'nombre' => 'Turno Test',
+            'dias' => '["monday","tuesday","wednesday","thursday","friday","saturday"]',
+            'hora_inicio' => '06:00:00',
+            'hora_final' => '14:00:00',
+            'activo' => true,
+        ]);
 
         // Give the user a role so Spatie doesn't complain
         $this->user->assignRole(\Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Operador', 'guard_name' => 'web']));
@@ -64,7 +78,7 @@ class CreateChequeoTest extends TestCase
 
         $livewire = Livewire::withQueryParams(['h' => $this->hoja->id])
             ->test(CreateChequeo::class)
-            ->set('centroCostoId', null);
+            ->set('turnoId', $this->turno->id);
 
         $this->assertDatabaseCount('hoja_ejecucions', 0);
 
@@ -86,7 +100,8 @@ class CreateChequeoTest extends TestCase
         $this->actingAs($this->user);
 
         $livewire = Livewire::withQueryParams(['h' => $this->hoja->id])
-            ->test(CreateChequeo::class);
+            ->test(CreateChequeo::class)
+            ->set('turnoId', $this->turno->id);
 
         // First change → creates
         $livewire->call('handleItemChanged', $this->fila->id, 10);
@@ -107,6 +122,7 @@ class CreateChequeoTest extends TestCase
 
         Livewire::withQueryParams(['h' => $this->hoja->id])
             ->test(CreateChequeo::class)
+            ->set('turnoId', $this->turno->id)
             ->call('handleItemChanged', $this->fila->id, 99)
             ->assertDispatched('chequeo-ejecucion-ensured');
     }
@@ -121,6 +137,7 @@ class CreateChequeoTest extends TestCase
 
         Livewire::withQueryParams(['h' => $this->hoja->id])
             ->test(CreateChequeo::class)
+            ->set('turnoId', $this->turno->id)
             ->set('data.nombre_operador', 'Nuevo Operador')
             ->assertDispatched('chequeo-autosave-saved');
 
@@ -139,6 +156,7 @@ class CreateChequeoTest extends TestCase
 
         Livewire::withQueryParams(['h' => $this->hoja->id])
             ->test(CreateChequeo::class)
+            ->set('turnoId', $this->turno->id)
             ->set('data.firma_operador', 'data:image/png;base64,FAKE')
             ->set('data.nombre_operador', 'Test User');
 
@@ -159,12 +177,14 @@ class CreateChequeoTest extends TestCase
         $ejecucion = HojaEjecucion::factory()->create([
             'hoja_chequeo_id' => $this->hoja->id,
             'user_id' => $this->user->id,
+            'turno_id' => $this->turno->id,
             'nombre_operador' => 'Juan Perez',
             'observaciones' => 'Nota de prueba',
         ]);
 
         $livewire = Livewire::withQueryParams(['e' => $ejecucion->id])
-            ->test(CreateChequeo::class);
+            ->test(CreateChequeo::class)
+            ->set('turnoId', $this->turno->id);
 
         // The form state should be pre-filled from the ejecucion
         $this->assertEquals('Juan Perez', $livewire->get('data')['nombre_operador']);
@@ -181,6 +201,7 @@ class CreateChequeoTest extends TestCase
 
         Livewire::withQueryParams(['h' => $this->hoja->id])
             ->test(CreateChequeo::class)
+            ->set('turnoId', $this->turno->id)
             ->set('data.nombre_operador', 'Operador Final')
             ->set('data.firma_operador', null)
             ->set('data.observaciones', '')
@@ -200,10 +221,12 @@ class CreateChequeoTest extends TestCase
         $ejecucion = HojaEjecucion::factory()->create([
             'hoja_chequeo_id' => $this->hoja->id,
             'user_id' => $this->user->id,
+            'turno_id' => $this->turno->id,
         ]);
 
         $livewire = Livewire::withQueryParams(['e' => $ejecucion->id])
             ->test(CreateChequeo::class)
+            ->set('turnoId', $this->turno->id)
             ->set('data.firma_operador', null)
             ->call('create');
 
@@ -223,6 +246,7 @@ class CreateChequeoTest extends TestCase
         $ejecucion = HojaEjecucion::factory()->finalizado()->create([
             'hoja_chequeo_id' => $this->hoja->id,
             'user_id' => $this->user->id,
+            'turno_id' => $this->turno->id,
             'created_at' => now(),
         ]);
 
@@ -230,6 +254,7 @@ class CreateChequeoTest extends TestCase
 
         Livewire::withQueryParams(['e' => $ejecucion->id])
             ->test(CreateChequeo::class)
+            ->set('turnoId', $this->turno->id)
             ->set('dateSelected', $selectedDate)
             ->set('data.firma_operador', null)
             ->call('create')
@@ -263,10 +288,12 @@ class CreateChequeoTest extends TestCase
         $ejecucion = HojaEjecucion::factory()->create([
             'hoja_chequeo_id' => $this->hoja->id,
             'user_id' => $this->user->id,
+            'turno_id' => $this->turno->id,
         ]);
 
         Livewire::withQueryParams(['e' => $ejecucion->id])
             ->test(CreateChequeo::class)
+            ->set('turnoId', $this->turno->id)
             ->call('activatePpm');
 
         $this->assertTrue($ejecucion->fresh()->es_ppm);
@@ -291,10 +318,12 @@ class CreateChequeoTest extends TestCase
         $ejecucion = HojaEjecucion::factory()->create([
             'hoja_chequeo_id' => $this->hoja->id,
             'user_id' => $this->user->id,
+            'turno_id' => $this->turno->id,
         ]);
 
         Livewire::withQueryParams(['e' => $ejecucion->id])
             ->test(CreateChequeo::class)
+            ->set('turnoId', $this->turno->id)
             ->call('activatePpm')
             ->set('data.firma_operador', null)
             ->call('create');

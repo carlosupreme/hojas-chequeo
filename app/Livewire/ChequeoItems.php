@@ -101,7 +101,7 @@ class ChequeoItems extends Component
 
             // Skip nulls — real-time saves already persisted these values.
             // Overwriting with null would corrupt the autosaved state.
-            if (is_null($value)) {
+            if ($value === null) {
                 continue;
             }
 

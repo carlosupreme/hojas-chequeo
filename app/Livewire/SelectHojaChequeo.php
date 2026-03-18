@@ -2,9 +2,9 @@
 
 namespace App\Livewire;
 
-use App\Models\CentroCosto;
 use App\Models\Equipo;
 use App\Models\HojaChequeo;
+use App\Models\Turno;
 use App\Models\User;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Utilities\Set;
@@ -35,15 +35,15 @@ class SelectHojaChequeo extends Component implements HasSchemas
     public function mount()
     {
         $this->form->fill([
-            'centro_costo' => Auth::user()->turno?->centro_costo_id,
+            'turno' => Auth::user()->turno_id,
         ]);
     }
 
     public function form(Schema $schema): Schema
     {
         return $schema->components([
-            Select::make('centro_costo')
-                ->options(CentroCosto::query()->pluck(column: 'nombre', key: 'id'))
+            Select::make('turno')
+                ->options(Turno::query()->pluck(column: 'nombre', key: 'id'))
                 ->native(false)
                 ->preload()
                 ->live()
@@ -51,7 +51,7 @@ class SelectHojaChequeo extends Component implements HasSchemas
                 ->hiddenLabel()
                 ->afterStateUpdated(function (Set $set, $state) {
                     if (empty($state)) {
-                        $set('centro_costo', Auth::user()->turno?->centro_costo_id);
+                        $set('turno', Auth::user()->turno_id);
                     }
                 }),
         ])->statePath('data');
@@ -82,7 +82,7 @@ class SelectHojaChequeo extends Component implements HasSchemas
     {
         $this->dispatch('hojaChequeoSelected', [
             'id' => $id,
-            'centro_costo' => $this->data['centro_costo'],
+            'turno' => $this->data['turno'],
         ]);
     }
 
@@ -90,7 +90,7 @@ class SelectHojaChequeo extends Component implements HasSchemas
     {
         $this->dispatch('hojaEjecucionSelected', [
             'id' => $chequeoId,
-            'centro_costo' => $this->data['centro_costo'],
+            'turno' => $this->data['turno'],
         ]);
     }
 
