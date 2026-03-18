@@ -287,6 +287,10 @@
 .cp-modal-row:last-child { border-bottom: none; }
 .cp-modal-row-lbl { color: var(--text-muted); }
 .cp-modal-row-val { font-weight: 600; color: var(--text-primary); text-align: right; }
+.cp-modal-link    { font-weight: 600; text-decoration: underline; text-underline-offset: 2px;
+                    text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+                    transition: text-decoration-color 0.15s; }
+.cp-modal-link:hover { text-decoration-color: currentColor; }
 
 /* ── Modal: live chequeo button ── */
 .cp-modal-live-btn{ display: flex; align-items: center; gap: 0.625rem;
@@ -849,15 +853,21 @@
                     <div class="cp-modal-stat">
                         <div class="cp-modal-stat-val"
                              :style="selectedEquipo?.tiene_chequeo_hoy ? 'color:#22c55e' : 'color:var(--text-muted)'"
-                             x-text="selectedEquipo?.tiene_chequeo_hoy ? '✓' : '—'"></div>
-                        <div class="cp-modal-stat-lbl">Chequeo hoy</div>
+                             x-text="selectedEquipo?.chequeos_hoy_count > 0 ? selectedEquipo.chequeos_hoy_count : '—'"></div>
+                        <div class="cp-modal-stat-lbl">Chequeos hoy</div>
                     </div>
-                    <div class="cp-modal-stat">
-                        <div class="cp-modal-stat-val"
-                             :style="selectedEquipo?.reportes_pendientes > 0 ? 'color:#f59e0b' : 'color:var(--text-muted)'"
-                             x-text="selectedEquipo?.reportes_pendientes"></div>
-                        <div class="cp-modal-stat-lbl">Pend.</div>
-                    </div>
+                    <template x-if="selectedEquipo?.reportes_pendientes > 0">
+                        <a :href="selectedEquipo?.reportes_pendientes_url" class="cp-modal-stat" style="text-decoration:none">
+                            <div class="cp-modal-stat-val" style="color:#f59e0b" x-text="selectedEquipo?.reportes_pendientes"></div>
+                            <div class="cp-modal-stat-lbl" style="color:#f59e0b">Pend. →</div>
+                        </a>
+                    </template>
+                    <template x-if="!selectedEquipo?.reportes_pendientes || selectedEquipo?.reportes_pendientes === 0">
+                        <div class="cp-modal-stat">
+                            <div class="cp-modal-stat-val" style="color:var(--text-muted)">0</div>
+                            <div class="cp-modal-stat-lbl">Pend.</div>
+                        </div>
+                    </template>
                     <div class="cp-modal-stat">
                         <div class="cp-modal-stat-val"
                              :style="selectedEquipo?.reportes_alta_prioridad > 0 ? 'color:#ef4444' : 'color:var(--text-muted)'"
@@ -869,12 +879,40 @@
                 <div>
                     <div class="cp-modal-row">
                         <span class="cp-modal-row-lbl">Último chequeo</span>
-                        <span class="cp-modal-row-val" x-text="selectedEquipo?.ultimo_chequeo ?? 'Sin registro'"></span>
+                        <template x-if="selectedEquipo?.ultimo_chequeo">
+                            <a :href="selectedEquipo?.chequeos_url" class="cp-modal-row-val cp-modal-link"
+                               x-text="selectedEquipo?.ultimo_chequeo"></a>
+                        </template>
+                        <template x-if="!selectedEquipo?.ultimo_chequeo">
+                            <span class="cp-modal-row-val" style="color:var(--text-muted)">Sin registro</span>
+                        </template>
                     </div>
                     <template x-if="selectedEquipo?.ultimo_chequeo_operador">
                         <div class="cp-modal-row">
                             <span class="cp-modal-row-lbl">Operador</span>
-                            <span class="cp-modal-row-val" x-text="selectedEquipo?.ultimo_chequeo_operador"></span>
+                            <span class="cp-modal-row-val" style="display:flex;align-items:center;gap:0.375rem">
+                                <span x-text="selectedEquipo?.ultimo_chequeo_operador"></span>
+                                <template x-if="selectedEquipo?.ultimo_chequeo_turno">
+                                    <span class="cp-turno-tag" x-text="selectedEquipo?.ultimo_chequeo_turno"></span>
+                                </template>
+                            </span>
+                        </div>
+                    </template>
+                    <template x-if="selectedEquipo?.reportes_pendientes > 0">
+                        <div class="cp-modal-row">
+                            <span class="cp-modal-row-lbl">Reportes pend.</span>
+                            <a :href="selectedEquipo?.reportes_pendientes_url" class="cp-modal-row-val cp-modal-link"
+                               style="color:#f59e0b">
+                                <span x-text="selectedEquipo?.reportes_pendientes + ' sin resolver'"></span>
+                                <span style="margin-left:0.25rem">→</span>
+                            </a>
+                        </div>
+                    </template>
+                    <template x-if="selectedEquipo?.reportes_alta_prioridad > 0">
+                        <div class="cp-modal-row">
+                            <span class="cp-modal-row-lbl">Alta prioridad</span>
+                            <a :href="selectedEquipo?.reportes_pendientes_url" class="cp-modal-row-val cp-modal-link"
+                               style="color:#ef4444" x-text="selectedEquipo?.reportes_alta_prioridad + ' reporte(s) → Ver'"></a>
                         </div>
                     </template>
                     <template x-if="selectedEquipo?.capacidad">

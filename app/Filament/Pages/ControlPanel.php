@@ -108,7 +108,8 @@ class ControlPanel extends Page
 
         $ultimosChequeos = empty($allHojaIds) ? collect() : HojaEjecucion::finished()
             ->whereIn('hoja_chequeo_id', $allHojaIds)
-            ->select(['hoja_chequeo_id', 'finalizado_en', 'nombre_operador'])
+            ->select(['id', 'hoja_chequeo_id', 'finalizado_en', 'nombre_operador', 'turno_id'])
+            ->with('turno:id,nombre')
             ->when($turnoId, fn ($q) => $q->where('turno_id', $turnoId))
             ->orderByDesc('finalizado_en')
             ->get()
@@ -167,6 +168,12 @@ class ControlPanel extends Page
                         'continuar_url' => $pendingEj
                             ? CreateChequeo::getUrl()."?h={$pendingEj->hoja_chequeo_id}&e={$pendingEj->id}&b=".urlencode(static::getUrl())
                             : null,
+                        'ultimo_chequeo_turno' => $ultimoChequeo?->turno?->nombre,
+                        'chequeos_hoy_count' => collect($hojaIds)->filter(fn ($id) => isset($hojasConChequeoHoy[$id]))->count(),
+                        'chequeos_url' => ChequeosResource::getUrl('index'),
+                        'reportes_pendientes_url' => ReporteResource::getUrl('index').'?'.http_build_query([
+                            'tableFilters' => ['estado' => ['value' => 'pendiente'], 'equipo' => ['value' => $equipo->id]],
+                        ]),
                     ];
                 })->values()->all(),
             ])
