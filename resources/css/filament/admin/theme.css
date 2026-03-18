@@ -115,83 +115,84 @@
 /* ── DARK MODE TOKENS ──────────────────────────────────────── */
 
 .dark {
-    /* 3-level elevation: sidebar (darkest) → page → surface (lightest dark) */
-    --bg-page:          #16171c;   /* mid-dark shell          */
-    --bg-surface:       #1e1f27;   /* cards, sections         */
-    --bg-subtle:        #252633;   /* hover rows, alt rows    */
-    --bg-muted:         #2d2e3e;   /* active states           */
-    --bg-overlay:       rgba(0, 0, 0, 0.75);
+    /* Navy-black elevation system: sidebar → page → surface
+       Inspired by Linear/Vercel/GitHub — deep blue-black feels "enterprise" */
+    --bg-page:          #0d0f1a;   /* deep navy shell             */
+    --bg-surface:       #131726;   /* elevated navy for cards     */
+    --bg-subtle:        #1a1e30;   /* hover rows, alt rows        */
+    --bg-muted:         #21263a;   /* active/selected states      */
+    --bg-overlay:       rgba(0, 0, 0, 0.8);
 
-    --sidebar-bg:              #111218;   /* darkest layer   */
-    --sidebar-border:          #1a1b22;
-    --sidebar-text:            #9899b0;
-    --sidebar-text-active:     #ffffff;
-    --sidebar-item-active-bg:  #2a2b3d;
-    --sidebar-item-active-border: #3a3b52;
-    --sidebar-group-label:     #545570;
-    --sidebar-header-bg:       #111218;
-    --sidebar-footer-bg:       #111218;
+    --sidebar-bg:              #090c17;   /* deepest navy — base layer  */
+    --sidebar-border:          #131726;
+    --sidebar-text:            #8b90b0;
+    --sidebar-text-active:     #f1f5f9;
+    --sidebar-item-active-bg:  #1a1e30;
+    --sidebar-item-active-border: #2a2f4a;
+    --sidebar-group-label:     #4a4f6e;
+    --sidebar-header-bg:       #090c17;
+    --sidebar-footer-bg:       #090c17;
 
-    --topbar-bg:        #16171c;
-    --topbar-border:    #1e1f27;
+    --topbar-bg:        #0d0f1a;
+    --topbar-border:    #131726;
 
-    --border:           #1e2030;
-    --border-strong:    #27283a;
-    --border-focus:     #6366f1;   /* indigo-500 — matches the purple accent */
+    --border:           #181c2e;
+    --border-strong:    #21263a;
+    --border-focus:     #3b82f6;   /* blue-500 — clean professional accent */
 
-    --text-primary:     #e2e4f0;
-    --text-secondary:   #8a8b9e;
-    --text-muted:       #4a4b60;
-    --text-disabled:    #2d2e3e;
+    --text-primary:     #f1f5f9;   /* slate-100 — high contrast  */
+    --text-secondary:   #8b90b0;   /* medium contrast            */
+    --text-muted:       #454a6a;   /* low contrast for labels    */
+    --text-disabled:    #21263a;
 
-    --shadow-xs:   0 1px 2px 0 rgb(0 0 0 / 0.4);
-    --shadow-sm:   0 1px 3px 0 rgb(0 0 0 / 0.5), 0 1px 2px -1px rgb(0 0 0 / 0.4);
-    --shadow-md:   0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4);
-    --shadow-lg:   0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
-    --shadow-xl:   0 20px 25px -5px rgb(0 0 0 / 0.6), 0 8px 10px -6px rgb(0 0 0 / 0.5);
+    --shadow-xs:   0 1px 2px 0 rgb(0 0 0 / 0.5);
+    --shadow-sm:   0 1px 3px 0 rgb(0 0 0 / 0.6), 0 1px 2px -1px rgb(0 0 0 / 0.5);
+    --shadow-md:   0 4px 6px -1px rgb(0 0 0 / 0.6), 0 2px 4px -2px rgb(0 0 0 / 0.5);
+    --shadow-lg:   0 10px 15px -3px rgb(0 0 0 / 0.6), 0 4px 6px -4px rgb(0 0 0 / 0.5);
+    --shadow-xl:   0 20px 25px -5px rgb(0 0 0 / 0.7), 0 8px 10px -6px rgb(0 0 0 / 0.6);
 
-    --table-header-bg:      #1a1b22;
-    --table-header-text:    #6b6c82;
-    --table-row-bg:         #1e1f27;
-    --table-row-hover:      #252633;
-    --table-stripe-bg:      #21222a;
-    --table-border:         #252633;
+    --table-header-bg:      #0f1220;
+    --table-header-text:    #6b7090;
+    --table-row-bg:         #131726;
+    --table-row-hover:      #1a1e30;
+    --table-stripe-bg:      #161a28;
+    --table-border:         #1a1e30;
 
-    --input-bg:             #252633;
-    --input-border:         #2d2e3e;
-    --input-border-focus:   #6366f1;
-    --input-text:           #e2e4f0;
-    --input-placeholder:    #4a4b60;
-    --input-disabled-bg:    #1e1f27;
+    --input-bg:             #1a1e30;
+    --input-border:         #21263a;
+    --input-border-focus:   #3b82f6;
+    --input-text:           #f1f5f9;
+    --input-placeholder:    #454a6a;
+    --input-disabled-bg:    #131726;
 
-    --modal-bg:             #1e1f27;
-    --modal-border:         #27283a;
-    --modal-header-bg:      #1a1b22;
-    --modal-footer-bg:      #252633;
+    --modal-bg:             #131726;
+    --modal-border:         #21263a;
+    --modal-header-bg:      #0f1220;
+    --modal-footer-bg:      #1a1e30;
 
-    --notification-bg:      #1e1f27;
-    --notification-border:  #27283a;
+    --notification-bg:      #131726;
+    --notification-border:  #21263a;
 
-    --widget-bg:            #1e1f27;
-    --widget-border:        #252633;
+    --widget-bg:            #131726;
+    --widget-border:        #1a1e30;
 
-    --breadcrumb-text:      #4a4b60;
-    --breadcrumb-sep:       #27283a;
-    --breadcrumb-active:    #e2e4f0;
+    --breadcrumb-text:      #454a6a;
+    --breadcrumb-sep:       #21263a;
+    --breadcrumb-active:    #f1f5f9;
 
     /* ── Table filter tabs ────────────────────────── */
     --tabs-item-bg:           transparent;
-    --tabs-item-bg-active:    #252633;
-    --tabs-item-text:         #4a4b60;
-    --tabs-item-text-active:  #e2e4f0;
-    --tabs-item-border:       #1e2030;
-    --tabs-item-border-active:#2d2e3e;
-    --tabs-item-shadow-active: 0 1px 4px 0 rgb(0 0 0 / 0.5);
+    --tabs-item-bg-active:    #1a1e30;
+    --tabs-item-text:         #454a6a;
+    --tabs-item-text-active:  #f1f5f9;
+    --tabs-item-border:       #181c2e;
+    --tabs-item-border-active:#2a2f4a;
+    --tabs-item-shadow-active: 0 1px 4px 0 rgb(0 0 0 / 0.6);
 
     /* ── Scrollbar ────────────────────────────────── */
-    --scrollbar-track:        #16171c;
-    --scrollbar-thumb:        #252633;
-    --scrollbar-thumb-hover:  #2d2e3e;
+    --scrollbar-track:        #0d0f1a;
+    --scrollbar-thumb:        #1a1e30;
+    --scrollbar-thumb-hover:  #21263a;
 }
 
 /* ============================================================
