@@ -243,9 +243,9 @@
 
                                 <div class="bg-white dark:bg-gray-900">
                                     <div class="grid grid-cols-12 px-3 py-1.5 text-[11px] font-semibold text-gray-600 dark:text-gray-400 border-b border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-800/40">
-                                        <span class="col-span-5">Equipo</span>
+                                        <span class="col-span-4">Equipo</span>
+                                        <span class="col-span-4 text-center">Avance</span>
                                         <span class="col-span-4 text-center">Días</span>
-                                        <span class="col-span-3 text-right">Avance</span>
                                     </div>
 
                                     <div class="divide-y divide-gray-100 dark:divide-gray-800">
@@ -255,9 +255,9 @@
                                                 $eqColor = $eqPct >= 90 ? 'text-green-700 dark:text-green-400' : ($eqPct >= 70 ? 'text-yellow-700 dark:text-yellow-400' : 'text-red-700 dark:text-red-400');
                                             @endphp
                                             <div class="grid grid-cols-12 items-center px-3 py-1.5 text-xs hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                                <span class="col-span-5 font-mono text-gray-700 dark:text-gray-300 truncate">{{ $eq['tag'] }}</span>
+                                                <span class="col-span-4 font-mono text-gray-700 dark:text-gray-300 truncate">{{ $eq['tag'] }}</span>
+                                                <span class="col-span-4 text-center font-semibold tabular-nums {{ $eqColor }}">{{ round($eqPct, 0) }}%</span>
                                                 <span class="col-span-4 text-center text-gray-600 dark:text-gray-400 tabular-nums">{{ $eq['dias_revisados'] }} / {{ $turno['working_days'] }}</span>
-                                                <span class="col-span-3 text-right font-semibold tabular-nums {{ $eqColor }}">{{ round($eqPct, 0) }}%</span>
                                             </div>
                                         @endforeach
                                     </div>
