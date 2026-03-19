@@ -43,7 +43,7 @@ class HojaChequeoForm
                     ->readOnly()
                     ->live()
                     ->default(1)
-                    ->helperText('Esta version se calcula automaticamente'),
+                    ->helperText('La versión se actualizará si agregas o eliminas filas o columnas'),
                 RichEditor::make('observaciones')->disableToolbarButtons(['codeBlock', 'attachFiles']),
             ]);
     }

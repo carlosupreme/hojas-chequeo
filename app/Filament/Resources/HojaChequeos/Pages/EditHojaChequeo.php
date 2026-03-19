@@ -23,6 +23,8 @@ class EditHojaChequeo extends Page
 
     public int $hojaChequeoId;
 
+    public ?array $pendingData = null;
+
     public function mount(int|string $record): void
     {
         $this->record = HojaChequeo::findOrFail($record);
@@ -37,17 +39,40 @@ class EditHojaChequeo extends Page
     {
         $data = $this->form->getState();
         $data['observaciones'] = $data['observaciones'] === '<p></p>' ? null : $data['observaciones'];
-        $record = HojaChequeo::create($data);
-        $this->dispatch('hoja-chequeo-created', $record->id);
-        $this->record->update([
-            'encendido' => false,
-        ]);
+        $this->pendingData = $data;
+        $this->dispatch('check-has-new-items');
+    }
+
+    #[On('has-new-items-result')]
+    public function handleSave(bool $hasNew): void
+    {
+        $data = $this->pendingData;
+        $this->pendingData = null;
+
+        if ($hasNew) {
+            $newRecord = HojaChequeo::create($data);
+            $this->record->update(['encendido' => false]);
+            $this->dispatch('hoja-chequeo-created', $newRecord->id);
+        } else {
+            $this->record->update([
+                'observaciones' => $data['observaciones'],
+                'equipo_id' => $data['equipo_id'],
+            ]);
+            $this->dispatch('update-items-in-place', hojaChequeoId: $this->record->id);
+        }
     }
 
     #[On('create-hoja-chequeo-items-created')]
     public function success(): void
     {
         Notification::make()->success()->title('Nueva version creada')->send();
+        $this->redirect($this->getResource()::getUrl('index'));
+    }
+
+    #[On('hoja-chequeo-simple-updated')]
+    public function simpleUpdateSuccess(): void
+    {
+        Notification::make()->success()->title('Cambios guardados')->send();
         $this->redirect($this->getResource()::getUrl('index'));
     }
 

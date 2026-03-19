@@ -23,6 +23,12 @@ class CreateHojaChequeoItems extends Component
 
     public bool $isEditMode = false;
 
+    public bool $hasNewItems = false;
+
+    public array $removedFilaDbIds = [];
+
+    public array $removedColumnaDbIds = [];
+
     public function mount(?int $hojaChequeoId = null): void
     {
         $this->answerTypes = AnswerType::query()
@@ -51,6 +57,7 @@ class CreateHojaChequeoItems extends Component
             $columnId = 'col_'.uniqid();
             $this->columnas[$columnId] = [
                 'id' => $columnId,
+                'db_id' => $columna->id,
                 'key' => $columna->key,
                 'label' => $columna->label,
                 'is_fixed' => $columna->is_fixed,
@@ -62,6 +69,7 @@ class CreateHojaChequeoItems extends Component
             $filaId = 'row_'.uniqid();
             $this->filas[$filaId] = [
                 'id' => $filaId,
+                'db_id' => $fila->id,
                 'answer_type_id' => $fila->answer_type_id,
                 'categoria' => $fila->categoria,
                 'order' => $fila->order,
@@ -70,7 +78,7 @@ class CreateHojaChequeoItems extends Component
             $this->valores[$filaId] = [];
             foreach ($this->columnas as $columnId => $columnaData) {
                 $valor = $fila->valores
-                    ->first(fn ($v) => $v->hojaColumna->order === $columnaData['order']);
+                    ->first(fn ($v) => $v->hoja_columna_id === $columnaData['db_id']);
 
                 $this->valores[$filaId][$columnId] = $valor?->valor ?? '';
             }
@@ -94,6 +102,7 @@ class CreateHojaChequeoItems extends Component
 
     public function addColumna(): void
     {
+        $this->hasNewItems = true;
         $this->addColumnaWithLabel('');
     }
 
@@ -122,6 +131,10 @@ class CreateHojaChequeoItems extends Component
 
     public function removeColumna(string $columnId): void
     {
+        if (isset($this->columnas[$columnId]['db_id'])) {
+            $this->removedColumnaDbIds[] = $this->columnas[$columnId]['db_id'];
+        }
+
         unset($this->columnas[$columnId]);
 
         foreach ($this->filas as $filaId => $fila) {
@@ -133,6 +146,7 @@ class CreateHojaChequeoItems extends Component
 
     public function addFila(): void
     {
+        $this->hasNewItems = true;
         $order = count($this->filas);
         $filaId = 'row_'.uniqid();
 
@@ -151,6 +165,10 @@ class CreateHojaChequeoItems extends Component
 
     public function removeFila(string $filaId): void
     {
+        if (isset($this->filas[$filaId]['db_id'])) {
+            $this->removedFilaDbIds[] = $this->filas[$filaId]['db_id'];
+        }
+
         unset($this->filas[$filaId]);
         unset($this->valores[$filaId]);
 
@@ -195,6 +213,81 @@ class CreateHojaChequeoItems extends Component
                         'hoja_columna_id' => $columnaMapping[$columnId],
                         'valor' => $valor,
                     ]);
+                }
+            }
+        }
+    }
+
+    #[On('check-has-new-items')]
+    public function replyHasNewItems(): void
+    {
+        $this->dispatch('has-new-items-result', hasNew: $this->hasNewItems);
+    }
+
+    #[On('update-items-in-place')]
+    public function updateItemsInPlace(int $hojaChequeoId): void
+    {
+        $this->updateStructure($hojaChequeoId);
+        $this->dispatch('hoja-chequeo-simple-updated');
+    }
+
+    protected function updateStructure(int $hojaChequeoId): void
+    {
+        $hojaChequeo = HojaChequeo::findOrFail($hojaChequeoId);
+
+        // Delete removed columnas (cascade will handle their valores)
+        if ($this->removedColumnaDbIds) {
+            $hojaChequeo->columnas()->whereIn('id', $this->removedColumnaDbIds)->delete();
+        }
+
+        // Delete removed filas (cascade will handle their valores)
+        if ($this->removedFilaDbIds) {
+            $hojaChequeo->filas()->whereIn('id', $this->removedFilaDbIds)->delete();
+        }
+
+        // Update existing columnas
+        foreach ($this->columnas as $columnaData) {
+            if (! isset($columnaData['db_id'])) {
+                continue;
+            }
+
+            $hojaChequeo->columnas()->where('id', $columnaData['db_id'])->update([
+                'key' => $columnaData['key'],
+                'label' => $columnaData['label'],
+                'order' => $columnaData['order'],
+            ]);
+        }
+
+        // Update existing filas and their valores
+        foreach ($this->filas as $filaId => $filaData) {
+            if (! isset($filaData['db_id'])) {
+                continue;
+            }
+
+            $fila = $hojaChequeo->filas()->where('id', $filaData['db_id'])->first();
+            if (! $fila) {
+                continue;
+            }
+
+            $fila->update([
+                'answer_type_id' => $filaData['answer_type_id'],
+                'categoria' => $filaData['categoria'],
+                'order' => $filaData['order'],
+            ]);
+
+            foreach ($this->valores[$filaId] ?? [] as $columnId => $valor) {
+                $columnaDbId = $this->columnas[$columnId]['db_id'] ?? null;
+                if (! $columnaDbId) {
+                    continue;
+                }
+
+                if (empty($valor)) {
+                    $fila->valores()->where('hoja_columna_id', $columnaDbId)->delete();
+                } else {
+                    $fila->valores()->updateOrCreate(
+                        ['hoja_columna_id' => $columnaDbId],
+                        ['valor' => $valor]
+                    );
                 }
             }
         }
