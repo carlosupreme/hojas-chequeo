@@ -44,7 +44,7 @@ class HojaChequeoForm
                     ->live()
                     ->default(1)
                     ->helperText('Esta version se calcula automaticamente'),
-                RichEditor::make('observaciones')->disableToolbarButtons(['codeBlock', 'attachFiles'])->maxLength(255),
+                RichEditor::make('observaciones')->disableToolbarButtons(['codeBlock', 'attachFiles']),
             ]);
     }
 }
