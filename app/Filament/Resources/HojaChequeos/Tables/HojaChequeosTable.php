@@ -11,6 +11,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -106,7 +107,7 @@ class HojaChequeosTable
                 Action::make('Historial')
                     ->url(fn (HojaChequeo $record): string => HojaChequeoResource::getUrl('history', ['record' => $record]))
                     ->icon('heroicon-o-calendar'),
-                ViewAction::make(),
+                ViewAction::make()->modalWidth(Width::SevenExtraLarge),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
