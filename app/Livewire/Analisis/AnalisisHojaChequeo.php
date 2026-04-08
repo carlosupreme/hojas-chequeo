@@ -273,18 +273,18 @@ class AnalisisHojaChequeo extends Component
                 if ($ejecucionIds->isNotEmpty()) {
                     // Find filas with temperatura answer type
                     $temperaturaFilaIds = HojaFila::where('hoja_chequeo_id', $hojaChequeo->id)
-                        ->whereHas('answerType', fn ($q) => $q->where('key', 'temperatura'))
-                        ->pluck('id');
+                        ->whereRelation('valores', 'valor', 'TEMPERATURAS DE LAS PARTES A PRESIÓN')
+                        ->value('id');
 
                     // Find filas with presion answer type
                     $presionFilaIds = HojaFila::where('hoja_chequeo_id', $hojaChequeo->id)
-                        ->whereHas('answerType', fn ($q) => $q->where('key', 'presion'))
-                        ->pluck('id');
+                        ->whereRelation('valores', 'valor', 'PRESIÓN DE VAPOR')
+                        ->value('id');
 
                     // Get temperatura values
-                    if ($temperaturaFilaIds->isNotEmpty()) {
+                    if ($temperaturaFilaIds) {
                         $temperaturaRespuestas = HojaFilaRespuesta::whereIn('hoja_ejecucion_id', $ejecucionIds)
-                            ->whereIn('hoja_fila_id', $temperaturaFilaIds)
+                            ->where('hoja_fila_id', $temperaturaFilaIds)
                             ->whereNotNull('numeric_value')
                             ->pluck('numeric_value');
 
@@ -294,9 +294,9 @@ class AnalisisHojaChequeo extends Component
                     }
 
                     // Get presion values
-                    if ($presionFilaIds->isNotEmpty()) {
+                    if ($presionFilaIds) {
                         $presionRespuestas = HojaFilaRespuesta::whereIn('hoja_ejecucion_id', $ejecucionIds)
-                            ->whereIn('hoja_fila_id', $presionFilaIds)
+                            ->where('hoja_fila_id', $presionFilaIds)
                             ->whereNotNull('numeric_value')
                             ->pluck('numeric_value');
 
