@@ -20,6 +20,16 @@ class Equipo extends Model
         'revision',
     ];
 
+    public static function getAreas()
+    {
+        return Equipo::query()
+            ->selectRaw('UPPER(area) as area')
+            ->whereNotNull('area')
+            ->distinct()
+            ->pluck('area')
+            ->toArray();
+    }
+
     public function registroCargas(): HasMany
     {
         return $this->hasMany(RegistroCarga::class);

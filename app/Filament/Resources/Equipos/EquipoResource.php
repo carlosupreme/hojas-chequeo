@@ -46,6 +46,7 @@ class EquipoResource extends Resource
                     ->maxLength(255),
                 TextInput::make('area')
                     ->required()
+                    ->datalist(fn () => Equipo::getAreas())
                     ->maxLength(255),
                 TextInput::make('numeroControl')
                     ->label('Numero de control')
