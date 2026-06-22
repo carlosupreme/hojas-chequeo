@@ -234,6 +234,7 @@ class AnalisisHojaChequeo extends Component
                         'presion' => 0,
                     ],
                     'tarjetones_count' => 0,
+                    'sin_falla_vapor' => 0,
                 ];
 
                 continue;
@@ -323,6 +324,7 @@ class AnalisisHojaChequeo extends Component
                     'presion' => $presionAvg,
                 ],
                 'tarjetones_count' => $tarjetonesCount,
+                'sin_falla_vapor'  => $sinFallaVapor,
             ];
         }
 
@@ -501,5 +503,46 @@ class AnalisisHojaChequeo extends Component
         }
 
         return $stats;
+    }
+
+    /**
+     * Flattened CC → equipo data for the compact print summary.
+     */
+    public function getPrintDataProperty(): array
+    {
+        $result = [];
+
+        foreach ($this->cumplimientoPorCentroCosto as $cc) {
+            $maxWorkingDays = 0;
+            $equipoMap      = [];
+
+            foreach ($cc['turnos'] as $turno) {
+                if ($turno['working_days'] > $maxWorkingDays) {
+                    $maxWorkingDays = $turno['working_days'];
+                }
+                foreach ($turno['equipos_detail'] as $eq) {
+                    $tag = $eq['tag'];
+                    if (! isset($equipoMap[$tag])) {
+                        $equipoMap[$tag] = 0;
+                    }
+                    $equipoMap[$tag] = max($equipoMap[$tag], $eq['dias_revisados']);
+                }
+            }
+
+            $result[] = [
+                'nombre'         => $cc['centro_costo'],
+                'dias_operacion' => $maxWorkingDays,
+                'equipos'        => array_values(array_map(
+                    fn ($tag, $dias) => ['tag' => $tag, 'dias' => $dias],
+                    array_keys($equipoMap),
+                    array_values($equipoMap),
+                )),
+                'cumplimiento'   => $cc['percentage'],
+                'total_actual'   => $cc['total_actual'],
+                'total_expected' => $cc['total_expected'],
+            ];
+        }
+
+        return $result;
     }
 }

@@ -163,13 +163,23 @@
     </div>
 
     {{-- CUMPLIMIENTO POR CENTRO DE COSTO --}}
+    <div x-data="{ showResumen: false }">
     <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
         <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                <x-heroicon-o-building-office class="w-5 h-5 text-indigo-500" />
-                Cumplimiento de Chequeos por Centro de Costo
-            </h3>
-            <p class="text-sm text-gray-500 mt-1">Chequeos válidos vs. esperados según los días configurados en cada turno, excluyendo días inhábiles.</p>
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                        <x-heroicon-o-building-office class="w-5 h-5 text-indigo-500" />
+                        Cumplimiento de Chequeos por Centro de Costo
+                    </h3>
+                    <p class="text-sm text-gray-500 mt-1">Chequeos válidos vs. esperados según los días configurados en cada turno, excluyendo días inhábiles.</p>
+                </div>
+                <button @click="showResumen = true"
+                        class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 transition-colors shadow-sm">
+                    <x-heroicon-o-printer class="w-3.5 h-3.5" />
+                    Resumen
+                </button>
+            </div>
         </div>
 
         <div class="p-6 space-y-6">
@@ -284,6 +294,152 @@
             @endforelse
         </div>
     </div>
+
+    {{-- ── PRINT / RESUMEN OVERLAY ─────────────────────────────────────────── --}}
+    <style>
+        @media print {
+            body > *:not(.resumen-print-overlay) { display: none !important; }
+            .resumen-print-overlay {
+                display: block !important;
+                position: static !important;
+                overflow: visible !important;
+                height: auto !important;
+            }
+        }
+    </style>
+    <script>
+        (function () {
+            var _parent, _next;
+            window.addEventListener('beforeprint', function () {
+                var el = document.querySelector('.resumen-print-overlay');
+                if (!el || el.style.display === 'none') return;
+                _parent = el.parentNode;
+                _next   = el.nextSibling;
+                document.body.appendChild(el);
+            });
+            window.addEventListener('afterprint', function () {
+                var el = document.querySelector('.resumen-print-overlay');
+                if (!el || !_parent) return;
+                _parent.insertBefore(el, _next || null);
+                _parent = _next = null;
+            });
+        })();
+    </script>
+    <div x-show="showResumen"
+         x-cloak
+         class="resumen-print-overlay fixed inset-0 z-50 bg-white overflow-y-auto"
+         style="display:none">
+
+        {{-- Controls (hidden when printing) --}}
+        <div class="print:hidden sticky top-0 z-10 bg-gray-100 border-b border-gray-300 px-6 py-3 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <span class="font-semibold text-gray-800 text-sm">Resumen de cumplimiento</span>
+                <span class="text-xs text-gray-500 bg-white border border-gray-200 px-2 py-0.5 rounded">
+                    {{ $this->startDate }} → {{ $this->endDate }}
+                </span>
+            </div>
+            <button @click="showResumen = false"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors">
+                <x-heroicon-o-x-mark class="w-3.5 h-3.5" />
+                Cerrar
+            </button>
+        </div>
+
+        {{-- Print body --}}
+        <div class="max-w-6xl mx-auto px-6 py-8">
+
+            {{-- Title --}}
+            <h2 class="text-center font-bold text-xl uppercase tracking-widest mb-8 text-gray-900">
+                {{ \Carbon\Carbon::parse($this->startDate)->isoFormat('D MMM') }} &ndash; {{ \Carbon\Carbon::parse($this->endDate)->isoFormat('D MMM YYYY') }}
+            </h2>
+
+            @php
+                $printData  = $this->printData;
+                $colCount   = count($printData);
+                $gridClass  = match(true) {
+                    $colCount >= 4 => 'grid-cols-4',
+                    $colCount === 3 => 'grid-cols-3',
+                    $colCount === 2 => 'grid-cols-2',
+                    default         => 'grid-cols-1',
+                };
+                // Pre-defined color sets so Tailwind picks them up at build time
+                $palette = [
+                    ['bg' => 'bg-orange-50',  'hdr' => 'bg-orange-200',  'hdrtxt' => 'text-orange-900',  'foot' => 'text-orange-900',  'border' => 'border-orange-200'],
+                    ['bg' => 'bg-orange-50',  'hdr' => 'bg-orange-200',  'hdrtxt' => 'text-orange-900',  'foot' => 'text-orange-900',  'border' => 'border-orange-200'],
+                    ['bg' => 'bg-sky-50',     'hdr' => 'bg-sky-300',     'hdrtxt' => 'text-sky-900',     'foot' => 'text-sky-900',     'border' => 'border-sky-200'],
+                    ['bg' => 'bg-emerald-50', 'hdr' => 'bg-emerald-200', 'hdrtxt' => 'text-emerald-900', 'foot' => 'text-emerald-900', 'border' => 'border-emerald-200'],
+                    ['bg' => 'bg-violet-50',  'hdr' => 'bg-violet-200',  'hdrtxt' => 'text-violet-900',  'foot' => 'text-violet-900',  'border' => 'border-violet-200'],
+                ];
+            @endphp
+
+            {{-- CC columns --}}
+            <div class="grid {{ $gridClass }} gap-4 items-start">
+                @foreach($printData as $idx => $cc)
+                    @php $col = $palette[$idx] ?? $palette[0]; @endphp
+                    <div class="rounded-lg overflow-hidden border {{ $col['border'] }}">
+
+                        {{-- Header --}}
+                        <div class="{{ $col['hdr'] }} {{ $col['hdrtxt'] }} px-3 py-2.5 text-center">
+                            <p class="font-bold text-sm uppercase tracking-wide">{{ $cc['nombre'] }}</p>
+                            <p class="text-xs mt-0.5 font-medium opacity-80">Dias de operación {{ $cc['dias_operacion'] }}</p>
+                        </div>
+
+                        {{-- Column headers --}}
+                        <div class="{{ $col['bg'] }} grid grid-cols-2 px-3 py-1 border-b {{ $col['border'] }}">
+                            <span class="text-xs font-semibold text-gray-600">Equipo</span>
+                            <span class="text-xs font-semibold text-gray-600 text-right">Días revisados</span>
+                        </div>
+
+                        {{-- Equipo rows --}}
+                        <div class="{{ $col['bg'] }} divide-y divide-gray-100">
+                            @forelse($cc['equipos'] as $eq)
+                                <div class="grid grid-cols-2 px-3 py-1">
+                                    <span class="text-xs font-mono text-gray-800">{{ $eq['tag'] }}</span>
+                                    <span class="text-xs text-right font-semibold tabular-nums text-gray-800">{{ $eq['dias'] }}</span>
+                                </div>
+                            @empty
+                                <div class="px-3 py-2 text-xs text-gray-400 text-center">Sin equipos</div>
+                            @endforelse
+                        </div>
+
+                        {{-- Cumplimiento footer --}}
+                        <div class="{{ $col['bg'] }} border-t-2 {{ $col['border'] }} px-3 py-2 flex justify-between items-center">
+                            <span class="text-xs font-bold {{ $col['foot'] }}">Cumplimiento</span>
+                            <span class="text-sm font-black {{ $col['foot'] }}">{{ $cc['cumplimiento'] }}%</span>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            {{-- Calderas summary --}}
+            <div class="mt-10">
+                <h3 class="text-center font-bold text-sm uppercase tracking-widest text-gray-700 mb-4">
+                    Encendido y apagado Calderas
+                </h3>
+                <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto">
+                    @foreach($this->calderasStats as $caldera)
+                        <div class="rounded-lg overflow-hidden border border-orange-200">
+                            <div class="bg-orange-200 text-orange-900 px-3 py-2 text-center font-bold text-sm">
+                                {{ $caldera['nombre'] }}
+                            </div>
+                            <div class="bg-orange-50 px-4 py-3 space-y-1.5 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600 text-xs">Registros</span>
+                                    <span class="font-bold text-gray-900">{{ $caldera['tarjetones_count'] }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600 text-xs">Operaciones completas</span>
+                                    <span class="font-bold text-gray-900">{{ $caldera['sin_falla_vapor'] }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+        </div>
+    </div>
+    </div>{{-- /x-data --}}
 
     {{-- CALDERAS SECTION --}}
     <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
