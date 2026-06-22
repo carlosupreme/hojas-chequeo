@@ -52,6 +52,11 @@ class Equipo extends Model
         return $query->where('tag', 'CM-CAL-01')->orWhere('tag', 'CM-CAL-02');
     }
 
+    public function scopeTombolas($query)
+    {
+        return $query->where('tag', 'like', '%TOM-%');
+    }
+
     public function specs(): HasMany
     {
         return $this->hasMany(EquipoSpec::class);

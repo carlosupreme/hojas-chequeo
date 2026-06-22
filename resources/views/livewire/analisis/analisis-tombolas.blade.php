@@ -109,6 +109,97 @@
         </div>
     </div>
 
+    {{-- ── HORAS DE TRABAJO ────────────────────────────────────────────────── --}}
+    @php
+        $horasPorEquipo = $this->horasPorEquipo;
+        $horasPorDia    = $this->horasPorDiaTurno;
+        $turnosCols     = $horasPorDia['turnos'] ?? [];
+        $diasRows       = $horasPorDia['days'] ?? [];
+    @endphp
+
+    @if(count($horasPorEquipo) || count($turnosCols))
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        {{-- Left: avg hours per equipo --}}
+        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+                <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+                    Horas de trabajo de tómbolas
+                </h3>
+                <p class="text-xs text-gray-400 mt-0.5">Promedio por sesión · {{ $this->startDate }} → {{ $this->endDate }}</p>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-gray-50 dark:bg-gray-800 text-left">
+                            <th class="px-4 py-2.5 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Equipo</th>
+                            <th class="px-4 py-2.5 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide text-right">Promedio hrs</th>
+                            <th class="px-4 py-2.5 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide text-right">Total hrs</th>
+                            <th class="px-4 py-2.5 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide text-right">Sesiones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                        @forelse($horasPorEquipo as $row)
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                <td class="px-4 py-2.5 font-mono text-xs font-bold text-gray-700 dark:text-gray-200">{{ $row['tag'] }}</td>
+                                <td class="px-4 py-2.5 text-right font-semibold text-blue-600 dark:text-blue-400">
+                                    {{ $row['avg_horas'] > 0 ? $row['avg_horas'] : '—' }}
+                                </td>
+                                <td class="px-4 py-2.5 text-right text-gray-600 dark:text-gray-300">
+                                    {{ $row['total_horas'] > 0 ? $row['total_horas'] : '—' }}
+                                </td>
+                                <td class="px-4 py-2.5 text-right text-gray-400 text-xs">{{ $row['sesiones'] }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="4" class="px-4 py-6 text-center text-sm text-gray-400">Sin registros en este período</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- Right: daily avg hours per turno --}}
+        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+                <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+                    Hrs promedio por día · turno
+                </h3>
+                <p class="text-xs text-gray-400 mt-0.5">Promedio de "Horas al final del turno" por día</p>
+            </div>
+            <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                <table class="w-full text-sm">
+                    <thead class="sticky top-0 z-10">
+                        <tr class="bg-gray-50 dark:bg-gray-800 text-left">
+                            <th class="px-4 py-2.5 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Día</th>
+                            @foreach($turnosCols as $t)
+                                <th class="px-4 py-2.5 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide text-right">
+                                    {{ Str::upper(Str::substr($t['nombre'], 0, 3)) }}
+                                </th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                        @forelse($diasRows as $row)
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                <td class="px-4 py-2 font-bold text-gray-700 dark:text-gray-200 text-center w-12">{{ $row['day'] }}</td>
+                                @foreach($turnosCols as $t)
+                                    @php $val = $row['turno_data'][$t['id']] ?? 0; @endphp
+                                    <td class="px-4 py-2 text-right {{ $val > 0 ? 'text-gray-700 dark:text-gray-200 font-semibold' : 'text-gray-300 dark:text-gray-600' }}">
+                                        {{ $val > 0 ? $val : '0' }}
+                                    </td>
+                                @endforeach
+                            </tr>
+                        @empty
+                            <tr><td colspan="{{ count($turnosCols) + 1 }}" class="px-4 py-6 text-center text-sm text-gray-400">Sin registros</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    @endif
+
     {{-- ── BREAKDOWNS ───────────────────────────────────────────────────────── --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 

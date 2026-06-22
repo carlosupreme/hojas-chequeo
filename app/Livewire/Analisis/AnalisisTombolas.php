@@ -4,9 +4,15 @@ namespace App\Livewire\Analisis;
 
 use App\Models\CentroCosto;
 use App\Models\Equipo;
+use App\Models\HojaChequeo;
+use App\Models\HojaEjecucion;
+use App\Models\HojaFila;
+use App\Models\HojaFilaRespuesta;
 use App\Models\RegistroCarga;
+use App\Models\Turno;
 use App\Models\User;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Livewire\Component;
 
 class AnalisisTombolas extends Component
@@ -50,7 +56,7 @@ class AnalisisTombolas extends Component
 
     public function getTombolasProperty()
     {
-        return Equipo::where('tag', 'like', '%-TOM-%')
+        return Equipo::tombolas()
             ->orderBy('tag')
             ->get(['id', 'nombre', 'tag']);
     }
@@ -71,7 +77,7 @@ class AnalisisTombolas extends Component
                 Carbon::parse($this->startDate)->startOfDay(),
                 Carbon::parse($this->endDate)->endOfDay(),
             ])
-            ->whereHas('equipo', fn ($eq) => $eq->where('tag', 'like', '%-TOM-%'));
+            ->whereHas('equipo', fn ($eq) => $eq->tombolas());
 
         if ($this->equipoId) {
             $q->where('equipo_id', $this->equipoId);
@@ -226,6 +232,155 @@ class AnalisisTombolas extends Component
         }
 
         return ['labels' => $labels, 'data' => $data];
+    }
+
+    // -------------------------------------------------------------------------
+    // Horas de trabajo (via HojaFilaRespuesta "HORAS AL FINAL DEL TURNO")
+    // -------------------------------------------------------------------------
+
+    /**
+     * Average hours worked per tombola equipo over the selected range.
+     * Mirrors getCalderasStatsProperty pattern from AnalisisHojaChequeo.
+     */
+    public function getHorasPorEquipoProperty(): array
+    {
+        $startDate = Carbon::parse($this->startDate)->startOfDay();
+        $endDate   = Carbon::parse($this->endDate)->endOfDay();
+
+        $equipos = Equipo::tombolas()->orderBy('tag')->get();
+        $stats   = [];
+
+        foreach ($equipos as $equipo) {
+            $hojaChequeo = HojaChequeo::where('equipo_id', $equipo->id)->latest()->first();
+
+            $totalHoras = 0;
+            $avgHoras   = 0;
+            $count      = 0;
+
+            if ($hojaChequeo) {
+                $ejecucionIds = HojaEjecucion::where('hoja_chequeo_id', $hojaChequeo->id)
+                    ->whereNotNull('finalizado_en')
+                    ->whereBetween('finalizado_en', [$startDate, $endDate])
+                    ->pluck('id');
+
+                if ($ejecucionIds->isNotEmpty()) {
+                    $filaId = HojaFila::where('hoja_chequeo_id', $hojaChequeo->id)
+                        ->whereRelation('valores', 'valor', 'like', '%HORAS%')
+                        ->value('id');
+
+                    if ($filaId) {
+                        $valores = HojaFilaRespuesta::whereIn('hoja_ejecucion_id', $ejecucionIds)
+                            ->where('hoja_fila_id', $filaId)
+                            ->whereNotNull('numeric_value')
+                            ->pluck('numeric_value');
+
+                        $count      = $valores->count();
+                        $totalHoras = round($valores->sum(), 1);
+                        $avgHoras   = $count > 0 ? round($totalHoras / $count, 1) : 0;
+                    }
+                }
+            }
+
+            $stats[] = [
+                'tag'         => $equipo->tag,
+                'nombre'      => $equipo->nombre,
+                'total_horas' => $totalHoras,
+                'avg_horas'   => $avgHoras,
+                'sesiones'    => $count,
+            ];
+        }
+
+        usort($stats, fn ($a, $b) => $a['avg_horas'] <=> $b['avg_horas']);
+
+        return $stats;
+    }
+
+    /**
+     * Daily average hours per turno, for the month-view table.
+     * Columns = active turnos; rows = each day in range.
+     */
+    public function getHorasPorDiaTurnoProperty(): array
+    {
+        $startDate = Carbon::parse($this->startDate)->startOfDay();
+        $endDate   = Carbon::parse($this->endDate)->endOfDay();
+
+        $turnos = Turno::where('activo', true)->orderBy('id')->get();
+
+        // For each turno, collect equipo hoja_chequeo_ids that belong to tombolas
+        $turnoFilaMap = []; // turno_id => [hoja_fila_id => ...]
+
+        foreach ($turnos as $turno) {
+            $equipoIds = $turno->equipos()
+                ->tombolas()
+                ->pluck('equipos.id');
+
+            if ($equipoIds->isEmpty()) {
+                continue;
+            }
+
+            $hojaChequeoIds = HojaChequeo::whereIn('equipo_id', $equipoIds)->pluck('id');
+
+            if ($hojaChequeoIds->isEmpty()) {
+                continue;
+            }
+
+            $filaIds = HojaFila::whereIn('hoja_chequeo_id', $hojaChequeoIds)
+                ->whereRelation('valores', 'valor', 'like', '%HORAS%')
+                ->pluck('id');
+
+            $turnoFilaMap[$turno->id] = [
+                'turno'            => $turno,
+                'hoja_chequeo_ids' => $hojaChequeoIds,
+                'fila_ids'         => $filaIds,
+            ];
+        }
+
+        if (empty($turnoFilaMap)) {
+            return ['turnos' => [], 'days' => []];
+        }
+
+        // Build day rows
+        $period = CarbonPeriod::create($startDate->copy()->startOfDay(), $endDate->copy()->startOfDay());
+        $days   = [];
+
+        foreach ($period as $day) {
+            $dayStart = $day->copy()->startOfDay();
+            $dayEnd   = $day->copy()->endOfDay();
+            $turnoData = [];
+
+            foreach ($turnoFilaMap as $turnoId => $meta) {
+                $ejecucionIds = HojaEjecucion::whereIn('hoja_chequeo_id', $meta['hoja_chequeo_ids'])
+                    ->where('turno_id', $turnoId)
+                    ->whereNotNull('finalizado_en')
+                    ->whereBetween('finalizado_en', [$dayStart, $dayEnd])
+                    ->pluck('id');
+
+                $avg = 0;
+                if ($ejecucionIds->isNotEmpty() && $meta['fila_ids']->isNotEmpty()) {
+                    $valores = HojaFilaRespuesta::whereIn('hoja_ejecucion_id', $ejecucionIds)
+                        ->whereIn('hoja_fila_id', $meta['fila_ids'])
+                        ->whereNotNull('numeric_value')
+                        ->pluck('numeric_value');
+
+                    $avg = $valores->count() > 0 ? round($valores->avg(), 1) : 0;
+                }
+
+                $turnoData[$turnoId] = $avg;
+            }
+
+            $days[] = [
+                'day'        => $day->day,
+                'date'       => $day->format('Y-m-d'),
+                'turno_data' => $turnoData,
+            ];
+        }
+
+        $turnosList = collect($turnoFilaMap)->map(fn ($meta) => [
+            'id'     => $meta['turno']->id,
+            'nombre' => $meta['turno']->nombre,
+        ])->values()->toArray();
+
+        return ['turnos' => $turnosList, 'days' => $days];
     }
 
     public function render()
