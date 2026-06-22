@@ -383,6 +383,113 @@ class AnalisisTombolas extends Component
         return ['turnos' => $turnosList, 'days' => $days];
     }
 
+    // -------------------------------------------------------------------------
+    // Matriz horas por día y turno (T = Tintoreria, L = Lavanderia)
+    // -------------------------------------------------------------------------
+
+    public function getMatrizHorasProperty(): array
+    {
+        $startDate = Carbon::parse($this->startDate)->startOfDay();
+        $endDate   = Carbon::parse($this->endDate)->endOfDay();
+
+        $period = CarbonPeriod::create($startDate->copy(), $endDate->copy()->startOfDay());
+        $days   = collect($period)->map(fn ($d) => ['day' => $d->day, 'date' => $d->format('Y-m-d')]);
+
+        $turnoTId  = Turno::where('nombre', 'like', '%Tintoreria%')->value('id');
+        $turnoLIds = Turno::where('nombre', 'like', '%Lavanderia%')->pluck('id');
+        $allTurnoIds = collect([$turnoTId])->merge($turnoLIds)->filter()->unique()->values();
+
+        $equiposQuery = Equipo::tombolas()->orderBy('tag');
+        if ($this->equipoId) {
+            $equiposQuery->where('id', $this->equipoId);
+        }
+        $equipos = $equiposQuery->get();
+
+        $sumPerDay = $days->mapWithKeys(fn ($d) => [$d['date'] => ['T' => 0.0, 'L' => 0.0]])->toArray();
+        $rows = [];
+
+        foreach ($equipos as $equipo) {
+            $hcIds = HojaChequeo::where('equipo_id', $equipo->id)->pluck('id');
+
+            $data = $days->mapWithKeys(fn ($d) => [$d['date'] => ['T' => 0.0, 'L' => 0.0]])->toArray();
+
+            if ($hcIds->isNotEmpty()) {
+                $filaIds = HojaFila::whereIn('hoja_chequeo_id', $hcIds)
+                    ->whereRelation('valores', 'valor', 'like', '%HORAS%')
+                    ->pluck('id');
+
+                $ejecuciones = HojaEjecucion::whereIn('hoja_chequeo_id', $hcIds)
+                    ->whereIn('turno_id', $allTurnoIds)
+                    ->whereNotNull('finalizado_en')
+                    ->whereBetween('finalizado_en', [$startDate, $endDate])
+                    ->get(['id', 'finalizado_en', 'turno_id']);
+
+                $ejIds = $ejecuciones->pluck('id');
+
+                $respuestasByEj = ($filaIds->isNotEmpty() && $ejIds->isNotEmpty())
+                    ? HojaFilaRespuesta::whereIn('hoja_ejecucion_id', $ejIds)
+                        ->whereIn('hoja_fila_id', $filaIds)
+                        ->whereNotNull('numeric_value')
+                        ->pluck('numeric_value', 'hoja_ejecucion_id')
+                    : collect();
+
+                $ejByDay = $ejecuciones->groupBy(fn ($e) => Carbon::parse($e->finalizado_en)->format('Y-m-d'));
+
+                foreach ($days as $d) {
+                    $date = $d['date'];
+                    $tVal = 0.0;
+                    $lVal = 0.0;
+
+                    foreach ($ejByDay[$date] ?? [] as $ej) {
+                        $hrs = (float) ($respuestasByEj[$ej->id] ?? 0);
+                        if ($ej->turno_id == $turnoTId) {
+                            $tVal += $hrs;
+                        } else {
+                            $lVal += $hrs;
+                        }
+                    }
+
+                    $data[$date] = ['T' => $tVal, 'L' => $lVal];
+                    $sumPerDay[$date]['T'] += $tVal;
+                    $sumPerDay[$date]['L'] += $lVal;
+                }
+            }
+
+            $sumaT = array_sum(array_column($data, 'T'));
+            $sumaL = array_sum(array_column($data, 'L'));
+            $total = $sumaT + $sumaL;
+
+            $rows[] = [
+                'tag'      => $equipo->tag,
+                'data'     => $data,
+                'suma_T'   => $sumaT,
+                'suma_L'   => $sumaL,
+                'suma'     => $total,
+                'promedio' => $days->count() > 0 ? round($total / max(1, $days->count() * 2), 1) : 0,
+            ];
+        }
+
+        $numEquipos = max(1, count($rows));
+        $avgPerDay  = [];
+        foreach ($sumPerDay as $date => $vals) {
+            $avgPerDay[$date] = [
+                'T' => round($vals['T'] / $numEquipos, 0),
+                'L' => round($vals['L'] / $numEquipos, 0),
+            ];
+        }
+
+        $grandTotal = array_sum(array_column($rows, 'suma'));
+
+        return [
+            'days'        => $days->toArray(),
+            'rows'        => $rows,
+            'sum_per_day' => $sumPerDay,
+            'avg_per_day' => $avgPerDay,
+            'suma'        => $grandTotal,
+            'promedio'    => $days->count() > 0 ? round($grandTotal / max(1, $days->count() * 2), 1) : 0,
+        ];
+    }
+
     public function render()
     {
         return view('livewire.analisis.analisis-tombolas');

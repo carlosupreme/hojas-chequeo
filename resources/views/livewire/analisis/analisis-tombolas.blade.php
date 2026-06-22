@@ -200,6 +200,110 @@
     </div>
     @endif
 
+    {{-- ── MATRIZ HORAS POR TURNO ─────────────────────────────────────────── --}}
+    @php
+        $matriz        = $this->matrizHoras;
+        $matrizDays    = $matriz['days']        ?? [];
+        $matrizRows    = $matriz['rows']        ?? [];
+        $matrizSumDay  = $matriz['sum_per_day'] ?? [];
+        $matrizAvgDay  = $matriz['avg_per_day'] ?? [];
+    @endphp
+
+    @if(count($matrizRows) && count($matrizDays))
+    <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+            <div>
+                <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+                    Horas por día y turno
+                </h3>
+                <p class="text-xs text-gray-400 mt-0.5">
+                    <span class="text-blue-500 font-bold">T</span> Tintoreria &nbsp;·&nbsp;
+                    <span class="text-emerald-500 font-bold">L</span> Lavanderia &nbsp;·&nbsp;
+                    {{ $this->startDate }} → {{ $this->endDate }}
+                </p>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="text-xs border-collapse">
+                <thead>
+                    {{-- Row 1: day numbers --}}
+                    <tr class="bg-gray-100 dark:bg-gray-800">
+                        <th class="px-3 py-2 text-left font-bold text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 sticky left-0 z-20 bg-gray-100 dark:bg-gray-800 min-w-[110px]"></th>
+                        @foreach($matrizDays as $d)
+                            <th colspan="2" class="px-0 py-2 text-center font-bold text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 min-w-[44px]">
+                                {{ $d['day'] }}
+                            </th>
+                        @endforeach
+                        <th class="px-2 py-2 text-center font-bold text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 bg-gray-200 dark:bg-gray-700 min-w-[44px]">Suma</th>
+                        <th class="px-2 py-2 text-center font-bold text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 bg-gray-200 dark:bg-gray-700 min-w-[52px]">Promedio</th>
+                    </tr>
+                    {{-- Row 2: T / L sub-headers --}}
+                    <tr class="bg-gray-50 dark:bg-gray-800/70">
+                        <th class="px-3 py-1 text-left font-semibold text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 sticky left-0 z-20 bg-gray-50 dark:bg-gray-800/70">Equipo</th>
+                        @foreach($matrizDays as $d)
+                            <th class="px-0 py-1 text-center font-bold text-blue-600 dark:text-blue-400 border border-gray-200 dark:border-gray-700 w-[22px]">T</th>
+                            <th class="px-0 py-1 text-center font-bold text-emerald-600 dark:text-emerald-400 border border-gray-200 dark:border-gray-700 w-[22px]">L</th>
+                        @endforeach
+                        <th class="px-1 py-1 text-center font-semibold text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800"></th>
+                        <th class="px-1 py-1 text-center font-semibold text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($matrizRows as $row)
+                        <tr class="hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-colors">
+                            <td class="px-3 py-1.5 font-mono font-bold text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 sticky left-0 z-10 bg-white dark:bg-gray-900">{{ $row['tag'] }}</td>
+                            @foreach($matrizDays as $d)
+                                @php
+                                    $tVal = $row['data'][$d['date']]['T'] ?? 0;
+                                    $lVal = $row['data'][$d['date']]['L'] ?? 0;
+                                @endphp
+                                <td class="py-1.5 text-center border border-gray-200 dark:border-gray-700 w-[22px] {{ $tVal > 0 ? 'text-blue-700 dark:text-blue-300 font-semibold' : 'text-gray-300 dark:text-gray-600' }}">
+                                    {{ $tVal > 0 ? (int)$tVal : 0 }}
+                                </td>
+                                <td class="py-1.5 text-center border border-gray-200 dark:border-gray-700 w-[22px] {{ $lVal > 0 ? 'text-emerald-700 dark:text-emerald-300 font-semibold' : 'text-gray-300 dark:text-gray-600' }}">
+                                    {{ $lVal > 0 ? (int)$lVal : 0 }}
+                                </td>
+                            @endforeach
+                            <td class="px-2 py-1.5 text-center font-black text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/40">{{ (int)$row['suma'] }}</td>
+                            <td class="px-2 py-1.5 text-center font-semibold text-blue-600 dark:text-blue-400 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/40">{{ $row['promedio'] }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+                <tfoot>
+                    {{-- Suma row --}}
+                    <tr class="bg-gray-100 dark:bg-gray-800 font-bold">
+                        <td class="px-3 py-2 font-bold text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 sticky left-0 z-10 bg-gray-100 dark:bg-gray-800">Suma</td>
+                        @foreach($matrizDays as $d)
+                            @php
+                                $sT = $matrizSumDay[$d['date']]['T'] ?? 0;
+                                $sL = $matrizSumDay[$d['date']]['L'] ?? 0;
+                            @endphp
+                            <td class="py-2 text-center border border-gray-200 dark:border-gray-700 {{ $sT > 0 ? 'text-blue-700 dark:text-blue-300' : 'text-gray-400 dark:text-gray-600' }}">{{ (int)$sT }}</td>
+                            <td class="py-2 text-center border border-gray-200 dark:border-gray-700 {{ $sL > 0 ? 'text-emerald-700 dark:text-emerald-300' : 'text-gray-400 dark:text-gray-600' }}">{{ (int)$sL }}</td>
+                        @endforeach
+                        <td class="px-2 py-2 text-center font-black text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 bg-gray-200 dark:bg-gray-700">{{ (int)$matriz['suma'] }}</td>
+                        <td class="px-2 py-2 text-center text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-700 bg-gray-200 dark:bg-gray-700">—</td>
+                    </tr>
+                    {{-- Promedio row --}}
+                    <tr class="bg-gray-50 dark:bg-gray-800/60">
+                        <td class="px-3 py-2 font-bold text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 sticky left-0 z-10 bg-gray-50 dark:bg-gray-800/60">Promedio</td>
+                        @foreach($matrizDays as $d)
+                            @php
+                                $aT = $matrizAvgDay[$d['date']]['T'] ?? 0;
+                                $aL = $matrizAvgDay[$d['date']]['L'] ?? 0;
+                            @endphp
+                            <td class="py-2 text-center border border-gray-200 dark:border-gray-700 {{ $aT > 0 ? 'text-blue-600 dark:text-blue-400' : 'text-gray-300 dark:text-gray-600' }}">{{ $aT > 0 ? $aT : 0 }}</td>
+                            <td class="py-2 text-center border border-gray-200 dark:border-gray-700 {{ $aL > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-300 dark:text-gray-600' }}">{{ $aL > 0 ? $aL : 0 }}</td>
+                        @endforeach
+                        <td class="px-2 py-2 text-center text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/40">—</td>
+                        <td class="px-2 py-2 text-center font-bold text-blue-600 dark:text-blue-400 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/40">{{ $matriz['promedio'] }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    @endif
+
     {{-- ── BREAKDOWNS ───────────────────────────────────────────────────────── --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
