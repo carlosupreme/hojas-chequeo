@@ -113,16 +113,26 @@ class DatabaseBackupService
             '--no-owner',
             '--clean',
             '--if-exists',
-            '-f', $sqlPath,
             $database,
         ];
 
-        // Execute pg_dump
+        // Execute pg_dump and stream output directly to file
+        $fileHandle = fopen($sqlPath, 'w');
+        if (! $fileHandle) {
+            throw new RuntimeException("No se pudo crear el archivo temporal de volcado en {$sqlPath}");
+        }
+
         $process = Process::timeout(300)
             ->env([
                 'PGPASSWORD' => $password,
             ])
-            ->run($cmd);
+            ->run($cmd, function ($type, $buffer) use ($fileHandle) {
+                if ($type === 'out') {
+                    fwrite($fileHandle, $buffer);
+                }
+            });
+
+        fclose($fileHandle);
 
         if (! $process->successful() || ! file_exists($sqlPath) || filesize($sqlPath) === 0) {
             if (file_exists($sqlPath)) {
