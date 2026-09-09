@@ -6,13 +6,18 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Spatie\Permission\Exceptions\RoleDoesNotExist;
 
 class LoginSelectionController extends Controller
 {
     public function index()
     {
         if (! Auth::check()) {
-            $operadores = User::role('Operador')->get();
+            try {
+                $operadores = User::role('Operador')->get();
+            } catch (RoleDoesNotExist $e) {
+                $operadores = collect();
+            }
 
             return view('auth.login-selection', compact('operadores'));
         }

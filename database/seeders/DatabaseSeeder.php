@@ -22,81 +22,91 @@ class DatabaseSeeder extends Seeder
         $this->call(UserSeeder::class);
         $this->call(RecorridoTintoreriaSeeder::class);
 
-        $iconType = AnswerType::create([
+        $iconType = AnswerType::firstOrCreate([
             'key' => 'icon_set',
+        ], [
             'label' => 'Estado visual',
             'behavior' => 'enum',
             'aggregable' => false,
         ]);
 
-        $numberType = AnswerType::create([
+        $numberType = AnswerType::firstOrCreate([
             'key' => 'number',
+        ], [
             'label' => 'Numérico',
             'behavior' => 'numeric',
             'aggregable' => true,
         ]);
 
-        $textType = AnswerType::create([
+        $textType = AnswerType::firstOrCreate([
             'key' => 'text',
+        ], [
             'label' => 'Texto',
             'behavior' => 'text',
             'aggregable' => false,
         ]);
 
-        $boolType = AnswerType::create([
+        $boolType = AnswerType::firstOrCreate([
             'key' => 'boolean',
+        ], [
             'label' => 'Si/No',
             'behavior' => 'boolean',
             'aggregable' => false,
         ]);
 
-        $temperatura = AnswerType::create([
+        $temperatura = AnswerType::firstOrCreate([
             'key' => 'temperatura',
+        ], [
             'label' => 'Temperatura',
             'behavior' => 'numeric',
             'aggregable' => true,
         ]);
 
-        $temperatura = AnswerType::create([
+        $presion = AnswerType::firstOrCreate([
             'key' => 'presion',
+        ], [
             'label' => 'Presion',
             'behavior' => 'numeric',
             'aggregable' => true,
         ]);
 
-        $realizado = AnswerOption::create([
+        $realizado = AnswerOption::firstOrCreate([
             'answer_type_id' => $iconType->id,
             'key' => 'realizado',
+        ], [
             'label' => 'REALIZADO Y ESTA BIEN',
             'icon' => 'heroicon-o-check',
             'color' => 'green',
         ]);
 
-        $realizadoMal = AnswerOption::create([
+        $realizadoMal = AnswerOption::firstOrCreate([
             'answer_type_id' => $iconType->id,
             'key' => 'realizado_mal',
+        ], [
             'label' => 'REALIZADO Y ESTA MAL',
             'icon' => 'heroicon-o-x-mark',
             'color' => 'red',
         ]);
 
-        $noRealizado = AnswerOption::create([
+        $noRealizado = AnswerOption::firstOrCreate([
             'answer_type_id' => $iconType->id,
             'key' => 'no_realizado',
+        ], [
             'label' => 'NO REALIZADO',
             'icon' => 'heroicon-o-no-symbol',
             'color' => 'yellow',
         ]);
 
-        $noAplica = AnswerOption::create([
+        $noAplica = AnswerOption::firstOrCreate([
             'answer_type_id' => $iconType->id,
             'key' => 'no_aplica',
+        ], [
             'label' => 'NO APLICA',
             'icon' => 'heroicon-o-minus-circle',
             'color' => 'gray',
         ]);
 
-        $equipo = Equipo::createOrFirst([
+        $equipo = Equipo::firstOrCreate([
             'tag' => 'CM-CAL-01',
         ], [
             'nombre' => 'Caldera 1',
@@ -104,7 +114,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Hoja Chequeo
-        $hoja = HojaChequeo::create([
+        $hoja = HojaChequeo::firstOrCreate([
             'equipo_id' => $equipo->id,
         ]);
 
@@ -116,25 +126,28 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($columns as $i => $col) {
-            HojaColumna::create([
+            HojaColumna::firstOrCreate([
                 'hoja_chequeo_id' => $hoja->id,
                 'key' => $col['key'],
+            ], [
                 'label' => $col['label'],
                 'is_fixed' => true,
                 'order' => $i,
             ]);
         }
 
-        $filaLimpieza = HojaFila::create([
+        $filaLimpieza = HojaFila::firstOrCreate([
             'hoja_chequeo_id' => $hoja->id,
-            'answer_type_id' => $iconType->id,
             'order' => 1,
+        ], [
+            'answer_type_id' => $iconType->id,
         ]);
 
-        $filaHoras = HojaFila::create([
+        $filaHoras = HojaFila::firstOrCreate([
             'hoja_chequeo_id' => $hoja->id,
-            'answer_type_id' => $numberType->id,
             'order' => 2,
+        ], [
+            'answer_type_id' => $numberType->id,
         ]);
 
         $setValor = function ($fila, $key, $value) use ($hoja) {
@@ -142,11 +155,14 @@ class DatabaseSeeder extends Seeder
                 ->where('key', $key)
                 ->first();
 
-            HojaFilaValor::create([
-                'hoja_fila_id' => $fila->id,
-                'hoja_columna_id' => $col->id,
-                'valor' => $value,
-            ]);
+            if ($col) {
+                HojaFilaValor::firstOrCreate([
+                    'hoja_fila_id' => $fila->id,
+                    'hoja_columna_id' => $col->id,
+                ], [
+                    'valor' => $value,
+                ]);
+            }
         };
 
         // Row values

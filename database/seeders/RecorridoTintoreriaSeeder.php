@@ -12,8 +12,9 @@ class RecorridoTintoreriaSeeder extends Seeder
     public function run(): void
     {
         // 1. Crear el Formulario Principal
-        $formulario = FormularioRecorrido::create([
+        $formulario = FormularioRecorrido::firstOrCreate([
             'nombre' => 'RECORRIDO GENERAL PLANTA SANTA ROSA - TINTORERÍA',
+        ], [
             'descripcion' => 'Supervisión de áreas de tintorería al inicio y final de la jornada',
         ]);
 
@@ -86,17 +87,19 @@ class RecorridoTintoreriaSeeder extends Seeder
 
         $ordenCat = 1;
         foreach ($estructura as $nombreCat => $items) {
-            $categoria = CategoriaRecorrido::create([
+            $categoria = CategoriaRecorrido::firstOrCreate([
                 'formulario_recorrido_id' => $formulario->id,
                 'nombre' => $nombreCat,
+            ], [
                 'orden' => $ordenCat++,
             ]);
 
             $ordenItem = 1;
             foreach ($items as $itemData) {
-                ItemRecorrido::create([
+                ItemRecorrido::firstOrCreate([
                     'categoria_recorrido_id' => $categoria->id,
                     'nombre' => $itemData['nombre'],
+                ], [
                     'tipo_entrada' => $itemData['tipo'],
                     'orden' => $ordenItem++,
                 ]);
