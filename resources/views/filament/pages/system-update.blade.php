@@ -22,6 +22,46 @@
         </div>
     @endif
 
+    {{-- Database Backup Card --}}
+    <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex items-start gap-3.5">
+                <div class="p-2.5 rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/50">
+                    <x-heroicon-o-circle-stack class="h-6 w-6" />
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                        Copia de Seguridad de la Base de Datos
+                        <span class="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20 dark:bg-emerald-950 dark:text-emerald-300">Recomendado</span>
+                    </h3>
+                    <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
+                        Descarga un archivo comprimido (<code class="text-xs">.tgz</code> o <code class="text-xs">.zip</code>) con el volcado completo de PostgreSQL antes de aplicar actualizaciones.
+                    </p>
+                    <div class="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-400">
+                        <span class="inline-flex items-center gap-1">
+                            <span class="font-medium text-gray-600 dark:text-gray-300">Base de datos:</span>
+                            <code class="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-gray-700 dark:bg-gray-800 dark:text-gray-300">{{ config('database.connections.pgsql.database', 'laravel') }}</code>
+                        </span>
+                        <span>•</span>
+                        <span class="inline-flex items-center gap-1">
+                            <span class="font-medium text-gray-600 dark:text-gray-300">Servidor:</span>
+                            <code class="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-gray-700 dark:bg-gray-800 dark:text-gray-300">{{ config('database.connections.pgsql.host', '127.0.0.1') }}:{{ config('database.connections.pgsql.port', '5432') }}</code>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-shrink-0">
+                <x-filament::button
+                    wire:click="mountAction('downloadDatabase')"
+                    color="success"
+                    icon="heroicon-o-arrow-down-tray"
+                >
+                    Descargar Base de Datos
+                </x-filament::button>
+            </div>
+        </div>
+    </div>
+
     {{-- Log Output --}}
     <div class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
         <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700">

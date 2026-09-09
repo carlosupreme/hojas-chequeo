@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use Filament\Actions\Action;
+use Filament\Forms\Components\Radio;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
@@ -26,6 +27,14 @@ class SystemUpdate extends Page
     public function mount(): void
     {
         $this->isRunning = $this->checkIfRunning();
+
+        if (session()->has('backup_error')) {
+            Notification::make()
+                ->title('Error al generar la copia de seguridad')
+                ->body(session('backup_error'))
+                ->danger()
+                ->send();
+        }
     }
 
     public static function canAccess(): bool
@@ -36,13 +45,43 @@ class SystemUpdate extends Page
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('downloadDatabase')
+                ->label('Descargar Base de Datos')
+                ->icon(Heroicon::OutlinedArrowDownTray)
+                ->color('success')
+                ->modalHeading('Descargar Base de Datos (PostgreSQL)')
+                ->modalDescription('Se generará una copia de seguridad completa de la base de datos PostgreSQL del servidor y se descargará comprimida.')
+                ->form([
+                    Radio::make('format')
+                        ->label('Formato de descarga')
+                        ->options([
+                            'tgz' => 'Archivo TGZ (.tar.gz) — Recomendado para Linux / PostgreSQL',
+                            'zip' => 'Archivo ZIP (.zip) — Formato estándar compatible',
+                        ])
+                        ->default('tgz')
+                        ->required(),
+                ])
+                ->modalSubmitActionLabel('Descargar Respaldo')
+                ->action(function (array $data) {
+                    $format = $data['format'] ?? 'tgz';
+                    $url = route('admin.system-update.download-db', ['format' => $format]);
+
+                    $this->js("window.location.href = '{$url}';");
+
+                    Notification::make()
+                        ->title('Generando descarga...')
+                        ->body('El respaldo se está procesando en el servidor y la descarga comenzará en breve.')
+                        ->info()
+                        ->send();
+                }),
+
             Action::make('update')
                 ->label('Actualizar Sistema')
                 ->icon(Heroicon::OutlinedArrowPath)
                 ->color('warning')
                 ->requiresConfirmation()
                 ->modalHeading('¿Actualizar el sistema?')
-                ->modalDescription('Esto descargará los últimos cambios de GitHub y reiniciará la aplicación. El proceso toma 2-5 minutos.')
+                ->modalDescription('Esto descargará los últimos cambios de GitHub y reiniciará la aplicación. Se recomienda descargar una copia de seguridad antes de continuar.')
                 ->modalSubmitActionLabel('Sí, actualizar')
                 ->disabled(fn () => $this->isRunning)
                 ->action('runDeploy'),
