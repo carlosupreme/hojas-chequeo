@@ -20,6 +20,11 @@ class CreateHojaChequeo extends Page
 
     public ?int $recordCreatedId = null;
 
+    public static function canAccess(array $parameters = []): bool
+    {
+        return auth()->user()?->isAdmin() ?? false;
+    }
+
     public function mount(): void
     {
         $this->form->fill();

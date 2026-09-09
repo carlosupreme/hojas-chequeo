@@ -25,6 +25,11 @@ class EditHojaChequeo extends Page
 
     public ?array $pendingData = null;
 
+    public static function canAccess(array $parameters = []): bool
+    {
+        return auth()->user()?->isAdmin() ?? false;
+    }
+
     public function mount(int|string $record): void
     {
         $this->record = HojaChequeo::findOrFail($record);

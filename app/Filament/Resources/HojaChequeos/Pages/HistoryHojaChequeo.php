@@ -13,6 +13,7 @@ use Exception;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
+use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
@@ -21,11 +22,11 @@ use Illuminate\Support\Facades\Log;
 
 class HistoryHojaChequeo extends Page
 {
+    use InteractsWithRecord;
+
     protected static string $resource = HojaChequeoResource::class;
 
     protected string $view = 'filament.resources.hoja-chequeos.pages.history-hoja-chequeo';
-
-    public HojaChequeo $record;
 
     public ?string $startDate = null;
 
@@ -35,13 +36,19 @@ class HistoryHojaChequeo extends Page
 
     protected array $queryString = ['startDate', 'endDate', 'activeTab'];
 
+    public static function canAccess(array $parameters = []): bool
+    {
+        return auth()->user()?->hasAnyRole(['Administrador', 'Supervisor']) ?? false;
+    }
+
     public function getTitle(): string
     {
         return 'Historial de '.$this->record->equipo->tag.' (v'.$this->record->version.')';
     }
 
-    public function mount(): void
+    public function mount(int|string $record): void
     {
+        $this->record = HojaChequeo::findOrFail($record);
         $this->startDate = $this->startDate ?? now()->subWeeks(2)->format('Y-m-d');
         $this->endDate = $this->endDate ?? now()->format('Y-m-d');
     }

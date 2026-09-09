@@ -54,6 +54,7 @@ class HojaChequeosTable
 
                 ToggleColumn::make('encendido')
                     ->label('Publicada')
+                    ->disabled(fn () => ! auth()->user()?->isAdmin())
                     ->beforeStateUpdated(fn ($record) => HojaChequeo::where('equipo_id', $record->equipo_id)
                         ->update(['encendido' => false])),
 
@@ -107,6 +108,7 @@ class HojaChequeosTable
             ])
             ->recordActions([
                 Action::make('Copiar')
+                    ->visible(fn () => auth()->user()?->isAdmin())
                     ->icon('heroicon-o-document-duplicate')
                     ->color('gray')
                     ->modalHeading('Copiar hoja de chequeo')
@@ -193,20 +195,22 @@ class HojaChequeosTable
                 Action::make('Versiones')
                     ->url(fn (HojaChequeo $record): string => HojaChequeoResource::getUrl('versions', ['record' => $record]))
                     ->icon('heroicon-o-document-duplicate')
-                    ->visible(fn (HojaChequeo $record): bool => HojaChequeo::where('equipo_id', $record->equipo_id)->count() > 1),
+                    ->visible(fn (HojaChequeo $record): bool => auth()->user()?->isAdmin() && HojaChequeo::where('equipo_id', $record->equipo_id)->count() > 1),
                 Action::make('Historial')
                     ->url(fn (HojaChequeo $record): string => HojaChequeoResource::getUrl('history', ['record' => $record]))
                     ->icon('heroicon-o-calendar'),
                 ViewAction::make()->modalWidth(Width::SevenExtraLarge),
-                EditAction::make(),
-                DeleteAction::make(),
+                EditAction::make()
+                    ->visible(fn () => auth()->user()?->isAdmin()),
+                DeleteAction::make()
+                    ->visible(fn () => auth()->user()?->isAdmin()),
             ])
             ->persistSortInSession()
             ->persistFiltersInSession()
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                ]),
+                ])->visible(fn () => auth()->user()?->isAdmin()),
             ])
             ->defaultSort('created_at', 'desc');
     }

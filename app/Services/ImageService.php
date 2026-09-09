@@ -9,10 +9,10 @@ use InvalidArgumentException;
 
 class ImageService
 {
-    public function getAsBase64(string $filePath): string
+    public function getAsBase64(?string $filePath): ?string
     {
-        if (! Storage::exists($filePath)) {
-            throw new InvalidArgumentException("File not found: {$filePath}");
+        if (! $filePath || ! Storage::exists($filePath)) {
+            return null;
         }
 
         $fileContent = Storage::get($filePath);

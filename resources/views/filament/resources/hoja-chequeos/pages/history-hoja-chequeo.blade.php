@@ -279,8 +279,8 @@
                                         $ejecucion = $ejecucionesByDateAndTurno[$date][$turno->id] ?? null;
                                     @endphp
                                     <td class="px-3 py-3 text-center border-l border-r border-gray-200 dark:border-gray-700">
-                                        @if($ejecucion?->firma_operador)
-                                            <img src="{{ app(\App\Services\ImageService::class)->getAsBase64($ejecucion->firma_operador) }}"
+                                        @if($ejecucion?->firma_operador && ($firmaOp = app(\App\Services\ImageService::class)->getAsBase64($ejecucion->firma_operador)))
+                                            <img src="{{ $firmaOp }}"
                                                  alt="Firma Operador"
                                                  class="h-12 mx-auto">
                                         @endif
@@ -293,8 +293,8 @@
                                     $ejecucion = $ejecucionesByDateAndTurno[$date][$activeTab] ?? null;
                                 @endphp
                                 <td class="px-3 py-3 text-center border-l border-r border-gray-200 dark:border-gray-700">
-                                    @if($ejecucion?->firma_operador)
-                                        <img src="{{ app(\App\Services\ImageService::class)->getAsBase64($ejecucion->firma_operador) }}"
+                                    @if($ejecucion?->firma_operador && ($firmaOp = app(\App\Services\ImageService::class)->getAsBase64($ejecucion->firma_operador)))
+                                        <img src="{{ $firmaOp }}"
                                              alt="Firma Operador"
                                              class="h-12 mx-auto">
                                     @endif
@@ -319,8 +319,8 @@
                                         $ejecucion = $ejecucionesByDateAndTurno[$date][$turno->id] ?? null;
                                     @endphp
                                     <td class="px-3 py-3 text-center border-l border-r border-gray-200 dark:border-gray-700">
-                                        @if($ejecucion?->firma_supervisor)
-                                            <img src="{{ app(\App\Services\ImageService::class)->getAsBase64($ejecucion->firma_supervisor) }}"
+                                        @if($ejecucion?->firma_supervisor && ($firmaSup = app(\App\Services\ImageService::class)->getAsBase64($ejecucion->firma_supervisor)))
+                                            <img src="{{ $firmaSup }}"
                                                  alt="Firma Supervisor"
                                                  class="h-12 mx-auto">
                                         @endif
@@ -333,8 +333,8 @@
                                     $ejecucion = $ejecucionesByDateAndTurno[$date][$activeTab] ?? null;
                                 @endphp
                                 <td class="px-3 py-3 text-center border-l border-r border-gray-200 dark:border-gray-700">
-                                    @if($ejecucion?->firma_supervisor)
-                                        <img src="{{ app(\App\Services\ImageService::class)->getAsBase64($ejecucion->firma_supervisor) }}"
+                                    @if($ejecucion?->firma_supervisor && ($firmaSup = app(\App\Services\ImageService::class)->getAsBase64($ejecucion->firma_supervisor)))
+                                        <img src="{{ $firmaSup }}"
                                              alt="Firma Supervisor"
                                              class="h-12 mx-auto">
                                     @endif

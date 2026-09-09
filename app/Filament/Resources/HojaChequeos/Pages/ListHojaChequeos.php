@@ -12,10 +12,15 @@ class ListHojaChequeos extends ListRecords
 
     protected static ?string $title = 'Hojas de chequeo';
 
+    public static function canAccess(array $parameters = []): bool
+    {
+        return auth()->user()?->hasAnyRole(['Administrador', 'Supervisor']) ?? false;
+    }
+
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()->visible(fn () => auth()->user()?->isAdmin()),
         ];
     }
 }
