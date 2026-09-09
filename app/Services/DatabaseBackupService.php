@@ -33,15 +33,18 @@ class DatabaseBackupService
             // Ignore and try fallback paths
         }
 
-        // 3. Standard Linux / UNIX binaries
+        // 3. Standard Linux / UNIX binaries and common user bin paths
         $candidates = [
+            ($_SERVER['HOME'] ?? '').'/.local/bin/pg_dump',
+            (getenv('HOME') ?: '').'/.local/bin/pg_dump',
+            '/home/carlos/.local/bin/pg_dump',
             '/usr/bin/pg_dump',
             '/usr/local/bin/pg_dump',
             '/usr/local/pgsql/bin/pg_dump',
         ];
 
         foreach ($candidates as $candidate) {
-            if (file_exists($candidate) && is_executable($candidate)) {
+            if (! empty($candidate) && file_exists($candidate) && is_executable($candidate)) {
                 return $candidate;
             }
         }
@@ -55,6 +58,25 @@ class DatabaseBackupService
         }
 
         return null;
+    }
+
+    /**
+     * Check if a docker container for PostgreSQL is running.
+     */
+    public function isDockerPostgresAvailable(): bool
+    {
+        try {
+            $process = Process::timeout(5)->run("docker ps --format '{{.Names}}'");
+            if ($process->successful()) {
+                $containers = explode("\n", trim($process->output()));
+
+                return in_array('laravel-postgres', $containers, true);
+            }
+        } catch (\Throwable $e) {
+            // Docker not available or no permissions
+        }
+
+        return false;
     }
 
     /**
@@ -104,12 +126,14 @@ class DatabaseBackupService
         $sqlFilename = "backup_{$safeDbName}_{$timestamp}.sql";
         $sqlPath = $backupDir.DIRECTORY_SEPARATOR.$sqlFilename;
 
-        // Build pg_dump arguments
         $cmd = [
             $pgDump,
-            '-h', $host,
-            '-p', $port,
-            '-U', $username,
+            '-h',
+            $host,
+            '-p',
+            $port,
+            '-U',
+            $username,
             '--no-owner',
             '--clean',
             '--if-exists',

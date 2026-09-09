@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Services\DatabaseBackupService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Radio;
 use Filament\Notifications\Notification;
@@ -62,17 +63,32 @@ class SystemUpdate extends Page
                         ->required(),
                 ])
                 ->modalSubmitActionLabel('Descargar Respaldo')
-                ->action(function (array $data) {
+                ->action(function (array $data, DatabaseBackupService $backupService) {
                     $format = $data['format'] ?? 'tgz';
-                    $url = route('admin.system-update.download-db', ['format' => $format]);
 
-                    $this->js("window.location.href = '{$url}';");
+                    try {
+                        $backup = $backupService->generateBackup($format);
 
-                    Notification::make()
-                        ->title('Generando descarga...')
-                        ->body('El respaldo se está procesando en el servidor y la descarga comenzará en breve.')
-                        ->info()
-                        ->send();
+                        Notification::make()
+                            ->title('Copia de seguridad generada')
+                            ->body("Se descargó {$backup['filename']} correctamente.")
+                            ->success()
+                            ->send();
+
+                        $contentType = $format === 'zip' ? 'application/zip' : 'application/gzip';
+
+                        return response()->download($backup['path'], $backup['filename'], [
+                            'Content-Type' => $contentType,
+                        ])->deleteFileAfterSend(true);
+                    } catch (\Throwable $e) {
+                        Notification::make()
+                            ->title('Error al generar la copia de seguridad')
+                            ->body($e->getMessage())
+                            ->danger()
+                            ->send();
+
+                        return null;
+                    }
                 }),
 
             Action::make('update')

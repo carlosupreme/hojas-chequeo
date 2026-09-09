@@ -51,13 +51,7 @@
                 </div>
             </div>
             <div class="flex-shrink-0">
-                <x-filament::button
-                    wire:click="mountAction('downloadDatabase')"
-                    color="success"
-                    icon="heroicon-o-arrow-down-tray"
-                >
-                    Descargar Base de Datos
-                </x-filament::button>
+                {{ $this->getAction('downloadDatabase') }}
             </div>
         </div>
     </div>
