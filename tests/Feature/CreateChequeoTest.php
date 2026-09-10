@@ -15,8 +15,10 @@ use App\Models\Turno;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class CreateChequeoTest extends TestCase
@@ -49,10 +51,10 @@ class CreateChequeoTest extends TestCase
         ]);
 
         // Give the user a role so Spatie doesn't complain
-        $this->user->assignRole(\Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Operador', 'guard_name' => 'web']));
+        $this->user->assignRole(Role::firstOrCreate(['name' => 'Operador', 'guard_name' => 'web']));
 
         // HojaEjecucionObserver queries this role when finalizado_en is set
-        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Administrador', 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'Administrador', 'guard_name' => 'web']);
 
         $answerType = AnswerType::factory()->number()->create();
         $this->hoja = HojaChequeo::factory()
@@ -329,5 +331,63 @@ class CreateChequeoTest extends TestCase
             ->call('create');
 
         $this->assertTrue($ejecucion->fresh()->es_ppm);
+    }
+
+    // -------------------------------------------------------------------------
+    // SIGNATURE PAD
+    // -------------------------------------------------------------------------
+
+    public function test_create_persists_signature_to_storage_and_database(): void
+    {
+        Storage::fake();
+        $this->actingAs($this->user);
+
+        // 1x1 transparent png base64
+        $fakeSignature = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+
+        $livewire = Livewire::withQueryParams(['h' => $this->hoja->id])
+            ->test(CreateChequeo::class)
+            ->set('turnoId', $this->turno->id)
+            ->set('data.nombre_operador', 'Operador Firmante')
+            ->set('data.firma_operador', $fakeSignature)
+            ->call('create')
+            ->assertDispatched('close-finalizar-modal')
+            ->assertDispatched('hoja-ejecucion-saved');
+
+        $ejecucion = HojaEjecucion::where('hoja_chequeo_id', $this->hoja->id)->first();
+        $this->assertNotNull($ejecucion);
+        $this->assertNotNull($ejecucion->firma_operador);
+        $this->assertStringStartsWith('firmas/', $ejecucion->firma_operador);
+        $this->assertStringEndsWith('.png', $ejecucion->firma_operador);
+
+        Storage::assertExists($ejecucion->firma_operador);
+    }
+
+    public function test_create_on_resumed_ejecucion_persists_signature(): void
+    {
+        Storage::fake();
+        $this->actingAs($this->user);
+
+        $ejecucion = HojaEjecucion::factory()->create([
+            'hoja_chequeo_id' => $this->hoja->id,
+            'user_id' => $this->user->id,
+            'turno_id' => $this->turno->id,
+            'firma_operador' => null,
+        ]);
+
+        $fakeSignature = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+
+        Livewire::withQueryParams(['e' => $ejecucion->id])
+            ->test(CreateChequeo::class)
+            ->set('turnoId', $this->turno->id)
+            ->set('data.firma_operador', $fakeSignature)
+            ->call('create')
+            ->assertDispatched('close-finalizar-modal')
+            ->assertDispatched('hoja-ejecucion-saved', hojaEjecucionId: $ejecucion->id);
+
+        $ejecucion->refresh();
+        $this->assertNotNull($ejecucion->firma_operador);
+        $this->assertStringStartsWith('firmas/', $ejecucion->firma_operador);
+        Storage::assertExists($ejecucion->firma_operador);
     }
 }

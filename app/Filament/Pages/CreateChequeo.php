@@ -161,6 +161,8 @@ class CreateChequeo extends Page
         $this->hojaEjecucion = null;
         $this->form->fill([
             'nombre_operador' => $this->user->name,
+            'firma_operador' => null,
+            'observaciones' => '',
         ]);
         $this->esPpm = false;
         $this->dateSelected = Carbon::now();
@@ -360,9 +362,11 @@ class CreateChequeo extends Page
 
         $forcedFinalizadoEn = $this->getForcedFinalizadoEnForSave();
 
+        $signatureData = $this->signatureForm->getState();
+
         $data = [
             ...$this->form->getState(),
-            'firma_operador' => $this->data['firma_operador'] ?? null,
+            'firma_operador' => $signatureData['firma_operador'] ?? $this->data['firma_operador'] ?? null,
             'user_id' => $this->user->id,
             'turno_id' => $this->turnoId,
             'centro_costo_id' => Turno::findOrFail($this->turnoId)->centro_costo_id,
@@ -375,9 +379,11 @@ class CreateChequeo extends Page
             $data['finalizado_en'] = $forcedFinalizadoEn;
         }
 
-        if ($data['firma_operador']) {
+        if (! empty($data['firma_operador']) && str_starts_with($data['firma_operador'], 'data:image')) {
             $data['firma_operador'] = $this->imageService()->storeBase64('firmas', $data['firma_operador']);
         }
+
+        $this->dispatch('close-finalizar-modal');
 
         if ($this->hojaEjecucion) {
             $this->hojaEjecucion->update($data);

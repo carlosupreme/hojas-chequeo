@@ -4,10 +4,118 @@
         {{-- ================================================================
              FINALIZAR MODAL
         ================================================================ --}}
+        <script>
+            (function () {
+                function getComponent() {
+                    return {
+                        open: false,
+                        openModal() {
+                            this.open = true;
+                            this.$dispatch('ax-modal-opened');
+                            this.syncSignature();
+                        },
+                        closeModal() {
+                            this.open = false;
+                        },
+                        syncSignature() {
+                            const resize = () => {
+                                const padEl = this.$el.querySelector('[x-data*="signaturePadFormComponent"]');
+                                if (!padEl || !window.Alpine) return false;
+                                const comp = Alpine.$data(padEl);
+                                if (!comp) return false;
+                                const canvas = comp.$refs?.canvas || padEl.querySelector('canvas');
+                                if (!canvas) return false;
+
+                                const offsetWidth = canvas.offsetWidth;
+                                const offsetHeight = canvas.offsetHeight;
+                                if (offsetWidth === 0 || offsetHeight === 0) return false;
+
+                                const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                                const targetWidth = Math.round(offsetWidth * ratio);
+                                const targetHeight = Math.round(offsetHeight * ratio);
+
+                                if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+                                    if (comp.signaturePad && !comp.signaturePad.isEmpty()) {
+                                        comp.done();
+                                    }
+                                    const savedState = comp.state;
+
+                                    canvas.width = targetWidth;
+                                    canvas.height = targetHeight;
+                                    const ctx = canvas.getContext('2d');
+                                    ctx.scale(ratio, ratio);
+
+                                    if (comp.signaturePad) {
+                                        comp.signaturePad.clear();
+                                        if (savedState) {
+                                            comp.signaturePad.fromDataURL(savedState);
+                                            comp.state = savedState;
+                                        }
+                                    }
+                                }
+                                return true;
+                            };
+
+                            this.$nextTick(() => {
+                                if (!resize()) {
+                                    setTimeout(resize, 60);
+                                    setTimeout(resize, 180);
+                                    setTimeout(resize, 350);
+                                } else {
+                                    setTimeout(resize, 220);
+                                }
+                            });
+                        },
+                        init() {
+                            this.$watch('open', (value) => {
+                                if (value) {
+                                    this.$dispatch('ax-modal-opened');
+                                    this.syncSignature();
+                                }
+                            });
+                            window.addEventListener('resize', () => {
+                                if (this.open) {
+                                    this.syncSignature();
+                                }
+                            });
+                        },
+                        submitForm() {
+                            const padEl = this.$el.querySelector('[x-data*="signaturePadFormComponent"]');
+                            if (padEl && window.Alpine) {
+                                const comp = Alpine.$data(padEl);
+                                if (comp && comp.signaturePad) {
+                                    if (comp.signaturePad.isEmpty()) {
+                                        comp.state = null;
+                                        this.$wire.set('data.firma_operador', null, false);
+                                    } else {
+                                        comp.done();
+                                        this.$wire.set('data.firma_operador', comp.state, false);
+                                    }
+                                }
+                            }
+                            this.$wire.create();
+                        }
+                    };
+                }
+
+                window.finalizarModalComponent = getComponent;
+
+                if (window.Alpine) {
+                    Alpine.data('finalizarModalComponent', getComponent);
+                } else {
+                    document.addEventListener('alpine:init', () => {
+                        Alpine.data('finalizarModalComponent', getComponent);
+                    });
+                }
+            })();
+        </script>
+
         <div
-            x-data="{ open: false }"
-            @keydown.escape.window="open = false"
-            @open-finalizar-modal.window="open = true"
+            wire:ignore.self
+            x-data="finalizarModalComponent()"
+            @keydown.escape.window="closeModal()"
+            @open-finalizar-modal.window="openModal()"
+            @close-finalizar-modal.window="closeModal()"
         >
             <div
                 x-show="open"
@@ -19,7 +127,7 @@
                 x-transition:leave-end="opacity-0"
                 style="display:none"
                 class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
-                @click="open = false"
+                @click="closeModal()"
             ></div>
 
             <div
@@ -39,21 +147,21 @@
                             <h2 class="text-lg font-bold text-gray-900 dark:text-white">Finalizar hoja</h2>
                             <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Firme para confirmar el chequeo</p>
                         </div>
-                        <button type="button" @click="open = false"
+                        <button type="button" @click="closeModal()"
                             class="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
                         </button>
                     </div>
-                    <form wire:submit.prevent="create" class="px-6 py-5 space-y-5">
+                    <form @submit.prevent="submitForm" class="px-6 py-5 space-y-5">
                         {{ $this->signatureForm }}
                         <div class="flex gap-3 pt-2">
-                            <button type="button" @click="open = false"
+                            <button type="button" @click="closeModal()"
                                 class="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                                 Cancelar
                             </button>
-                            <button type="submit" wire:loading.attr="disabled"
+                            <button type="submit" wire:loading.attr="disabled" wire:target="create"
                                 class="flex-1 px-4 py-2.5 rounded-lg bg-green-600 hover:bg-green-500 text-sm font-semibold text-white transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
                                 <span wire:loading wire:target="create">
                                     <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">

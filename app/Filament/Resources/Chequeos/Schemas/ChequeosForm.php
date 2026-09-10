@@ -32,8 +32,7 @@ class ChequeosForm
                 SignaturePad::make('firma_operador')
                     ->label('Firma del operador')
                     ->penColor('blue')
-                    ->penColorOnDark('blue')
-                    ->live(),
+                    ->penColorOnDark('blue'),
             ]);
     }
 
