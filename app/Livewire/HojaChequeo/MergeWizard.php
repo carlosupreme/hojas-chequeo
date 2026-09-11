@@ -5,6 +5,7 @@ namespace App\Livewire\HojaChequeo;
 use App\Filament\Resources\HojaChequeos\HojaChequeoResource;
 use App\Models\HojaChequeo;
 use App\Services\HojaChequeoMergeService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\View\View;
 use Livewire\Component;
 
@@ -36,7 +37,7 @@ class MergeWizard extends Component
         $this->isOpen = false;
     }
 
-    public function getVersionsProperty(): \Illuminate\Database\Eloquent\Collection
+    public function getVersionsProperty(): Collection
     {
         return HojaChequeo::where('equipo_id', $this->equipoId)
             ->withCount('chequeos')

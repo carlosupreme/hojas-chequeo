@@ -35,7 +35,7 @@ class ReportesTable
                 TextColumn::make('equipo.tag')
                     ->label('Equipo:')
                     ->searchable(),
-                textColumn::make('falla')
+                TextColumn::make('falla')
                     ->label('Falla')
                     ->limit(30)
                     ->tooltip(fn (TextColumn $column): ?string => $column->getState()),
@@ -43,9 +43,9 @@ class ReportesTable
                     ->label('Observaciones')
                     ->limit(30)
                     ->tooltip(fn (TextColumn $column): ?string => $column->getState()),
-                textColumn::make('area')
+                TextColumn::make('area')
                     ->label('Area'),
-                textColumn::make('prioridad')
+                TextColumn::make('prioridad')
                     ->label('Prioridad')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {

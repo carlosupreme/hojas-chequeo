@@ -46,9 +46,32 @@ class HistoryHojaChequeo extends Page
         return 'Historial de '.$this->record->equipo->tag.' (v'.$this->record->version.')';
     }
 
+    protected ?Collection $ejecucionesCache = null;
+
+    protected ?Collection $turnosCache = null;
+
+    protected ?array $ejecucionesByDateAndTurnoCache = null;
+
+    public function updatedStartDate(): void
+    {
+        $this->clearCache();
+    }
+
+    public function updatedEndDate(): void
+    {
+        $this->clearCache();
+    }
+
+    protected function clearCache(): void
+    {
+        $this->ejecucionesCache = null;
+        $this->turnosCache = null;
+        $this->ejecucionesByDateAndTurnoCache = null;
+    }
+
     public function mount(int|string $record): void
     {
-        $this->record = HojaChequeo::findOrFail($record);
+        $this->record = HojaChequeo::with(['equipo', 'filas.answerType', 'columnas'])->findOrFail($record);
         $this->startDate = $this->startDate ?? now()->subWeeks(2)->format('Y-m-d');
         $this->endDate = $this->endDate ?? now()->format('Y-m-d');
     }
@@ -62,19 +85,37 @@ class HistoryHojaChequeo extends Page
 
     public function getEjecuciones(): Collection
     {
-        return app(HojaChequeoHistoryService::class)->getEjecuciones($this->record, $this->startDate, $this->endDate);
+        return $this->ejecucionesCache ??= app(HojaChequeoHistoryService::class)->getEjecuciones($this->record, $this->startDate, $this->endDate);
     }
 
     public function getTurnos(): Collection
     {
+        if ($this->turnosCache !== null) {
+            return $this->turnosCache;
+        }
+
         $ejecucionTurnos = $this->getEjecuciones()->pluck('turno_id')->unique();
 
-        return Turno::whereIn('id', $ejecucionTurnos)->get();
+        return $this->turnosCache = Turno::whereIn('id', $ejecucionTurnos)->get();
     }
 
     public function getEjecucionesByDateAndTurno(): array
     {
-        return app(HojaChequeoHistoryService::class)->getEjecucionesByDateAndTurno($this->record, $this->startDate, $this->endDate);
+        if ($this->ejecucionesByDateAndTurnoCache !== null) {
+            return $this->ejecucionesByDateAndTurnoCache;
+        }
+
+        $ejecuciones = $this->getEjecuciones();
+        $grouped = [];
+
+        foreach ($ejecuciones as $ejecucion) {
+            $date = $ejecucion->finalizado_en->format('Y-m-d');
+            $turnoId = $ejecucion->turno_id;
+
+            $grouped[$date][$turnoId] = $ejecucion;
+        }
+
+        return $this->ejecucionesByDateAndTurnoCache = $grouped;
     }
 
     public function getShiftColors(): array

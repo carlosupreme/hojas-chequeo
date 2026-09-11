@@ -14,6 +14,7 @@ use App\Models\Perfil;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class EditHojaChequeoTest extends TestCase
@@ -36,7 +37,7 @@ class EditHojaChequeoTest extends TestCase
 
         $perfil = Perfil::factory()->accesoTotal()->create();
         $this->user = User::factory()->create(['perfil_id' => $perfil->id, 'turno_id' => null]);
-        $this->user->assignRole(\Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Administrador', 'guard_name' => 'web']));
+        $this->user->assignRole(Role::firstOrCreate(['name' => 'Administrador', 'guard_name' => 'web']));
 
         $this->hoja = HojaChequeo::factory()
             ->for(Equipo::factory())

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\DatabaseBackupService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -13,7 +14,7 @@ class DatabaseBackupController extends Controller
     /**
      * Generate and download a compressed database backup.
      */
-    public function download(Request $request, DatabaseBackupService $backupService): BinaryFileResponse|\Illuminate\Http\RedirectResponse
+    public function download(Request $request, DatabaseBackupService $backupService): BinaryFileResponse|RedirectResponse
     {
         $user = Auth::user();
         if (! $user || ! $user->hasRole('Administrador')) {

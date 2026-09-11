@@ -74,7 +74,22 @@ class AnalisisHojaChequeo extends Component
             ? HojaChequeo::select('id', 'equipo_id')->find($this->hojaChequeoId)
             : null;
 
-        $centrosCosto = CentroCosto::with(['turnos.equipos', 'offDays'])->get();
+        $centrosCosto = CentroCosto::with(['turnos.equipos.hojaChequeos', 'offDays'])->get();
+
+        $ejecucionesAgrupadas = HojaEjecucion::query()
+            ->whereBetween('finalizado_en', [$startDate, $endDate])
+            ->whereNotNull('finalizado_en')
+            ->when($selectedHojaChequeo, fn ($q) => $q->where('hoja_chequeo_id', $selectedHojaChequeo->id))
+            ->select('hoja_chequeo_id', 'turno_id', DB::raw('DATE(finalizado_en) as fecha_str'))
+            ->distinct()
+            ->get();
+
+        $ejecucionesPorTurnoYHoja = [];
+        foreach ($ejecucionesAgrupadas as $row) {
+            $fecha = is_string($row->fecha_str) ? substr($row->fecha_str, 0, 10) : Carbon::parse($row->fecha_str)->format('Y-m-d');
+            $ejecucionesPorTurnoYHoja[$row->turno_id][$row->hoja_chequeo_id][$fecha] = true;
+        }
+
         $result = [];
 
         foreach ($centrosCosto as $cc) {
@@ -133,10 +148,12 @@ class AnalisisHojaChequeo extends Component
 
                 $totalExpected += $expected;
 
+                $validWorkingDatesLookup = array_flip($validWorkingDates);
+
                 // Per-equipo breakdown: count distinct valid working dates with a finished ejecución
                 $equiposBreakdown = [];
                 foreach ($equipos as $equipo) {
-                    $hojaChequeoIds = $equipo->hojaChequeos()->pluck('id');
+                    $hojaChequeoIds = $equipo->hojaChequeos->pluck('id');
 
                     if ($selectedHojaChequeo) {
                         $hojaChequeoIds = $hojaChequeoIds->intersect([$selectedHojaChequeo->id])->values();
@@ -153,15 +170,16 @@ class AnalisisHojaChequeo extends Component
                         continue;
                     }
 
-                    $ejecQuery = HojaEjecucion::whereIn('hoja_chequeo_id', $hojaChequeoIds)
-                        ->where('turno_id', $turno->id)
-                        ->whereNotNull('finalizado_en')
-                        ->whereBetween('finalizado_en', [$startDate, $endDate])
-                        ->whereIn(DB::raw('DATE(finalizado_en)'), $validWorkingDates);
+                    $datesWithExecution = [];
+                    foreach ($hojaChequeoIds as $hcId) {
+                        if (isset($ejecucionesPorTurnoYHoja[$turno->id][$hcId])) {
+                            foreach ($ejecucionesPorTurnoYHoja[$turno->id][$hcId] as $d => $_) {
+                                $datesWithExecution[$d] = true;
+                            }
+                        }
+                    }
 
-                    $diasRevisados = (clone $ejecQuery)
-                        ->selectRaw('COUNT(DISTINCT DATE(finalizado_en)) as total')
-                        ->value('total') ?? 0;
+                    $diasRevisados = count(array_intersect_key($datesWithExecution, $validWorkingDatesLookup));
 
                     $actual += $diasRevisados;
 
@@ -324,7 +342,7 @@ class AnalisisHojaChequeo extends Component
                     'presion' => $presionAvg,
                 ],
                 'tarjetones_count' => $tarjetonesCount,
-                'sin_falla_vapor'  => $sinFallaVapor,
+                'sin_falla_vapor' => $sinFallaVapor,
             ];
         }
 
@@ -337,45 +355,34 @@ class AnalisisHojaChequeo extends Component
     public function getTurnoCompletionStatsProperty()
     {
         $turnos = Turno::where('activo', true)->orderBy('id')->get();
+        $startDate = Carbon::parse($this->startDate)->startOfDay();
+        $endDate = Carbon::parse($this->endDate)->endOfDay();
+        $turnoIds = $turnos->pluck('id');
+
+        $respuestasByTurnoAndOption = DB::table('hoja_fila_respuestas as hfr')
+            ->join('hoja_ejecucions as he', 'hfr.hoja_ejecucion_id', '=', 'he.id')
+            ->whereIn('he.turno_id', $turnoIds)
+            ->whereNotNull('he.finalizado_en')
+            ->whereBetween('he.finalizado_en', [$startDate, $endDate])
+            ->whereNotNull('hfr.answer_option_id')
+            ->when($this->hojaChequeoId, fn ($q) => $q->where('he.hoja_chequeo_id', $this->hojaChequeoId))
+            ->select('he.turno_id', 'hfr.answer_option_id', DB::raw('COUNT(*) as total'))
+            ->groupBy('he.turno_id', 'hfr.answer_option_id')
+            ->get();
+
+        $optionCounts = [];
+        foreach ($respuestasByTurnoAndOption as $row) {
+            $optionCounts[$row->turno_id][$row->answer_option_id] = (int) $row->total;
+        }
 
         $labels = [];
         $percentages = [];
         $colors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
-        foreach ($turnos as $index => $turno) {
-            // Build base query for HojaEjecucion
-            $ejecucionQuery = HojaEjecucion::where('turno_id', $turno->id)
-                ->whereNotNull('finalizado_en')
-                ->whereBetween('finalizado_en', [
-                    Carbon::parse($this->startDate)->startOfDay(),
-                    Carbon::parse($this->endDate)->endOfDay(),
-                ]);
-
-            // if*$this->conDFiasFEstivos ->except(turno->diasFestivos->whereIn('year', $this->yearsSelected))
-
-            // Filter by HojaChequeo if specified
-            if ($this->hojaChequeoId) {
-                $ejecucionQuery->where('hoja_chequeo_id', $this->hojaChequeoId);
-            }
-
-            $ejecucionIds = $ejecucionQuery->pluck('id');
-
-            if ($ejecucionIds->isEmpty()) {
-                $labels[] = $turno->nombre;
-                $percentages[] = 0;
-
-                continue;
-            }
-
-            // Total responses with answer_option_id (icon type answers)
-            $totalResponses = HojaFilaRespuesta::whereIn('hoja_ejecucion_id', $ejecucionIds)
-                ->whereNotNull('answer_option_id') // where hojaFila->answerType->is_icon
-                ->count();
-
-            // Responses with answer_option_id = 1 (realizado/check)
-            $realizadoResponses = HojaFilaRespuesta::whereIn('hoja_ejecucion_id', $ejecucionIds)
-                ->where('answer_option_id', 1)
-                ->count();
+        foreach ($turnos as $turno) {
+            $respuestasByOption = $optionCounts[$turno->id] ?? [];
+            $totalResponses = array_sum($respuestasByOption);
+            $realizadoResponses = $respuestasByOption[1] ?? 0;
 
             $percentage = $totalResponses > 0 ? round(($realizadoResponses / $totalResponses) * 100, 1) : 0;
 
@@ -415,24 +422,24 @@ class AnalisisHojaChequeo extends Component
     public function getTurnoEjecucionCountProperty()
     {
         $turnos = Turno::where('activo', true)->orderBy('id')->get();
+        $startDate = Carbon::parse($this->startDate)->startOfDay();
+        $endDate = Carbon::parse($this->endDate)->endOfDay();
+        $turnoIds = $turnos->pluck('id');
+
+        $countsByTurno = HojaEjecucion::whereIn('turno_id', $turnoIds)
+            ->whereNotNull('finalizado_en')
+            ->whereBetween('finalizado_en', [$startDate, $endDate])
+            ->when($this->hojaChequeoId, fn ($q) => $q->where('hoja_chequeo_id', $this->hojaChequeoId))
+            ->select('turno_id', DB::raw('COUNT(*) as total'))
+            ->groupBy('turno_id')
+            ->pluck('total', 'turno_id');
 
         $labels = [];
         $counts = [];
 
         foreach ($turnos as $turno) {
-            $query = HojaEjecucion::where('turno_id', $turno->id)
-                ->whereNotNull('finalizado_en')
-                ->whereBetween('finalizado_en', [
-                    Carbon::parse($this->startDate)->startOfDay(),
-                    Carbon::parse($this->endDate)->endOfDay(),
-                ]);
-
-            if ($this->hojaChequeoId) {
-                $query->where('hoja_chequeo_id', $this->hojaChequeoId);
-            }
-
             $labels[] = $turno->nombre;
-            $counts[] = $query->count();
+            $counts[] = (int) ($countsByTurno[$turno->id] ?? 0);
         }
 
         return [
@@ -447,22 +454,37 @@ class AnalisisHojaChequeo extends Component
     public function getTurnoDetailedStatsProperty()
     {
         $turnos = Turno::where('activo', true)->orderBy('id')->get();
+        $startDate = Carbon::parse($this->startDate)->startOfDay();
+        $endDate = Carbon::parse($this->endDate)->endOfDay();
+        $turnoIds = $turnos->pluck('id');
+
+        $ejecucionCounts = HojaEjecucion::whereIn('turno_id', $turnoIds)
+            ->whereNotNull('finalizado_en')
+            ->whereBetween('finalizado_en', [$startDate, $endDate])
+            ->when($this->hojaChequeoId, fn ($q) => $q->where('hoja_chequeo_id', $this->hojaChequeoId))
+            ->select('turno_id', DB::raw('COUNT(*) as total'))
+            ->groupBy('turno_id')
+            ->pluck('total', 'turno_id');
+
+        $respuestasByTurnoAndOption = DB::table('hoja_fila_respuestas as hfr')
+            ->join('hoja_ejecucions as he', 'hfr.hoja_ejecucion_id', '=', 'he.id')
+            ->whereIn('he.turno_id', $turnoIds)
+            ->whereNotNull('he.finalizado_en')
+            ->whereBetween('he.finalizado_en', [$startDate, $endDate])
+            ->whereNotNull('hfr.answer_option_id')
+            ->when($this->hojaChequeoId, fn ($q) => $q->where('he.hoja_chequeo_id', $this->hojaChequeoId))
+            ->select('he.turno_id', 'hfr.answer_option_id', DB::raw('COUNT(*) as total'))
+            ->groupBy('he.turno_id', 'hfr.answer_option_id')
+            ->get();
+
+        $optionCounts = [];
+        foreach ($respuestasByTurnoAndOption as $row) {
+            $optionCounts[$row->turno_id][$row->answer_option_id] = (int) $row->total;
+        }
+
         $stats = [];
-
         foreach ($turnos as $turno) {
-            $ejecucionQuery = HojaEjecucion::where('turno_id', $turno->id)
-                ->whereNotNull('finalizado_en')
-                ->whereBetween('finalizado_en', [
-                    Carbon::parse($this->startDate)->startOfDay(),
-                    Carbon::parse($this->endDate)->endOfDay(),
-                ]);
-
-            if ($this->hojaChequeoId) {
-                $ejecucionQuery->where('hoja_chequeo_id', $this->hojaChequeoId);
-            }
-
-            $ejecucionIds = $ejecucionQuery->pluck('id');
-            $totalEjecuciones = $ejecucionIds->count();
+            $totalEjecuciones = (int) ($ejecucionCounts[$turno->id] ?? 0);
 
             if ($totalEjecuciones === 0) {
                 $stats[] = [
@@ -479,14 +501,7 @@ class AnalisisHojaChequeo extends Component
                 continue;
             }
 
-            // Count by answer_option_id
-            $respuestasByOption = HojaFilaRespuesta::whereIn('hoja_ejecucion_id', $ejecucionIds)
-                ->whereNotNull('answer_option_id')
-                ->select('answer_option_id', DB::raw('count(*) as total'))
-                ->groupBy('answer_option_id')
-                ->pluck('total', 'answer_option_id')
-                ->toArray();
-
+            $respuestasByOption = $optionCounts[$turno->id] ?? [];
             $totalRespuestas = array_sum($respuestasByOption);
             $realizados = $respuestasByOption[1] ?? 0;
 
@@ -514,7 +529,7 @@ class AnalisisHojaChequeo extends Component
 
         foreach ($this->cumplimientoPorCentroCosto as $cc) {
             $maxWorkingDays = 0;
-            $equipoMap      = [];
+            $equipoMap = [];
 
             foreach ($cc['turnos'] as $turno) {
                 if ($turno['working_days'] > $maxWorkingDays) {
@@ -530,15 +545,15 @@ class AnalisisHojaChequeo extends Component
             }
 
             $result[] = [
-                'nombre'         => $cc['centro_costo'],
+                'nombre' => $cc['centro_costo'],
                 'dias_operacion' => $maxWorkingDays,
-                'equipos'        => array_values(array_map(
+                'equipos' => array_values(array_map(
                     fn ($tag, $dias) => ['tag' => $tag, 'dias' => $dias],
                     array_keys($equipoMap),
                     array_values($equipoMap),
                 )),
-                'cumplimiento'   => $cc['percentage'],
-                'total_actual'   => $cc['total_actual'],
+                'cumplimiento' => $cc['percentage'],
+                'total_actual' => $cc['total_actual'],
                 'total_expected' => $cc['total_expected'],
             ];
         }

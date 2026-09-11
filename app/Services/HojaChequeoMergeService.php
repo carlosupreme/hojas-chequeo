@@ -7,6 +7,7 @@ use App\Models\HojaColumna;
 use App\Models\HojaEjecucion;
 use App\Models\HojaFila;
 use App\Models\HojaFilaRespuesta;
+use App\Models\HojaFilaValor;
 use App\Models\Perfil;
 use Illuminate\Support\Facades\DB;
 
@@ -67,7 +68,7 @@ class HojaChequeoMergeService
                 // Create HojaFilaValors for included columns
                 foreach ($rowData['valores'] ?? [] as $colKey => $valor) {
                     if (isset($newColumnasByKey[$colKey]) && $valor !== null && $valor !== '') {
-                        \App\Models\HojaFilaValor::create([
+                        HojaFilaValor::create([
                             'hoja_fila_id' => $newFila->id,
                             'hoja_columna_id' => $newColumnasByKey[$colKey]->id,
                             'valor' => $valor,

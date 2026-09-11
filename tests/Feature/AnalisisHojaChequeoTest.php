@@ -13,6 +13,7 @@ use App\Models\Turno;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class AnalisisHojaChequeoTest extends TestCase
@@ -26,7 +27,7 @@ class AnalisisHojaChequeoTest extends TestCase
         parent::setUp();
 
         $perfil = Perfil::factory()->accesoTotal()->create();
-        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Administrador', 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'Administrador', 'guard_name' => 'web']);
         $this->user = User::factory()->create([
             'perfil_id' => $perfil->id,
             'turno_id' => null,

@@ -120,7 +120,7 @@ class BitacoraReporte extends Page
             fn (Tarjeton $t) => $t->hora_encendido?->format('Y-m-d') ?? 'sin-fecha'
         );
 
-        $pdf = PDF::loadView('bitacora-reporte-pdf', [
+        $pdf = Pdf::loadView('bitacora-reporte-pdf', [
             'registros' => $this->registros,
             'registrosPorDia' => $registrosPorDia,
             'equipo' => $this->equipo,

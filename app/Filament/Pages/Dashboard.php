@@ -2,6 +2,11 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\RecorridosEstadoChart;
+use App\Filament\Widgets\ReportesChart;
+use App\Filament\Widgets\StatsOverview;
+use App\Filament\Widgets\TopUsersWidget;
+use App\Filament\Widgets\TurnoEjecucionesChart;
 use BackedEnum;
 use Filament\Forms\Components\DatePicker;
 use Filament\Pages\Dashboard as BaseDashboard;
@@ -46,11 +51,11 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
-            \App\Filament\Widgets\StatsOverview::class,
-            \App\Filament\Widgets\TopUsersWidget::class,
-            \App\Filament\Widgets\RecorridosEstadoChart::class,
-            \App\Filament\Widgets\TurnoEjecucionesChart::class,
-            \App\Filament\Widgets\ReportesChart::class,
+            StatsOverview::class,
+            TopUsersWidget::class,
+            RecorridosEstadoChart::class,
+            TurnoEjecucionesChart::class,
+            ReportesChart::class,
         ];
     }
 

@@ -7,6 +7,7 @@ use App\Models\HojaChequeo;
 use App\Models\HojaEjecucion;
 use App\Models\HojaFilaRespuesta;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -21,6 +22,8 @@ class ChequeoItems extends Component
     public $hojaId;
 
     public $filas;
+
+    public array $filaTypes = [];
 
     public bool $readOnly = false;
 
@@ -42,6 +45,7 @@ class ChequeoItems extends Component
         ]);
 
         $this->filas = $hoja->filas;
+        $this->filaTypes = $hoja->filas->pluck('answerType.key', 'id')->toArray();
 
         $existingResponses = $ejecucion
             ? $ejecucion->respuestas()->get()->keyBy('hoja_fila_id')
@@ -94,44 +98,45 @@ class ChequeoItems extends Component
     #[On('hoja-ejecucion-saved')]
     public function save(int $hojaEjecucionId, ?string $forcedFinalizadoEn = null): void
     {
-        foreach (array_keys($this->form) as $filaId) {
-            $fila = $this->filas->find($filaId);
-            $type = $fila->answerType?->key;
-            $value = $this->form[$filaId];
+        DB::transaction(function () use ($hojaEjecucionId, $forcedFinalizadoEn) {
+            foreach (array_keys($this->form) as $filaId) {
+                $type = $this->filaTypes[$filaId] ?? $this->filas?->find($filaId)?->answerType?->key;
+                $value = $this->form[$filaId];
 
-            // Skip nulls — real-time saves already persisted these values.
-            // Overwriting with null would corrupt the autosaved state.
-            if ($value === null) {
-                continue;
+                // Skip nulls — real-time saves already persisted these values.
+                // Overwriting with null would corrupt the autosaved state.
+                if ($value === null) {
+                    continue;
+                }
+
+                HojaFilaRespuesta::updateOrCreate([
+                    'hoja_ejecucion_id' => $hojaEjecucionId,
+                    'hoja_fila_id' => $filaId,
+                ], [
+                    'answer_option_id' => $type === 'icon_set' ? $value : null,
+                    'numeric_value' => $type === 'number' && is_numeric($value) ? floatval($value) : null,
+                    'text_value' => $type === 'text' ? $value : null,
+                    'boolean_value' => $type === 'boolean' ? (bool) $value : null,
+                ]);
             }
 
-            HojaFilaRespuesta::updateOrCreate([
-                'hoja_ejecucion_id' => $hojaEjecucionId,
-                'hoja_fila_id' => $filaId,
-            ], [
-                'answer_option_id' => $type === 'icon_set' ? $value : null,
-                'numeric_value' => $type === 'number' && is_numeric($value) ? floatval($value) : null,
-                'text_value' => $type === 'text' ? $value : null,
-                'boolean_value' => $type === 'boolean' ? (bool) $value : null,
-            ]);
-        }
+            // Use the DB as source of truth — $this->form can have stale nulls
+            // for wire:model.blur inputs that weren't synced before submit.
+            $totalFilas = count($this->items);
+            $answeredCount = HojaFilaRespuesta::where('hoja_ejecucion_id', $hojaEjecucionId)
+                ->where(function ($q) {
+                    $q->whereNotNull('answer_option_id')
+                        ->orWhereNotNull('numeric_value')
+                        ->orWhereNotNull('text_value')
+                        ->orWhereNotNull('boolean_value');
+                })
+                ->count();
 
-        // Use the DB as source of truth — $this->form can have stale nulls
-        // for wire:model.blur inputs that weren't synced before submit.
-        $totalFilas = $this->filas->count();
-        $answeredCount = HojaFilaRespuesta::where('hoja_ejecucion_id', $hojaEjecucionId)
-            ->where(function ($q) {
-                $q->whereNotNull('answer_option_id')
-                    ->orWhereNotNull('numeric_value')
-                    ->orWhereNotNull('text_value')
-                    ->orWhereNotNull('boolean_value');
-            })
-            ->count();
-
-        if ($totalFilas > 0 && $answeredCount >= $totalFilas) {
-            $finalizadoEn = $forcedFinalizadoEn ? Carbon::parse($forcedFinalizadoEn) : now();
-            HojaEjecucion::find($hojaEjecucionId)->update(['finalizado_en' => $finalizadoEn]);
-        }
+            if ($totalFilas > 0 && $answeredCount >= $totalFilas) {
+                $finalizadoEn = $forcedFinalizadoEn ? Carbon::parse($forcedFinalizadoEn) : now();
+                HojaEjecucion::where('id', $hojaEjecucionId)->update(['finalizado_en' => $finalizadoEn]);
+            }
+        });
 
         $this->dispatch('hoja-fila-respuesta-items-created');
     }
@@ -168,9 +173,11 @@ class ChequeoItems extends Component
         $this->dispatch('progress-updated', answered: $this->answeredCount, total: $this->totalCount);
 
         if ($this->ejecucionId) {
-            foreach ($this->items as $fila) {
-                $this->saveFilaRespuesta($this->ejecucionId, $fila['id'], $this->form[$fila['id']]);
-            }
+            DB::transaction(function () {
+                foreach ($this->items as $fila) {
+                    $this->saveFilaRespuesta($this->ejecucionId, $fila['id'], $this->form[$fila['id']]);
+                }
+            });
         }
     }
 
@@ -206,12 +213,7 @@ class ChequeoItems extends Component
 
     private function saveFilaRespuesta(int $ejecucionId, int $filaId, mixed $value): void
     {
-        $fila = $this->filas->find($filaId);
-        if (! $fila) {
-            return;
-        }
-
-        $type = $fila->answerType?->key;
+        $type = $this->filaTypes[$filaId] ?? $this->filas?->find($filaId)?->answerType?->key;
 
         HojaFilaRespuesta::updateOrCreate(
             [

@@ -15,7 +15,9 @@ use App\Models\Perfil;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class ChequeoItemsTest extends TestCase
@@ -32,7 +34,7 @@ class ChequeoItemsTest extends TestCase
 
         $perfil = Perfil::factory()->accesoTotal()->create();
         $this->user = User::factory()->create(['perfil_id' => $perfil->id, 'turno_id' => null]);
-        $this->user->assignRole(\Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Operador', 'guard_name' => 'web']));
+        $this->user->assignRole(Role::firstOrCreate(['name' => 'Operador', 'guard_name' => 'web']));
 
         $this->hoja = HojaChequeo::factory()
             ->for(Equipo::factory())
@@ -42,7 +44,7 @@ class ChequeoItemsTest extends TestCase
         HojaColumna::factory()->create(['hoja_chequeo_id' => $this->hoja->id]);
 
         // HojaEjecucionObserver queries this role when finalizado_en is set
-        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'Administrador', 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'Administrador', 'guard_name' => 'web']);
     }
 
     // -------------------------------------------------------------------------
@@ -59,7 +61,7 @@ class ChequeoItemsTest extends TestCase
         ]);
     }
 
-    private function mountFresh(?HojaEjecucion $ejecucion = null): \Livewire\Features\SupportTesting\Testable
+    private function mountFresh(?HojaEjecucion $ejecucion = null): Testable
     {
         return Livewire::test(ChequeoItems::class, [
             'hoja' => $this->hoja,
@@ -222,7 +224,7 @@ class ChequeoItemsTest extends TestCase
         $ejecucion = HojaEjecucion::factory()->create(['hoja_chequeo_id' => $this->hoja->id, 'user_id' => $this->user->id]);
 
         // Seed an existing response
-        \App\Models\HojaFilaRespuesta::create([
+        HojaFilaRespuesta::create([
             'hoja_ejecucion_id' => $ejecucion->id,
             'hoja_fila_id' => $fila->id,
             'numeric_value' => 77,

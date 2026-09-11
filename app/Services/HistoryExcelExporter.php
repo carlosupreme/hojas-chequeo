@@ -8,7 +8,10 @@ use App\Models\Turno;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class HistoryExcelExporter
@@ -68,7 +71,7 @@ class HistoryExcelExporter
             $borderStyle = [
                 'borders' => [
                     'allBorders' => [
-                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                        'borderStyle' => Border::BORDER_THIN,
                     ],
                 ],
             ];
@@ -77,7 +80,7 @@ class HistoryExcelExporter
                 'font' => ['bold' => true],
                 'borders' => [
                     'allBorders' => [
-                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                        'borderStyle' => Border::BORDER_THIN,
                     ],
                 ],
             ];
@@ -148,14 +151,14 @@ class HistoryExcelExporter
                         if ($respuesta->answer_option_id && $respuesta->answerOption) {
                             $icon = $respuesta->answerOption->icon ?? null;
                             $mapped = $icon ? ($iconMap[$icon] ?? 3) : 3;
-                            $sheet->setCellValueExplicit($cell, $mapped, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
+                            $sheet->setCellValueExplicit($cell, $mapped, DataType::TYPE_NUMERIC);
                         } elseif ($respuesta->numeric_value !== null) {
-                            $sheet->setCellValueExplicit($cell, $respuesta->numeric_value, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
+                            $sheet->setCellValueExplicit($cell, $respuesta->numeric_value, DataType::TYPE_NUMERIC);
                         } elseif ($respuesta->text_value) {
                             $sheet->setCellValue($cell, $respuesta->text_value);
                         } elseif ($respuesta->boolean_value !== null) {
                             // store as 1/0 for easier aggregation
-                            $sheet->setCellValueExplicit($cell, $respuesta->boolean_value ? 1 : 0, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
+                            $sheet->setCellValueExplicit($cell, $respuesta->boolean_value ? 1 : 0, DataType::TYPE_NUMERIC);
                         }
                     }
 
@@ -239,7 +242,7 @@ class HistoryExcelExporter
         $fileName = 'historial-'.$record->equipo->tag.'_'.$turnoName.'-'.now()->format('Y-m-d').'.xlsx';
 
         return response()->streamDownload(function () use ($spreadsheet) {
-            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+            $writer = new Xlsx($spreadsheet);
             $writer->save('php://output');
         }, $fileName, [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

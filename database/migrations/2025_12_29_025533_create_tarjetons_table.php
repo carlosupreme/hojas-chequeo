@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Equipo;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('tarjetons', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\Equipo::class);
+            $table->foreignIdFor(Equipo::class);
             $table->date('fecha');
             $table->string('hora_encendido')->nullable();
             $table->string('hora_apagado')->nullable();

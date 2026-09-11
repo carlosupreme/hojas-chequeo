@@ -9,6 +9,7 @@ use App\Filament\Resources\Chequeos\ChequeosResource;
 use App\Filament\Resources\Recorridos\RecorridoResource;
 use App\Filament\Resources\Reportes\ReporteResource;
 use App\Filament\Resources\Tarjetons\TarjetonResource;
+use Filament\FontProviders\LocalFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -38,7 +39,7 @@ class OperadorPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
-            ->font('Inter Variable', provider: \Filament\FontProviders\LocalFontProvider::class, url: '/css/inter.css')
+            ->font('Inter Variable', provider: LocalFontProvider::class, url: '/css/inter.css')
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->renderHook(
                 PanelsRenderHook::HEAD_END,

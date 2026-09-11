@@ -29,6 +29,14 @@ class HojaChequeosTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query) => $query
+                ->with('equipo')
+                ->select('hoja_chequeos.*')
+                ->selectSub(
+                    'SELECT COUNT(*) FROM hoja_chequeos hc WHERE hc.equipo_id = hoja_chequeos.equipo_id',
+                    'versiones_count'
+                )
+            )
             ->columns([
                 TextColumn::make('equipo.tag')
                     ->label('Tag Equipo')
@@ -195,7 +203,7 @@ class HojaChequeosTable
                 Action::make('Versiones')
                     ->url(fn (HojaChequeo $record): string => HojaChequeoResource::getUrl('versions', ['record' => $record]))
                     ->icon('heroicon-o-document-duplicate')
-                    ->visible(fn (HojaChequeo $record): bool => auth()->user()?->isAdmin() && HojaChequeo::where('equipo_id', $record->equipo_id)->count() > 1),
+                    ->visible(fn (HojaChequeo $record): bool => auth()->user()?->isAdmin() && (int) ($record->versiones_count ?? HojaChequeo::where('equipo_id', $record->equipo_id)->count()) > 1),
                 Action::make('Historial')
                     ->url(fn (HojaChequeo $record): string => HojaChequeoResource::getUrl('history', ['record' => $record]))
                     ->icon('heroicon-o-calendar'),

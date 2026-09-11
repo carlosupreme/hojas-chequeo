@@ -13,6 +13,7 @@ use App\Models\Turno;
 use App\Models\User;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use Illuminate\Support\Collection;
 use Livewire\Component;
 
 class AnalisisTombolas extends Component
@@ -63,7 +64,7 @@ class AnalisisTombolas extends Component
 
     public function getCentrosCostoProperty()
     {
-        return \App\Models\CentroCosto::orderBy('nombre')->get(['id', 'nombre']);
+        return CentroCosto::orderBy('nombre')->get(['id', 'nombre']);
     }
 
     // -------------------------------------------------------------------------
@@ -133,7 +134,7 @@ class AnalisisTombolas extends Component
     // Breakdown by equipo
     // -------------------------------------------------------------------------
 
-    public function getByEquipoProperty(): \Illuminate\Support\Collection
+    public function getByEquipoProperty(): Collection
     {
         $days = max(1, Carbon::parse($this->startDate)->diffInDays(Carbon::parse($this->endDate)) + 1);
 
@@ -162,7 +163,7 @@ class AnalisisTombolas extends Component
     // Breakdown by centro de costo
     // -------------------------------------------------------------------------
 
-    public function getByCentroCostoProperty(): \Illuminate\Support\Collection
+    public function getByCentroCostoProperty(): Collection
     {
         $days = max(1, Carbon::parse($this->startDate)->diffInDays(Carbon::parse($this->endDate)) + 1);
 
@@ -176,7 +177,7 @@ class AnalisisTombolas extends Component
 
         return $rows->map(function ($row) use ($days, $grandTotal) {
             return [
-                'nombre' => \App\Models\CentroCosto::find($row->centro_costo_id)?->nombre ?? 'Sin centro',
+                'nombre' => CentroCosto::find($row->centro_costo_id)?->nombre ?? 'Sin centro',
                 'total' => $row->total,
                 'avg' => round($row->total / $days, 1),
                 'pct' => $grandTotal > 0 ? round(($row->total / $grandTotal) * 100) : 0,
@@ -188,7 +189,7 @@ class AnalisisTombolas extends Component
     // Breakdown by operator
     // -------------------------------------------------------------------------
 
-    public function getByUserProperty(): \Illuminate\Support\Collection
+    public function getByUserProperty(): Collection
     {
         $rows = (clone $this->baseQuery())
             ->selectRaw('user_id, count(*) as total')
@@ -245,17 +246,17 @@ class AnalisisTombolas extends Component
     public function getHorasPorEquipoProperty(): array
     {
         $startDate = Carbon::parse($this->startDate)->startOfDay();
-        $endDate   = Carbon::parse($this->endDate)->endOfDay();
+        $endDate = Carbon::parse($this->endDate)->endOfDay();
 
         $equipos = Equipo::tombolas()->orderBy('tag')->get();
-        $stats   = [];
+        $stats = [];
 
         foreach ($equipos as $equipo) {
             $hojaChequeo = HojaChequeo::where('equipo_id', $equipo->id)->latest()->first();
 
             $totalHoras = 0;
-            $avgHoras   = 0;
-            $count      = 0;
+            $avgHoras = 0;
+            $count = 0;
 
             if ($hojaChequeo) {
                 $ejecucionIds = HojaEjecucion::where('hoja_chequeo_id', $hojaChequeo->id)
@@ -274,19 +275,19 @@ class AnalisisTombolas extends Component
                             ->whereNotNull('numeric_value')
                             ->pluck('numeric_value');
 
-                        $count      = $valores->count();
+                        $count = $valores->count();
                         $totalHoras = round($valores->sum(), 1);
-                        $avgHoras   = $count > 0 ? round($totalHoras / $count, 1) : 0;
+                        $avgHoras = $count > 0 ? round($totalHoras / $count, 1) : 0;
                     }
                 }
             }
 
             $stats[] = [
-                'tag'         => $equipo->tag,
-                'nombre'      => $equipo->nombre,
+                'tag' => $equipo->tag,
+                'nombre' => $equipo->nombre,
                 'total_horas' => $totalHoras,
-                'avg_horas'   => $avgHoras,
-                'sesiones'    => $count,
+                'avg_horas' => $avgHoras,
+                'sesiones' => $count,
             ];
         }
 
@@ -302,7 +303,7 @@ class AnalisisTombolas extends Component
     public function getHorasPorDiaTurnoProperty(): array
     {
         $startDate = Carbon::parse($this->startDate)->startOfDay();
-        $endDate   = Carbon::parse($this->endDate)->endOfDay();
+        $endDate = Carbon::parse($this->endDate)->endOfDay();
 
         $turnos = Turno::where('activo', true)->orderBy('id')->get();
 
@@ -329,9 +330,9 @@ class AnalisisTombolas extends Component
                 ->pluck('id');
 
             $turnoFilaMap[$turno->id] = [
-                'turno'            => $turno,
+                'turno' => $turno,
                 'hoja_chequeo_ids' => $hojaChequeoIds,
-                'fila_ids'         => $filaIds,
+                'fila_ids' => $filaIds,
             ];
         }
 
@@ -341,11 +342,11 @@ class AnalisisTombolas extends Component
 
         // Build day rows
         $period = CarbonPeriod::create($startDate->copy()->startOfDay(), $endDate->copy()->startOfDay());
-        $days   = [];
+        $days = [];
 
         foreach ($period as $day) {
             $dayStart = $day->copy()->startOfDay();
-            $dayEnd   = $day->copy()->endOfDay();
+            $dayEnd = $day->copy()->endOfDay();
             $turnoData = [];
 
             foreach ($turnoFilaMap as $turnoId => $meta) {
@@ -369,14 +370,14 @@ class AnalisisTombolas extends Component
             }
 
             $days[] = [
-                'day'        => $day->day,
-                'date'       => $day->format('Y-m-d'),
+                'day' => $day->day,
+                'date' => $day->format('Y-m-d'),
                 'turno_data' => $turnoData,
             ];
         }
 
         $turnosList = collect($turnoFilaMap)->map(fn ($meta) => [
-            'id'     => $meta['turno']->id,
+            'id' => $meta['turno']->id,
             'nombre' => $meta['turno']->nombre,
         ])->values()->toArray();
 
@@ -390,12 +391,12 @@ class AnalisisTombolas extends Component
     public function getMatrizHorasProperty(): array
     {
         $startDate = Carbon::parse($this->startDate)->startOfDay();
-        $endDate   = Carbon::parse($this->endDate)->endOfDay();
+        $endDate = Carbon::parse($this->endDate)->endOfDay();
 
         $period = CarbonPeriod::create($startDate->copy(), $endDate->copy()->startOfDay());
-        $days   = collect($period)->map(fn ($d) => ['day' => $d->day, 'date' => $d->format('Y-m-d')]);
+        $days = collect($period)->map(fn ($d) => ['day' => $d->day, 'date' => $d->format('Y-m-d')]);
 
-        $turnoTId  = Turno::where('nombre', 'like', '%Tintoreria%')->value('id');
+        $turnoTId = Turno::where('nombre', 'like', '%Tintoreria%')->value('id');
         $turnoLIds = Turno::where('nombre', 'like', '%Lavanderia%')->pluck('id');
         $allTurnoIds = collect([$turnoTId])->merge($turnoLIds)->filter()->unique()->values();
 
@@ -460,17 +461,17 @@ class AnalisisTombolas extends Component
             $total = $sumaT + $sumaL;
 
             $rows[] = [
-                'tag'      => $equipo->tag,
-                'data'     => $data,
-                'suma_T'   => $sumaT,
-                'suma_L'   => $sumaL,
-                'suma'     => $total,
+                'tag' => $equipo->tag,
+                'data' => $data,
+                'suma_T' => $sumaT,
+                'suma_L' => $sumaL,
+                'suma' => $total,
                 'promedio' => $days->count() > 0 ? round($total / max(1, $days->count() * 2), 1) : 0,
             ];
         }
 
         $numEquipos = max(1, count($rows));
-        $avgPerDay  = [];
+        $avgPerDay = [];
         foreach ($sumPerDay as $date => $vals) {
             $avgPerDay[$date] = [
                 'T' => round($vals['T'] / $numEquipos, 0),
@@ -481,12 +482,12 @@ class AnalisisTombolas extends Component
         $grandTotal = array_sum(array_column($rows, 'suma'));
 
         return [
-            'days'        => $days->toArray(),
-            'rows'        => $rows,
+            'days' => $days->toArray(),
+            'rows' => $rows,
             'sum_per_day' => $sumPerDay,
             'avg_per_day' => $avgPerDay,
-            'suma'        => $grandTotal,
-            'promedio'    => $days->count() > 0 ? round($grandTotal / max(1, $days->count() * 2), 1) : 0,
+            'suma' => $grandTotal,
+            'promedio' => $days->count() > 0 ? round($grandTotal / max(1, $days->count() * 2), 1) : 0,
         ];
     }
 

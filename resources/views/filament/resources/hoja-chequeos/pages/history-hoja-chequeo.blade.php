@@ -7,8 +7,8 @@
     $shiftColors = $this->getShiftColors();
     $filaAggregates = $this->getFilaAggregates(); // SQL aggregation instead of runtime calculation
 
-    $filas = $record->filas()->with('answerType')->get();
-    $columnas = $record->columnas()->get();
+    $filas = $record->filas;
+    $columnas = $record->columnas;
 @endphp
 
 <x-filament-panels::page>

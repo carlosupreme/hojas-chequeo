@@ -25,7 +25,7 @@ class Tarjeton extends Model
     /**
      * Derive fecha from hora_encendido for backward compatibility.
      */
-    public function getFechaAttribute(): ?\Carbon\Carbon
+    public function getFechaAttribute(): ?Carbon
     {
         return $this->hora_encendido?->copy()->startOfDay();
     }
