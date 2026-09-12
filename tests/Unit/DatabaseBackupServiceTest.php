@@ -52,7 +52,7 @@ class DatabaseBackupServiceTest extends TestCase
     {
         $service = new class extends DatabaseBackupService
         {
-            public function test_zip(string $source, string $filename, string $target): void
+            public function callCreateZipArchive(string $source, string $filename, string $target): void
             {
                 $this->createZipArchive($source, $filename, $target);
             }
@@ -62,7 +62,7 @@ class DatabaseBackupServiceTest extends TestCase
         file_put_contents($dummySql, 'CREATE TABLE test (id INT);');
 
         $zipPath = $this->tempDir.DIRECTORY_SEPARATOR.'backup.zip';
-        $service->testZip($dummySql, 'dummy.sql', $zipPath);
+        $service->callCreateZipArchive($dummySql, 'dummy.sql', $zipPath);
 
         $this->assertFileExists($zipPath);
 
@@ -78,7 +78,7 @@ class DatabaseBackupServiceTest extends TestCase
     {
         $service = new class extends DatabaseBackupService
         {
-            public function test_tgz(string $dir, string $filename, string $target): void
+            public function callCreateTgzArchive(string $dir, string $filename, string $target): void
             {
                 $this->createTgzArchive($dir, $filename, $target);
             }
@@ -88,7 +88,7 @@ class DatabaseBackupServiceTest extends TestCase
         file_put_contents($dummySql, 'CREATE TABLE test_tgz (id INT);');
 
         $tgzPath = $this->tempDir.DIRECTORY_SEPARATOR.'backup.tgz';
-        $service->testTgz($this->tempDir, 'dummy.sql', $tgzPath);
+        $service->callCreateTgzArchive($this->tempDir, 'dummy.sql', $tgzPath);
 
         $this->assertFileExists($tgzPath);
         $this->assertGreaterThan(0, filesize($tgzPath));

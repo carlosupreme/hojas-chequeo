@@ -4,122 +4,6 @@
         {{-- ================================================================
              FINALIZAR MODAL
         ================================================================ --}}
-        <script>
-            (function () {
-                function getComponent() {
-                    return {
-                        open: false,
-                        openModal() {
-                            this.open = true;
-                            this.$dispatch('ax-modal-opened');
-                            this.syncSignature();
-                        },
-                        closeModal() {
-                            this.open = false;
-                        },
-                        syncSignature() {
-                            const resize = () => {
-                                const padEl = this.$el.querySelector('[x-data*="signaturePadFormComponent"]');
-                                if (!padEl || !window.Alpine) return false;
-                                const comp = Alpine.$data(padEl);
-                                if (!comp) return false;
-                                const canvas = comp.$refs?.canvas || padEl.querySelector('canvas');
-                                if (!canvas) return false;
-
-                                const offsetWidth = canvas.offsetWidth;
-                                const offsetHeight = canvas.offsetHeight;
-                                if (offsetWidth === 0 || offsetHeight === 0) return false;
-
-                                const ratio = Math.max(window.devicePixelRatio || 1, 1);
-                                const targetWidth = Math.round(offsetWidth * ratio);
-                                const targetHeight = Math.round(offsetHeight * ratio);
-
-                                if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
-                                    if (comp.signaturePad && !comp.signaturePad.isEmpty()) {
-                                        comp.done();
-                                    }
-                                    const savedState = comp.state;
-
-                                    canvas.width = targetWidth;
-                                    canvas.height = targetHeight;
-                                    const ctx = canvas.getContext('2d');
-                                    ctx.scale(ratio, ratio);
-
-                                    if (comp.signaturePad) {
-                                        comp.signaturePad.clear();
-                                        if (savedState) {
-                                            comp.signaturePad.fromDataURL(savedState);
-                                            comp.state = savedState;
-                                        }
-                                    }
-                                }
-                                return true;
-                            };
-
-                            this.$nextTick(() => {
-                                if (!resize()) {
-                                    setTimeout(resize, 60);
-                                    setTimeout(resize, 180);
-                                    setTimeout(resize, 350);
-                                } else {
-                                    setTimeout(resize, 220);
-                                }
-                            });
-                        },
-                        init() {
-                            this.$watch('open', (value) => {
-                                if (value) {
-                                    this.$dispatch('ax-modal-opened');
-                                    this.syncSignature();
-                                }
-                            });
-                            window.addEventListener('resize', () => {
-                                if (this.open) {
-                                    this.syncSignature();
-                                }
-                            });
-                        },
-                        submitForm() {
-                            const padEl = this.$el.querySelector('[x-data*="signaturePadFormComponent"]');
-                            if (padEl && window.Alpine) {
-                                const comp = Alpine.$data(padEl);
-                                if (comp && comp.signaturePad) {
-                                    if (comp.signaturePad.isEmpty()) {
-                                        comp.state = null;
-                                        this.$wire.set('data.firma_operador', null, false);
-                                    } else {
-                                        comp.done();
-                                        this.$wire.set('data.firma_operador', comp.state, false);
-                                    }
-                                }
-                            }
-
-                            const itemsEl = document.querySelector('[x-data*="chequeoClientComponent"]');
-                            let clientForm = {};
-                            if (itemsEl && window.Alpine) {
-                                const itemsComp = Alpine.$data(itemsEl);
-                                if (itemsComp && itemsComp.form) {
-                                    clientForm = itemsComp.form;
-                                }
-                            }
-
-                            this.$wire.create(clientForm);
-                        }
-                    };
-                }
-
-                window.finalizarModalComponent = getComponent;
-
-                if (window.Alpine) {
-                    Alpine.data('finalizarModalComponent', getComponent);
-                } else {
-                    document.addEventListener('alpine:init', () => {
-                        Alpine.data('finalizarModalComponent', getComponent);
-                    });
-                }
-            })();
-        </script>
-
         <div
             wire:ignore.self
             x-data="finalizarModalComponent()"
@@ -128,7 +12,7 @@
             @close-finalizar-modal.window="closeModal()"
         >
             <div
-                x-show="open"
+                x-show="isOpen"
                 x-transition:enter="transition ease-out duration-200"
                 x-transition:enter-start="opacity-0"
                 x-transition:enter-end="opacity-100"
@@ -141,7 +25,7 @@
             ></div>
 
             <div
-                x-show="open"
+                x-show="isOpen"
                 x-transition:enter="transition ease-out duration-200"
                 x-transition:enter-start="opacity-0 translate-y-4 scale-98"
                 x-transition:enter-end="opacity-100 translate-y-0 scale-100"

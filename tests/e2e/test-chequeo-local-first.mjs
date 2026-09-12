@@ -27,6 +27,18 @@ async function run() {
 
     const page = await context.newPage();
 
+    const browserErrors = [];
+    page.on('console', msg => {
+        if (msg.type() === 'error' || msg.text().includes('Alpine Expression Error')) {
+            console.error(`[BROWSER ERROR] ${msg.text()}`);
+            browserErrors.push(msg.text());
+        }
+    });
+    page.on('pageerror', err => {
+        console.error(`[PAGE UNCAUGHT ERROR] ${err}`);
+        browserErrors.push(String(err));
+    });
+
     try {
         // 1. Iniciar Sesión
         console.log('▶ [Paso 1] Iniciando sesión como Administrador...');
@@ -39,9 +51,15 @@ async function run() {
         ]);
         console.log(`  ✔ Sesión iniciada.`);
 
-        // 2. Abrir Chequeo Diario
-        console.log('\n▶ [Paso 2] Abriendo Chequeo Diario de Caldera 1 (/admin/create-chequeo?h=1)...');
-        await page.goto(`${BASE_URL}/admin/create-chequeo?h=1`, { waitUntil: 'networkidle' });
+        // 2. Abrir Selector y Seleccionar Hoja de Chequeo
+        console.log('\n▶ [Paso 2] Abriendo selector de hojas (/admin/create-chequeo) y seleccionando Caldera 1...');
+        await page.goto(`${BASE_URL}/admin/create-chequeo`, { waitUntil: 'networkidle' });
+        
+        const cardCaldera = page.locator('.snap-center [wire\\:click^="selectHojaChequeo"]').first();
+        await cardCaldera.waitFor({ state: 'visible', timeout: 5000 });
+        await cardCaldera.click();
+
+        await page.waitForSelector('[x-data*="chequeoClientComponent"]', { timeout: 10000 });
         await page.screenshot({ path: path.join(SCREENSHOT_DIR, '01-chequeo-loaded.png') });
 
         // Verificar que el equipo y tag están visibles
@@ -49,7 +67,7 @@ async function run() {
         if (!equipmentTitle) {
             throw new Error('No se visualizó la hoja de chequeo de Caldera 1.');
         }
-        console.log('  ✔ Hoja de chequeo cargada correctamente.');
+        console.log('  ✔ Hoja de chequeo seleccionada y cargada correctamente (sin errores de Alpine).');
 
         // 3. Verificar estructura DOM (Sin duplicación de inputs)
         const iconButtonsCount = await page.locator('.icon-btn').count();
@@ -138,11 +156,16 @@ async function run() {
             await page.screenshot({ path: path.join(SCREENSHOT_DIR, '04-view-chequeo-modal.png') });
         }
 
+        if (browserErrors.length > 0) {
+            throw new Error(`Se detectaron errores en el navegador durante la ejecución: \n${browserErrors.join('\n')}`);
+        }
+
         console.log('\n================================================================');
         console.log('🎉 PRUEBA E2E DE CHEQUEO LOCAL-FIRST Y VISUALIZACIÓN COMPLETADA CON ÉXITO');
         console.log('✔ Cero bloqueos con caídas de WiFi');
         console.log('✔ Persistencia local garantizada en localStorage');
         console.log('✔ Sincronización transparente en segundo plano a PostgreSQL');
+        console.log('✔ Cero errores de Alpine al seleccionar hoja de chequeo');
         console.log('✔ Visualización correcta de respuestas marcadas en modal Ver Detalle');
         console.log('================================================================\n');
 

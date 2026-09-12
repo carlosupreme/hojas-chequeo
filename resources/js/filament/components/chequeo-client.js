@@ -207,6 +207,116 @@ export function getChequeoComponent(config) {
 
 // Global registrations
 window.chequeoClientComponent = getChequeoComponent;
+window.finalizarModalComponent = getFinalizarModalComponent;
+
+export function getFinalizarModalComponent() {
+    return {
+        isOpen: false,
+        get open() { return this.isOpen; },
+        set open(v) { this.isOpen = v; },
+
+        openModal() {
+            this.isOpen = true;
+            this.$dispatch('ax-modal-opened');
+            this.syncSignature();
+        },
+
+        closeModal() {
+            this.isOpen = false;
+        },
+
+        syncSignature() {
+            const resize = () => {
+                const padEl = this.$el.querySelector('[x-data*="signaturePadFormComponent"]');
+                if (!padEl || !window.Alpine) return false;
+                const comp = Alpine.$data(padEl);
+                if (!comp) return false;
+                const canvas = comp.$refs?.canvas || padEl.querySelector('canvas');
+                if (!canvas) return false;
+
+                const offsetWidth = canvas.offsetWidth;
+                const offsetHeight = canvas.offsetHeight;
+                if (offsetWidth === 0 || offsetHeight === 0) return false;
+
+                const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                const targetWidth = Math.round(offsetWidth * ratio);
+                const targetHeight = Math.round(offsetHeight * ratio);
+
+                if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+                    if (comp.signaturePad && !comp.signaturePad.isEmpty()) {
+                        comp.done();
+                    }
+                    const savedState = comp.state;
+
+                    canvas.width = targetWidth;
+                    canvas.height = targetHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.scale(ratio, ratio);
+
+                    if (comp.signaturePad) {
+                        comp.signaturePad.clear();
+                        if (savedState) {
+                            comp.signaturePad.fromDataURL(savedState);
+                            comp.state = savedState;
+                        }
+                    }
+                }
+                return true;
+            };
+
+            this.$nextTick(() => {
+                if (!resize()) {
+                    setTimeout(resize, 60);
+                    setTimeout(resize, 180);
+                    setTimeout(resize, 350);
+                } else {
+                    setTimeout(resize, 220);
+                }
+            });
+        },
+
+        init() {
+            this.$watch('isOpen', (value) => {
+                if (value) {
+                    this.$dispatch('ax-modal-opened');
+                    this.syncSignature();
+                }
+            });
+            window.addEventListener('resize', () => {
+                if (this.isOpen) {
+                    this.syncSignature();
+                }
+            });
+        },
+
+        submitForm() {
+            const padEl = this.$el.querySelector('[x-data*="signaturePadFormComponent"]');
+            if (padEl && window.Alpine) {
+                const comp = Alpine.$data(padEl);
+                if (comp && comp.signaturePad) {
+                    if (comp.signaturePad.isEmpty()) {
+                        comp.state = null;
+                        this.$wire.set('data.firma_operador', null, false);
+                    } else {
+                        comp.done();
+                        this.$wire.set('data.firma_operador', comp.state, false);
+                    }
+                }
+            }
+
+            const itemsEl = document.querySelector('[x-data*="chequeoClientComponent"]');
+            let clientForm = {};
+            if (itemsEl && window.Alpine) {
+                const itemsComp = Alpine.$data(itemsEl);
+                if (itemsComp && itemsComp.form) {
+                    clientForm = itemsComp.form;
+                }
+            }
+
+            this.$wire.create(clientForm);
+        }
+    };
+}
 
 window.scrollModalToTop = function(el) {
     if (el) {
@@ -219,6 +329,7 @@ window.scrollModalToTop = function(el) {
 function registerAlpine() {
     if (typeof window !== 'undefined' && window.Alpine) {
         window.Alpine.data('chequeoClientComponent', getChequeoComponent);
+        window.Alpine.data('finalizarModalComponent', getFinalizarModalComponent);
     }
 }
 
