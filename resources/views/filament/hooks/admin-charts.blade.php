@@ -75,7 +75,7 @@ document.addEventListener('alpine:init', () => {
                 }
             };
 
-            this.chart = new ApexCharts(this.\$el, options);
+            this.chart = new ApexCharts(this.$el, options);
             this.chart.render();
         },
 
@@ -170,7 +170,7 @@ document.addEventListener('alpine:init', () => {
                 }
             };
 
-            this.chart = new ApexCharts(this.\$el, options);
+            this.chart = new ApexCharts(this.$el, options);
             this.chart.render();
         },
 
@@ -244,7 +244,7 @@ document.addEventListener('alpine:init', () => {
                 }
             };
 
-            this.chart = new ApexCharts(this.\$el, options);
+            this.chart = new ApexCharts(this.$el, options);
             this.chart.render();
         },
 
@@ -333,7 +333,7 @@ document.addEventListener('alpine:init', () => {
                 }
             };
 
-            this.chart = new ApexCharts(this.\$el, options);
+            this.chart = new ApexCharts(this.$el, options);
             this.chart.render();
         },
 
@@ -432,7 +432,7 @@ document.addEventListener('alpine:init', () => {
                 }
             };
 
-            this.chart = new ApexCharts(this.\$el, options);
+            this.chart = new ApexCharts(this.$el, options);
             this.chart.render();
         },
 
@@ -530,7 +530,7 @@ document.addEventListener('alpine:init', () => {
                 }
             };
 
-            this.chart = new ApexCharts(this.\$el, options);
+            this.chart = new ApexCharts(this.$el, options);
             this.chart.render();
         },
 
@@ -622,7 +622,7 @@ document.addEventListener('alpine:init', () => {
                 }
             };
 
-            this.chart = new ApexCharts(this.\$el, options);
+            this.chart = new ApexCharts(this.$el, options);
             this.chart.render();
         },
 
@@ -678,7 +678,7 @@ document.addEventListener('alpine:init', () => {
                 theme: { mode: isDark ? 'dark' : 'light' },
                 tooltip: { theme: isDark ? 'dark' : 'light' }
             };
-            this.chart = new ApexCharts(this.\$el, options);
+            this.chart = new ApexCharts(this.$el, options);
             this.chart.render();
         },
 
@@ -732,7 +732,7 @@ document.addEventListener('alpine:init', () => {
                 theme: { mode: isDark ? 'dark' : 'light' },
                 tooltip: { theme: isDark ? 'dark' : 'light' }
             };
-            this.chart = new ApexCharts(this.\$el, options);
+            this.chart = new ApexCharts(this.$el, options);
             this.chart.render();
         },
 

@@ -93,7 +93,17 @@
                                     }
                                 }
                             }
-                            this.$wire.create();
+
+                            const itemsEl = document.querySelector('[x-data*="chequeoClientComponent"]');
+                            let clientForm = {};
+                            if (itemsEl && window.Alpine) {
+                                const itemsComp = Alpine.$data(itemsEl);
+                                if (itemsComp && itemsComp.form) {
+                                    clientForm = itemsComp.form;
+                                }
+                            }
+
+                            this.$wire.create(clientForm);
                         }
                     };
                 }
@@ -233,20 +243,27 @@
                                 this.state = 'saved';
                                 setTimeout(() => this.state = 'idle', 2500);
                             });
+                            window.addEventListener('sync-status-changed', (e) => {
+                                this.state = e.detail?.status || 'idle';
+                            });
                         }
                      }" class="h-5 flex items-center shrink-0">
-                    <span x-show="state === 'saving'" x-transition class="text-xs text-blue-500 flex items-center gap-1.5">
+                    <span x-show="state === 'saving'" x-transition class="text-xs text-blue-500 flex items-center gap-1.5 font-medium">
                         <svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                         </svg>
                         Guardando…
                     </span>
-                    <span x-show="state === 'saved'" x-transition class="text-xs text-green-600 dark:text-green-400 flex items-center gap-1.5">
+                    <span x-show="state === 'saved'" x-transition class="text-xs text-green-600 dark:text-green-400 flex items-center gap-1.5 font-medium">
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                         </svg>
                         Guardado
+                    </span>
+                    <span x-show="state === 'offline'" x-transition class="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1.5 font-medium" title="Sin conexión WiFi. Respuestas guardadas en este equipo.">
+                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                        En dispositivo (Offline)
                     </span>
                 </div>
 
@@ -318,6 +335,10 @@
                     $wire.on('progress-updated', ({ answered, total }) => {
                         this.answered = answered;
                         this.total = total;
+                    });
+                    window.addEventListener('progress-updated-local', (e) => {
+                        this.answered = e.detail.answered;
+                        this.total = e.detail.total;
                     });
                     this._sync();
                     const s = document.querySelector('.fi-sidebar');

@@ -81,6 +81,7 @@ class ChequeoItems extends Component
             return [
                 'id' => $fila->id,
                 'type_key' => $fila->answerType?->key,
+                'value' => $initialValue,
                 'options' => $fila->answerType?->answerOptions->map(fn ($o) => [
                     'id' => $o->id,
                     'label' => $o->label,
@@ -96,8 +97,16 @@ class ChequeoItems extends Component
     }
 
     #[On('hoja-ejecucion-saved')]
-    public function save(int $hojaEjecucionId, ?string $forcedFinalizadoEn = null): void
+    public function save(int $hojaEjecucionId, ?string $forcedFinalizadoEn = null, array $clientForm = []): void
     {
+        if (! empty($clientForm)) {
+            foreach ($clientForm as $fId => $fVal) {
+                if ($fVal !== null && $fVal !== '') {
+                    $this->form[$fId] = $fVal;
+                }
+            }
+        }
+
         DB::transaction(function () use ($hojaEjecucionId, $forcedFinalizadoEn) {
             foreach (array_keys($this->form) as $filaId) {
                 $type = $this->filaTypes[$filaId] ?? $this->filas?->find($filaId)?->answerType?->key;
@@ -139,6 +148,66 @@ class ChequeoItems extends Component
         });
 
         $this->dispatch('hoja-fila-respuesta-items-created');
+    }
+
+    /**
+     * Synchronize a batch of answers from Alpine.js client in a single round-trip.
+     *
+     * @param  array<int|string, mixed>  $items
+     * @return array<string, mixed>
+     */
+    public function syncBatch(array $items): array
+    {
+        if (empty($items)) {
+            return [
+                'status' => 'no_op',
+                'ejecucion_id' => $this->ejecucionId,
+                'answered_count' => $this->answeredCount,
+                'total_count' => $this->totalCount,
+            ];
+        }
+
+        foreach ($items as $filaId => $value) {
+            $this->form[$filaId] = $value;
+        }
+
+        if (! $this->ejecucionId) {
+            $this->dispatch('chequeo-batch-save-requested', items: $items);
+        } else {
+            $this->saveBatchRespuestas($this->ejecucionId, $items);
+        }
+
+        $this->recomputeProgress();
+        $this->dispatch('progress-updated', answered: $this->answeredCount, total: $this->totalCount);
+
+        return [
+            'status' => 'success',
+            'ejecucion_id' => $this->ejecucionId,
+            'answered_count' => $this->answeredCount,
+            'total_count' => $this->totalCount,
+        ];
+    }
+
+    /**
+     * Persist a batch of respuestas in a single DB transaction.
+     *
+     * @param  array<int|string, mixed>  $items
+     */
+    public function saveBatchRespuestas(int $ejecucionId, array $items): void
+    {
+        $this->ejecucionId = $ejecucionId;
+
+        DB::transaction(function () use ($ejecucionId, $items) {
+            foreach ($items as $filaId => $value) {
+                $this->saveFilaRespuesta($ejecucionId, (int) $filaId, $value);
+            }
+        });
+    }
+
+    #[On('chequeo-batch-ejecucion-ensured')]
+    public function onBatchEjecucionEnsured(int $ejecucionId, array $items): void
+    {
+        $this->saveBatchRespuestas($ejecucionId, $items);
     }
 
     /**

@@ -3,8 +3,8 @@
 namespace Tests\Unit;
 
 use App\Services\DatabaseBackupService;
-use Tests\TestCase;
 use RuntimeException;
+use Tests\TestCase;
 use ZipArchive;
 
 class DatabaseBackupServiceTest extends TestCase
@@ -52,7 +52,7 @@ class DatabaseBackupServiceTest extends TestCase
     {
         $service = new class extends DatabaseBackupService
         {
-            public function testZip(string $source, string $filename, string $target): void
+            public function test_zip(string $source, string $filename, string $target): void
             {
                 $this->createZipArchive($source, $filename, $target);
             }
@@ -78,7 +78,7 @@ class DatabaseBackupServiceTest extends TestCase
     {
         $service = new class extends DatabaseBackupService
         {
-            public function testTgz(string $dir, string $filename, string $target): void
+            public function test_tgz(string $dir, string $filename, string $target): void
             {
                 $this->createTgzArchive($dir, $filename, $target);
             }

@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Area;
 use App\Events\ChequeoAutoSaved;
 use App\Filament\Resources\Chequeos\Schemas\ChequeosForm;
+use App\Models\AnswerOption;
 use App\Models\Equipo;
 use App\Models\HojaChequeo;
 use App\Models\HojaEjecucion;
@@ -207,6 +208,23 @@ class CreateChequeo extends Page
         }
     }
 
+    #[On('chequeo-batch-save-requested')]
+    public function handleBatchSaveRequested(array $items): void
+    {
+        if (! $this->hojaChequeo) {
+            return;
+        }
+
+        $this->autoSave();
+
+        if ($this->hojaEjecucion) {
+            $this->dispatch('chequeo-batch-ejecucion-ensured',
+                ejecucionId: $this->hojaEjecucion->id,
+                items: $items,
+            );
+        }
+    }
+
     protected function autoSave(): void
     {
         // $this->data is the raw form state — no validation triggered
@@ -260,7 +278,9 @@ class CreateChequeo extends Page
     public function activatePpm(): void
     {
         $this->esPpm = true;
+        $realizadoId = AnswerOption::where('key', 'realizado')->value('id');
         $this->dispatch('ppm-activated');
+        $this->dispatch('ppm-activated-local', realizadoId: $realizadoId);
         $this->data['observaciones'] = ($this->data['observaciones'] ?? '')."\nPPM";
 
         if ($this->ejecucionId) {
@@ -272,6 +292,7 @@ class CreateChequeo extends Page
     {
         $this->esPpm = false;
         $this->dispatch('ppm-deactivated');
+        $this->dispatch('ppm-deactivated-local');
         $this->data['observaciones'] = str_replace("\nPPM", '', $this->data['observaciones'] ?? '');
         if ($this->ejecucionId) {
             HojaEjecucion::where('id', $this->ejecucionId)->update(['es_ppm' => false]);
@@ -348,7 +369,7 @@ class CreateChequeo extends Page
             });
     }
 
-    public function create(): void
+    public function create(array $clientForm = []): void
     {
         if (! $this->turnoId && $this->user->turno_id) {
             $this->turnoId = $this->user->turno_id;
@@ -387,13 +408,22 @@ class CreateChequeo extends Page
 
         if ($this->hojaEjecucion) {
             $this->hojaEjecucion->update($data);
-            $this->dispatch('hoja-ejecucion-saved', hojaEjecucionId: $this->ejecucionId, forcedFinalizadoEn: $forcedFinalizadoEn);
+            $this->dispatch('hoja-ejecucion-saved',
+                hojaEjecucionId: $this->ejecucionId,
+                forcedFinalizadoEn: $forcedFinalizadoEn,
+                clientForm: $clientForm,
+            );
 
             return;
         }
 
         $hojaEjecucion = HojaEjecucion::create($data);
-        $this->dispatch('hoja-ejecucion-saved', hojaEjecucionId: $hojaEjecucion->id, forcedFinalizadoEn: $forcedFinalizadoEn);
+        $this->ejecucionId = $hojaEjecucion->id;
+        $this->dispatch('hoja-ejecucion-saved',
+            hojaEjecucionId: $hojaEjecucion->id,
+            forcedFinalizadoEn: $forcedFinalizadoEn,
+            clientForm: $clientForm,
+        );
     }
 
     protected function normalizeDateForComparison(mixed $value): ?string
@@ -434,6 +464,7 @@ class CreateChequeo extends Page
             ->title('Chequeo diario guardado')
             ->send();
 
+        $this->dispatch('chequeo-completed');
         $this->resetState();
     }
 

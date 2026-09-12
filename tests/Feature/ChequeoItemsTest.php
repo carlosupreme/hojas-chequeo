@@ -316,4 +316,61 @@ class ChequeoItemsTest extends TestCase
             ->set("form.{$fila->id}", 42)
             ->assertDispatched('progress-updated');
     }
+
+    public function test_sync_batch_persists_multiple_respuestas_when_ejecucion_exists(): void
+    {
+        $fila1 = $this->filaOfType('number');
+        $fila2 = $this->filaOfType('text');
+        $ejecucion = HojaEjecucion::factory()->create([
+            'hoja_chequeo_id' => $this->hoja->id,
+            'user_id' => $this->user->id,
+        ]);
+
+        $component = $this->mountFresh($ejecucion);
+
+        $result = $component->call('syncBatch', [
+            $fila1->id => 123.45,
+            $fila2->id => 'Operativo',
+        ]);
+
+        $this->assertSame('success', $result->get('status') ?? 'success');
+        $this->assertDatabaseHas('hoja_fila_respuestas', [
+            'hoja_ejecucion_id' => $ejecucion->id,
+            'hoja_fila_id' => $fila1->id,
+            'numeric_value' => 123.45,
+        ]);
+        $this->assertDatabaseHas('hoja_fila_respuestas', [
+            'hoja_ejecucion_id' => $ejecucion->id,
+            'hoja_fila_id' => $fila2->id,
+            'text_value' => 'Operativo',
+        ]);
+    }
+
+    public function test_sync_batch_requests_autosave_when_no_ejecucion(): void
+    {
+        $fila = $this->filaOfType('number');
+
+        $this->mountFresh()
+            ->call('syncBatch', [$fila->id => 99])
+            ->assertDispatched('chequeo-batch-save-requested');
+    }
+
+    public function test_save_with_client_form_persists_latest_client_state(): void
+    {
+        $fila = $this->filaOfType('number');
+        $ejecucion = HojaEjecucion::factory()->create([
+            'hoja_chequeo_id' => $this->hoja->id,
+            'user_id' => $this->user->id,
+        ]);
+
+        $this->mountFresh($ejecucion)
+            ->call('save', $ejecucion->id, null, [$fila->id => 77])
+            ->assertDispatched('hoja-fila-respuesta-items-created');
+
+        $this->assertDatabaseHas('hoja_fila_respuestas', [
+            'hoja_ejecucion_id' => $ejecucion->id,
+            'hoja_fila_id' => $fila->id,
+            'numeric_value' => 77,
+        ]);
+    }
 }

@@ -1,9 +1,15 @@
-@props(['options', 'readOnly' => false])
+@props(['options', 'readOnly' => false, 'itemId' => null, 'value' => null])
 
 <div
     wire:ignore
     x-data="{
+        itemId: {{ $itemId ? (int)$itemId : 'null' }},
+        @if($itemId)
+        value: {{ json_encode($value) }},
+        @else
         value: @entangle($attributes->wire('model')),
+        @endif
+        readOnly: {{ $readOnly ? 'true' : 'false' }},
         selectedLabel: '',
         _opts: @js($options),
 
@@ -19,29 +25,51 @@
         _btns: null, _gaps: null, _label: null,
 
         init() {
-            this.$nextTick(() => {
-                this._btns  = [...this.$el.querySelectorAll('.icon-btn')];
-                this._gaps  = [...this.$el.querySelectorAll('.icon-gap')];
-                this._label = this.$el.querySelector('.icon-label');
+            this._btns  = [...this.$el.querySelectorAll('.icon-btn')];
+            this._gaps  = [...this.$el.querySelectorAll('.icon-gap')];
+            this._label = this.$el.querySelector('.icon-label');
 
-                // Initial state without animation (resumed chequeo)
-                if (this.value !== null && this.value !== undefined && this.value !== '') {
-                    const opt = this._opts.find(o => o.id == this.value);
-                    if (opt) this.selectedLabel = opt.label;
-                    this._anim(false);
-                }
+            if (this.itemId && typeof this.form !== 'undefined' && this.form[this.itemId] !== undefined && this.form[this.itemId] !== null) {
+                this.value = this.form[this.itemId];
+            }
 
-                // React to any value change: user click OR external update (e.g. PPM bulk-fill)
+            // Initial state without animation (resumed chequeo or view mode)
+            if (this.value !== null && this.value !== undefined && this.value !== '') {
+                const opt = this._opts.find(o => String(o.id) === String(this.value));
+                if (opt) this.selectedLabel = opt.label;
+                this._anim(false);
+            }
+
+            // React to parent form state updates (e.g. PPM bulk-fill or localStorage load)
+            if (this.itemId && typeof this.form !== 'undefined') {
+                this.$watch('form[' + this.itemId + ']', (v) => {
+                    if (this.value != v) {
+                        this.value = v;
+                        const opt = this._opts.find(o => String(o.id) === String(v));
+                        this.selectedLabel = opt ? opt.label : '';
+                        this._anim(true);
+                    }
+                });
+            } else {
                 this.$watch('value', (v) => {
-                    const opt = this._opts.find(o => o.id == v);
+                    const opt = this._opts.find(o => String(o.id) === String(v));
                     this.selectedLabel = opt ? opt.label : '';
                     this._anim(true);
                 });
-            });
+            }
         },
 
         toggle(optId) {
-            this.value = (this.value == optId) ? null : optId;
+            if (this.readOnly) return;
+            const nextVal = (String(this.value) === String(optId)) ? null : optId;
+            this.value = nextVal;
+            const opt = this._opts.find(o => String(o.id) === String(nextVal));
+            this.selectedLabel = opt ? opt.label : '';
+            this._anim(true);
+
+            if (this.itemId && typeof this.setAnswer === 'function') {
+                this.setAnswer(this.itemId, nextVal);
+            }
         },
 
         // Single method handles both select and deselect based on current this.value
@@ -103,7 +131,7 @@
                 @disabled($readOnly)
                 @click="toggle({{ $option['id'] }})"
                 class="flex items-center justify-center w-10 h-10 rounded-lg border-2 transition-colors duration-150"
-                :class="value == {{ $option['id'] }}
+                :class="String(value) === String({{ $option['id'] }})
                     ? (colorSelected['{{ $option['color'] }}'] ?? colorSelected.gray)
                     : colorUnselected"
             >
@@ -119,8 +147,9 @@
     <div class="icon-label overflow-hidden whitespace-nowrap" style="width: 0; opacity: 0;">
         <span
             x-text="selectedLabel"
-            @click="toggle(value)"
-            class="ml-3 text-sm font-semibold text-gray-700 dark:text-gray-300 cursor-pointer select-none"
+            @click="if (!readOnly) toggle(value)"
+            class="ml-3 text-sm font-semibold text-gray-700 dark:text-gray-300 select-none"
+            :class="!readOnly && 'cursor-pointer'"
         ></span>
     </div>
 </div>
