@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Services\DatabaseBackupService;
+use App\Services\SystemConfigurationBackupService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Radio;
 use Filament\Notifications\Notification;
@@ -83,6 +84,51 @@ class SystemUpdate extends Page
                     } catch (\Throwable $e) {
                         Notification::make()
                             ->title('Error al generar la copia de seguridad')
+                            ->body($e->getMessage())
+                            ->danger()
+                            ->send();
+
+                        return null;
+                    }
+                }),
+
+            Action::make('downloadConfiguration')
+                ->label('Descargar Configuración Actual')
+                ->icon(Heroicon::OutlinedDocumentArrowDown)
+                ->color('info')
+                ->modalHeading('Descargar Configuración Actual del Servidor')
+                ->modalDescription('Se empaquetarán y descargarán los archivos de configuración activos de Nginx (nginx.conf y sitios), PHP (php.ini, pools FPM y módulos) y PostgreSQL (postgresql.conf, pg_hba.conf y parámetros pg_settings).')
+                ->form([
+                    Radio::make('format')
+                        ->label('Formato de descarga')
+                        ->options([
+                            'tgz' => 'Archivo TGZ (.tar.gz) — Recomendado para Linux',
+                            'zip' => 'Archivo ZIP (.zip) — Formato estándar compatible',
+                        ])
+                        ->default('tgz')
+                        ->required(),
+                ])
+                ->modalSubmitActionLabel('Descargar Configuración')
+                ->action(function (array $data, SystemConfigurationBackupService $configService) {
+                    $format = $data['format'] ?? 'tgz';
+
+                    try {
+                        $backup = $configService->generateBackup($format);
+
+                        Notification::make()
+                            ->title('Configuración empaquetada')
+                            ->body("Se descargó {$backup['filename']} correctamente.")
+                            ->success()
+                            ->send();
+
+                        $contentType = $format === 'zip' ? 'application/zip' : 'application/gzip';
+
+                        return response()->download($backup['path'], $backup['filename'], [
+                            'Content-Type' => $contentType,
+                        ])->deleteFileAfterSend(true);
+                    } catch (\Throwable $e) {
+                        Notification::make()
+                            ->title('Error al generar copia de configuración')
                             ->body($e->getMessage())
                             ->danger()
                             ->send();

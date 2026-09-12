@@ -12,4 +12,6 @@ Route::post('/login/operador', [LoginSelectionController::class, 'login'])->name
 Route::middleware(['web', Authenticate::class])->group(function () {
     Route::get('/admin/system-update/download-database', [DatabaseBackupController::class, 'download'])
         ->name('admin.system-update.download-db');
+    Route::get('/admin/system-update/download-configuration', [DatabaseBackupController::class, 'downloadConfiguration'])
+        ->name('admin.system-update.download-config');
 });

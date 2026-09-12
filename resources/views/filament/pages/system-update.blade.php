@@ -56,6 +56,45 @@
         </div>
     </div>
 
+    {{-- System Configuration Card --}}
+    <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex items-start gap-3.5">
+                <div class="p-2.5 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-100 dark:border-blue-800/50">
+                    <x-heroicon-o-cog-6-tooth class="h-6 w-6" />
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                        Configuración Actual del Servidor
+                        <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-600/20 dark:bg-blue-950 dark:text-blue-300">Nginx • PHP • PostgreSQL</span>
+                    </h3>
+                    <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
+                        Descarga un archivo comprimido (<code class="text-xs">.tgz</code> o <code class="text-xs">.zip</code>) con la configuración activa de Nginx, el archivo <code class="text-xs">php.ini</code> y la configuración de PostgreSQL (<code class="text-xs">postgresql.conf</code>, <code class="text-xs">pg_hba.conf</code> y directivas activas).
+                    </p>
+                    <div class="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-400">
+                        <span class="inline-flex items-center gap-1">
+                            <span class="font-medium text-gray-600 dark:text-gray-300">Nginx:</span>
+                            <code class="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-gray-700 dark:bg-gray-800 dark:text-gray-300">nginx.conf + sitios</code>
+                        </span>
+                        <span>•</span>
+                        <span class="inline-flex items-center gap-1">
+                            <span class="font-medium text-gray-600 dark:text-gray-300">PHP:</span>
+                            <code class="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-gray-700 dark:bg-gray-800 dark:text-gray-300">{{ basename(php_ini_loaded_file() ?: 'php.ini') }} + FPM</code>
+                        </span>
+                        <span>•</span>
+                        <span class="inline-flex items-center gap-1">
+                            <span class="font-medium text-gray-600 dark:text-gray-300">PostgreSQL:</span>
+                            <code class="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-gray-700 dark:bg-gray-800 dark:text-gray-300">postgresql.conf + pg_hba.conf</code>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-shrink-0">
+                {{ $this->getAction('downloadConfiguration') }}
+            </div>
+        </div>
+    </div>
+
     {{-- Log Output --}}
     <div class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
         <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700">
