@@ -29,9 +29,13 @@ async function run() {
 
     const browserErrors = [];
     page.on('console', msg => {
-        if (msg.type() === 'error' || msg.text().includes('Alpine Expression Error')) {
-            console.error(`[BROWSER ERROR] ${msg.text()}`);
-            browserErrors.push(msg.text());
+        const text = msg.text();
+        if (text.includes('ERR_CONNECTION_REFUSED') || text.includes('WebSocket connection')) {
+            return;
+        }
+        if (msg.type() === 'error' || text.includes('Alpine Expression Error')) {
+            console.error(`[BROWSER ERROR] ${text}`);
+            browserErrors.push(text);
         }
     });
     page.on('pageerror', err => {

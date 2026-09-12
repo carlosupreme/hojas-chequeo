@@ -115,7 +115,7 @@
             }
         },
     }"
-    class="flex items-center"
+    class="flex items-center justify-start md:justify-end w-full"
     style="min-height: 40px;"
 >
     @foreach($options as $option)

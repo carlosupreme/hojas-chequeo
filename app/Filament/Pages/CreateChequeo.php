@@ -270,7 +270,12 @@ class CreateChequeo extends Page
             $this->ejecucionId = $this->hojaEjecucion->id;
         }
 
-        broadcast(new ChequeoAutoSaved($this->hojaEjecucion))->toOthers();
+        try {
+            $b = broadcast(new ChequeoAutoSaved($this->hojaEjecucion))->toOthers();
+            unset($b);
+        } catch (\Throwable) {
+            // Reverb/Pusher offline - ignore broadcast error
+        }
 
         $this->dispatch('chequeo-autosave-saved');
     }

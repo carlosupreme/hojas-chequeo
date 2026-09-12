@@ -9,7 +9,7 @@
     }
 @endphp
 
-<div class="w-full">
+<div class="w-full flex items-center md:justify-end">
     @if($item['type_key'] === 'icon_set')
         <x-table-inputs.icon-buttons
             :options="$item['options']"
@@ -19,35 +19,39 @@
         />
     @elseif($item['type_key'] === 'number')
         @if($readOnly)
-            <div class="text-sm font-semibold text-gray-900 dark:text-white px-3 py-1.5 bg-gray-50 dark:bg-gray-800 rounded-lg text-right">
+            <div class="w-full md:w-36 text-sm font-semibold text-gray-900 dark:text-white px-3 py-1.5 bg-gray-50 dark:bg-gray-800 rounded-lg text-right">
                 <span x-text="(typeof form !== 'undefined' && form[{{ $item['id'] }}] !== undefined && form[{{ $item['id'] }}] !== null && form[{{ $item['id'] }}] !== '') ? form[{{ $item['id'] }}] : @js($item['value'] ?? '—')"></span>
             </div>
         @else
-            <x-filament::input.wrapper>
-                <x-filament::input
-                    type="number"
-                    :readonly="$readOnly"
-                    x-model.number="form[{{ $item['id'] }}]"
-                    @input.debounce.300ms="setAnswer({{ $item['id'] }}, form[{{ $item['id'] }}])"
-                    placeholder="0"
-                />
-            </x-filament::input.wrapper>
+            <div class="w-full md:w-36">
+                <x-filament::input.wrapper>
+                    <x-filament::input
+                        type="number"
+                        :readonly="$readOnly"
+                        x-model.number="form[{{ $item['id'] }}]"
+                        @input.debounce.300ms="setAnswer({{ $item['id'] }}, form[{{ $item['id'] }}])"
+                        placeholder="0"
+                    />
+                </x-filament::input.wrapper>
+            </div>
         @endif
     @elseif($item['type_key'] === 'text')
         @if($readOnly)
-            <div class="text-sm text-gray-900 dark:text-white px-3 py-1.5 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div class="w-full md:w-52 text-sm text-gray-900 dark:text-white px-3 py-1.5 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <span x-text="(typeof form !== 'undefined' && form[{{ $item['id'] }}] !== undefined && form[{{ $item['id'] }}] !== null && form[{{ $item['id'] }}] !== '') ? form[{{ $item['id'] }}] : @js($item['value'] ?? '—')"></span>
             </div>
         @else
-            <x-filament::input.wrapper>
-                <x-filament::input
-                    type="text"
-                    :readonly="$readOnly"
-                    x-model="form[{{ $item['id'] }}]"
-                    @input.debounce.300ms="setAnswer({{ $item['id'] }}, form[{{ $item['id'] }}])"
-                    placeholder="Escriba aquí…"
-                />
-            </x-filament::input.wrapper>
+            <div class="w-full md:w-52">
+                <x-filament::input.wrapper>
+                    <x-filament::input
+                        type="text"
+                        :readonly="$readOnly"
+                        x-model="form[{{ $item['id'] }}]"
+                        @input.debounce.300ms="setAnswer({{ $item['id'] }}, form[{{ $item['id'] }}])"
+                        placeholder="Escriba aquí…"
+                    />
+                </x-filament::input.wrapper>
+            </div>
         @endif
     @elseif($item['type_key'] === 'boolean')
         @if($readOnly)

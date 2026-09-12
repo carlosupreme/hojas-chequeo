@@ -42,7 +42,7 @@ class ChequeosForm
             DatePicker::make('dateSelected')
                 ->disabled(fn () => ! auth()->user()->can(User::$canEditDatesPermission))
                 ->hiddenLabel()
-                ->displayFormat('D d/m/Y')
+                ->displayFormat('d/m/Y')
                 ->native(false)
                 ->locale('es')
                 ->closeOnDateSelection()

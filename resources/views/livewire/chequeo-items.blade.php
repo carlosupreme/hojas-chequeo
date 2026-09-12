@@ -224,23 +224,51 @@
             items: @js($items),
             initialForm: @js($form),
         })"
-        class="w-full"
+        class="w-full md:overflow-x-auto"
     >
+        @php
+            $totalCols = count($columnas);
+            $getColClasses = function($index) use ($totalCols) {
+                if ($index === 0) {
+                    return 'flex-[1.4] min-w-[125px] font-semibold text-gray-900 dark:text-white';
+                }
+                if ($index === $totalCols - 1 && $totalCols >= 3) {
+                    return 'flex-[1.3] min-w-[110px] text-gray-700 dark:text-gray-300';
+                }
+                if ($totalCols >= 4 && $index === 2) {
+                    return 'flex-[0.8] min-w-[75px] text-gray-700 dark:text-gray-300';
+                }
+                return 'flex-[1.1] min-w-[105px] text-gray-700 dark:text-gray-300';
+            };
+            $getHeaderColClasses = function($index) use ($totalCols) {
+                if ($index === 0) {
+                    return 'flex-[1.4] min-w-[125px]';
+                }
+                if ($index === $totalCols - 1 && $totalCols >= 3) {
+                    return 'flex-[1.3] min-w-[110px]';
+                }
+                if ($totalCols >= 4 && $index === 2) {
+                    return 'flex-[0.8] min-w-[75px]';
+                }
+                return 'flex-[1.1] min-w-[105px]';
+            };
+        @endphp
+
         {{-- ================================================================
              SINGLE UNIFIED RESPONSIVE STRUCTURE (NO DUPLICATED INPUT NODES)
         ================================================================ --}}
-        <div class="divide-y divide-gray-100 dark:divide-gray-800">
+        <div class="divide-y divide-gray-100 dark:divide-gray-800 min-w-full md:min-w-[700px]">
 
             {{-- Table header for desktop (hidden on mobile) --}}
-            <div class="hidden md:flex items-center px-5 py-3.5 bg-gray-50/70 dark:bg-gray-800/40 border-b border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                <div class="flex-1 flex items-center gap-4">
-                    @foreach($columnas as $columna)
-                        <div class="flex-1 px-2 font-semibold">
+            <div class="hidden md:flex items-center px-4 sm:px-5 py-3.5 bg-gray-50/70 dark:bg-gray-800/40 border-b border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-normal gap-4">
+                <div class="flex-1 flex items-center gap-3 min-w-0">
+                    @foreach($columnas as $index => $columna)
+                        <div class="{{ $getHeaderColClasses($index) }} px-1.5 font-semibold whitespace-nowrap">
                             {{ $columna['label'] }}
                         </div>
                     @endforeach
                 </div>
-                <div class="w-72 px-3 text-right font-semibold shrink-0">
+                <div class="w-52 lg:w-60 px-2 text-right font-semibold shrink-0">
                     Estado / Valor
                 </div>
             </div>
@@ -254,49 +282,41 @@
                         ? 'bg-green-50/40 dark:bg-green-900/10 hover:bg-green-50/60 dark:hover:bg-green-900/20'
                         : 'bg-white dark:bg-gray-900 hover:bg-gray-50/60 dark:hover:bg-gray-800/40'"
                 >
-                    {{-- Desktop layout: columns horizontally --}}
-                    <div class="hidden md:flex md:flex-1 md:items-center md:gap-4 min-w-0">
-                        @foreach($columnas as $columna)
-                            <div class="flex-1 px-2 text-sm text-gray-700 dark:text-gray-300 leading-snug truncate" title="{{ $item['cells'][$columna['key']] ?? '' }}">
+                    {{-- Desktop layout: columns horizontally without cropping --}}
+                    <div class="hidden md:flex md:flex-1 md:items-center md:gap-3 min-w-0">
+                        @foreach($columnas as $index => $columna)
+                            <div class="{{ $getColClasses($index) }} px-1.5 text-sm leading-snug break-words whitespace-normal" title="{{ $item['cells'][$columna['key']] ?? '' }}">
                                 {{ $item['cells'][$columna['key']] ?? '—' }}
                             </div>
                         @endforeach
                     </div>
 
-                    {{-- Mobile layout: Title and Collapsible Details --}}
+                    {{-- Mobile layout: Title and all metadata cleanly visible without cropping --}}
                     <div class="block md:hidden mb-3">
-                        <p class="text-sm font-semibold text-gray-900 dark:text-white leading-snug">
+                        <p class="text-sm font-bold text-gray-900 dark:text-white leading-snug break-words">
                             {{ $item['cells'][$columnas[0]['key']] ?? '—' }}
                         </p>
 
                         @if(count($columnas) > 1)
-                            <div x-data="{ open: false }" class="mt-2 pt-2 border-t border-gray-100 dark:border-gray-800">
-                                <button
-                                    type="button"
-                                    @click="open = !open"
-                                    class="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors py-0.5"
-                                >
-                                    <svg class="w-3.5 h-3.5 transition-transform duration-150" :class="open && 'rotate-180'" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                                    </svg>
-                                    <span x-text="open ? 'Ocultar detalles' : 'Ver detalles'"></span>
-                                </button>
-                                <div x-show="open" x-collapse class="mt-2 space-y-1.5 pl-1">
-                                    @foreach($columnas as $index => $col)
-                                        @if($index > 0)
-                                            <div class="flex gap-2 text-xs">
-                                                <span class="w-24 shrink-0 font-medium text-gray-500 dark:text-gray-400">{{ $col['label'] }}</span>
-                                                <span class="text-gray-700 dark:text-gray-300">{{ $item['cells'][$col['key']] ?? '—' }}</span>
-                                            </div>
-                                        @endif
-                                    @endforeach
-                                </div>
+                            <div class="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-gray-100 dark:border-gray-800/60 text-xs">
+                                @foreach($columnas as $index => $col)
+                                    @if($index > 0 && isset($item['cells'][$col['key']]) && $item['cells'][$col['key']] !== '')
+                                        <div class="{{ ($loop->last && ($loop->count % 2 === 1)) ? 'col-span-2' : '' }} bg-gray-50 dark:bg-gray-800/50 rounded-lg p-2 border border-gray-100 dark:border-gray-800">
+                                            <span class="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                                                {{ $col['label'] }}
+                                            </span>
+                                            <span class="block text-xs font-medium text-gray-800 dark:text-gray-200 break-words leading-snug mt-0.5">
+                                                {{ $item['cells'][$col['key']] }}
+                                            </span>
+                                        </div>
+                                    @endif
+                                @endforeach
                             </div>
                         @endif
                     </div>
 
                     {{-- Single input container (Shared across both desktop & mobile views) --}}
-                    <div class="w-full md:w-72 shrink-0 flex items-center md:justify-end">
+                    <div class="w-full md:w-52 lg:w-60 shrink-0 flex items-center md:justify-end">
                         <x-table-inputs.input-dispatcher
                             :item="$item"
                             :readOnly="$readOnly"

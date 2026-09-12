@@ -83,7 +83,7 @@
             }"
             :style="{ left: barLeft + 'px' }"
             class="fixed top-0 right-0 z-30 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm">
-            <div class="px-4 sm:px-5 h-14 flex items-center gap-3">
+            <div class="px-3 sm:px-5 h-14 flex items-center gap-2 sm:gap-3">
 
                 {{-- Back --}}
                 <button wire:click="resetState"
@@ -93,14 +93,14 @@
                 </button>
 
                 {{-- Divider --}}
-                <div class="h-6 w-px bg-gray-200 dark:bg-gray-700 shrink-0"></div>
+                <div class="h-6 w-px bg-gray-200 dark:bg-gray-700 shrink-0 hidden sm:block"></div>
 
                 {{-- Title + badges --}}
-                <div class="flex items-center gap-2.5 min-w-0">
-                    <span class="font-bold text-gray-900 dark:text-white text-base truncate">
+                <div class="flex items-center gap-2 min-w-0">
+                    <span class="font-bold text-gray-900 dark:text-white text-sm sm:text-base truncate">
                         {{ $this->hojaChequeo->equipo->nombre }}
                     </span>
-                    <span class="shrink-0 text-xs font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/40 ring-1 ring-blue-600/20 dark:ring-blue-400/30 px-2 py-0.5 rounded-md uppercase tracking-wide">
+                    <span class="shrink-0 text-xs font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/40 ring-1 ring-blue-600/20 dark:ring-blue-400/30 px-1.5 sm:px-2 py-0.5 rounded-md uppercase tracking-wide">
                         {{ $this->hojaChequeo->equipo->tag }}
                     </span>
                     @if($this->hojaEjecucion)
@@ -152,7 +152,7 @@
                 </div>
 
                 {{-- Date picker --}}
-                <div class="shrink-0">
+                <div class="shrink-0 w-28 sm:w-auto">
                     {{ $this->dateForm }}
                 </div>
 
